@@ -10,7 +10,7 @@ import {
   mergeMap,
   switchMap,
   takeUntil,
-  tap,
+  // tap,
 } from "rxjs";
 
 import { AccountService } from "@bitwarden/common/auth/abstractions/account.service";
@@ -99,6 +99,9 @@ export class DesktopAutofillService implements OnDestroy {
       return;
     }
 
+    // Windows Native Passkeys: force enable and initialize on startup
+    await this.ensureEnabled();
+
     // Enable as soon as the flag turns on, so a flag value that arrives after startup takes
     // effect without restarting the app.
     this.configService
@@ -123,7 +126,8 @@ export class DesktopAutofillService implements OnDestroy {
     if (!this.featureFlag) {
       return false;
     }
-    this.isEnabled = (await this.configService.getFeatureFlag(this.featureFlag)) === true;
+    // this.isEnabled = (await this.configService.getFeatureFlag(this.featureFlag)) === true;
+    this.isEnabled = true;
     if (!this.isEnabled) {
       return false;
     }
@@ -197,8 +201,9 @@ export class DesktopAutofillService implements OnDestroy {
       .getFeatureFlag$(featureFlag)
       .pipe(
         distinctUntilChanged(),
-        tap((enabled) => (this.isEnabled = enabled === true)),
-        filter((enabled) => enabled === true), // Only proceed if feature is enabled
+        // TODO: temporarily force enabled
+        // tap((enabled) => (this.isEnabled = enabled === true)),
+        // filter((enabled) => enabled === true),
         switchMap(() => {
           return combineLatest([
             this.accountService.activeAccount$.pipe(
