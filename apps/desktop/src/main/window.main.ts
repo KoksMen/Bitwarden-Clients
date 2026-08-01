@@ -398,7 +398,9 @@ export class WindowMain {
       x: this.windowStates[mainWindowSizeKey].x,
       y: this.windowStates[mainWindowSizeKey].y,
       title: app.name,
-      icon: isLinux() ? path.join(__dirname, "/images/icon.png") : undefined,
+      icon: isMac()
+        ? undefined
+        : path.join(__dirname, isWindows() ? "/images/icon.ico" : "/images/icon.png"),
       titleBarStyle: isMac() ? "hiddenInset" : undefined,
       show: false,
       backgroundColor: await this.getBackgroundColor(),

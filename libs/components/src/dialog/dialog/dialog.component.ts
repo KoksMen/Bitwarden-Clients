@@ -49,8 +49,8 @@ const drawerSizeToWidth = {
 /** Width in rem for each drawer size, used to declare push-mode column widths. */
 export const drawerSizeToWidthRem: Record<string, number> = {
   small: 26,
-  default: 36,
-  large: 48,
+  default: 38,
+  large: 52,
 };
 
 // FIXME(https://bitwarden.atlassian.net/browse/CL-764): Migrate to OnPush

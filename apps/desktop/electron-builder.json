@@ -91,6 +91,7 @@
     "target": ["dmg", "zip"]
   },
   "win": {
+    "icon": "resources/icon.ico",
     "electronUpdaterCompatibility": ">=0.0.1",
     "target": ["portable", "nsis-web", "appx"],
     "signExts": [".dll", ".node"],

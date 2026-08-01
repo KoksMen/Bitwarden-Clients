@@ -43,11 +43,11 @@ export class VaultCollectionRowComponent {
   protected get hostClasses(): string {
     const isSelected = this.selected();
     const base =
-      "tw-block tw-rounded-xl tw-border tw-py-2 tw-px-3.5 tw-transition-all tw-duration-150 tw-cursor-pointer tw-shadow-xs";
+      "tw-block tw-rounded-xl tw-border tw-py-2.5 tw-px-3.5 tw-transition-all tw-duration-150 tw-cursor-pointer tw-shadow-xs";
     if (isSelected) {
-      return `${base} tw-border-blue-600 dark:tw-border-blue-400 tw-ring-2 tw-ring-blue-500/30 tw-bg-blue-50/70 dark:tw-bg-blue-950/50 tw-shadow-md`;
+      return `${base} tw-border-blue-600 dark:tw-border-blue-400 tw-ring-2 tw-ring-blue-500/40 tw-bg-blue-500/20 dark:tw-bg-blue-600/35 tw-shadow-md`;
     }
-    return `${base} tw-border-border tw-bg-surface-alt hover:tw-border-blue-400/70 hover:tw-bg-surface-hover hover:tw-shadow-sm`;
+    return `${base} tw-border-border tw-bg-surface-alt hover:tw-border-blue-400/80 hover:tw-bg-blue-100/70 dark:hover:tw-bg-blue-900/40 hover:tw-shadow-sm`;
   }
 
   protected readonly disabled = input<boolean>();

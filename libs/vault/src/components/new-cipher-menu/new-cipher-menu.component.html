@@ -1,7 +1,7 @@
 @if (useNewItemDialog() && (canCreateCipher() || canCreateCollection() || canCreateFolder())) {
   <button
     bitButton
-    [buttonType]="buttonType()"
+    buttonType="primary"
     type="button"
     (click)="handleButtonClick()"
     id="newItemButton"
@@ -12,7 +12,8 @@
     [popoverOpen]="coachmarkPopoverOpen()"
     [position]="coachmarkPosition()"
     [spotlight]="!!coachmarkPopover()"
-    [startIcon]="icon()"
+    [startIcon]="icon() || 'bwi-plus'"
+    class="!tw-py-2.5 !tw-px-5 !tw-rounded-xl !tw-font-semibold !tw-shadow-md hover:!tw-shadow-lg !tw-transition-all"
   >
     {{ getButtonLabel() | i18n }}
   </button>
@@ -20,7 +21,7 @@
   <div>
     <button
       bitButton
-      [buttonType]="buttonType()"
+      buttonType="primary"
       type="button"
       [bitMenuTriggerFor]="isOnlyCollectionCreation() ? null : addOptions"
       (click)="handleButtonClick()"
@@ -33,7 +34,8 @@
       [position]="coachmarkPosition()"
       [spotlight]="!!coachmarkPopover()"
       [closeOnBackdropClick]="false"
-      [startIcon]="icon()"
+      [startIcon]="icon() || 'bwi-plus'"
+      class="!tw-py-2.5 !tw-px-5 !tw-rounded-xl !tw-font-semibold !tw-shadow-md hover:!tw-shadow-lg !tw-transition-all"
     >
       {{ getButtonLabel() | i18n }}
     </button>

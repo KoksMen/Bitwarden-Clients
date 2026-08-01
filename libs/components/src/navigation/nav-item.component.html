@@ -2,11 +2,11 @@
 @let interactiveElClass =
   "tw-size-full tw-px-0 tw-block tw-truncate tw-border-none !tw-text-fg-nav tw-text-start hover:tw-no-underline focus:tw-outline-none [&_i]:tw-leading-[1.5rem]";
 
-<div class="tw-cursor-pointer tw-ps-3 tw-pe-3">
+<div class="tw-cursor-pointer tw-px-2 tw-my-1">
   @if (open || icon()) {
     <div
       [style.padding-inline-start]="navItemIndentationPadding()"
-      class="tw-relative tw-rounded-xl tw-h-10 tw-bg-bg-nav hover:tw-bg-bg-nav-hover"
+      class="tw-relative tw-rounded-xl tw-h-11 tw-border tw-border-transparent hover:tw-border-blue-400/50 tw-bg-bg-nav hover:tw-bg-blue-100/60 dark:hover:tw-bg-blue-900/40 tw-transition-all"
       [class]="fvwStyles()"
       [style]="
         showActiveStyles()
