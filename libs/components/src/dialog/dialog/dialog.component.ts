@@ -79,6 +79,28 @@ export const drawerSizeToWidthRem: Record<string, number> = {
 export class DialogComponent implements AfterViewInit {
   private readonly drawerService = inject(DrawerService);
   private readonly autofocusFallback = inject(AutofocusFallbackDirective, { host: true });
+  private readonly elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
+
+  protected startResizing(event: MouseEvent) {
+    event.preventDefault();
+    const startX = event.clientX;
+    const startWidth = this.elementRef.nativeElement.offsetWidth || 768;
+
+    const onMouseMove = (moveEvent: MouseEvent) => {
+      const deltaX = startX - moveEvent.clientX; // Moving left increases width
+      const newWidth = Math.max(380, Math.min(1400, startWidth + deltaX));
+      this.drawerService.declarePushWidth(newWidth);
+      this.elementRef.nativeElement.style.width = `${newWidth}px`;
+    };
+
+    const onMouseUp = () => {
+      window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("mouseup", onMouseUp);
+    };
+
+    window.addEventListener("mousemove", onMouseMove);
+    window.addEventListener("mouseup", onMouseUp);
+  }
 
   constructor() {
     effect(() => {

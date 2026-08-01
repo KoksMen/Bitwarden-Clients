@@ -39,6 +39,7 @@
     [showAddCipherBtn]="showAddCipherBtn$ | async"
     [emptyStateItem]="emptyState$ | async"
     [showPremiumCallout]="showPremiumCallout$ | async"
+    [activeCipherId]="cipher()?.id"
     (onEvent)="onVaultItemsEvent($event)"
     (onAddCipher)="addCipher($event)"
     (onAddFolder)="addFolder()"

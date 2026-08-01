@@ -92,6 +92,8 @@ export class VaultListComponent<C extends CipherViewLike> {
   readonly showPremiumCallout = input<boolean>(false);
 
   protected onEvent = output<VaultItemEvent<C>>();
+  readonly activeCipherId = input<string | undefined>();
+
   protected onAddCipher = output<CipherType>();
   protected onAddFolder = output<void>();
   protected onAddItemDialog = output<void>();

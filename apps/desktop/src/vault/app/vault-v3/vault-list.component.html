@@ -60,7 +60,10 @@
               [userCanArchive]="userCanArchive()"
               [enforceOrgDataOwnershipPolicy]="enforceOrgDataOwnershipPolicy()"
               [showBatchBar]="showBatchBar()"
-              [selected]="selection.isSelected(item)"
+              [selected]="
+                selection.isSelected(item) ||
+                (activeCipherId() != null && activeCipherId() === item.cipher?.id)
+              "
               (checkboxChange)="selection.toggle(item)"
             ></tr>
           }
