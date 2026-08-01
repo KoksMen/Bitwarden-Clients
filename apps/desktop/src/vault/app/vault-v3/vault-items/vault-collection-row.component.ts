@@ -40,7 +40,15 @@ export class VaultCollectionRowComponent {
   protected DefaultCollectionType = CollectionTypes.DefaultUserCollection;
 
   @HostBinding("class")
-  protected readonly hostClasses = "tw-transition-all tw-cursor-pointer hover:tw-bg-surface-hover";
+  protected get hostClasses(): string {
+    const isSelected = this.selected();
+    const base =
+      "tw-block tw-rounded-xl tw-border tw-p-3.5 tw-transition-all tw-duration-200 tw-cursor-pointer tw-shadow-sm";
+    if (isSelected) {
+      return `${base} tw-border-primary tw-ring-2 tw-ring-primary/20 tw-bg-primary-50/50 dark:tw-bg-primary-950/40 tw-shadow-md`;
+    }
+    return `${base} tw-border-border tw-bg-surface-alt hover:tw-border-primary/60 hover:tw-bg-surface-hover hover:tw-shadow-md`;
+  }
 
   protected readonly disabled = input<boolean>();
   protected readonly collection = input<CollectionView>();

@@ -74,7 +74,15 @@ export class VaultCipherRowComponent<C extends CipherViewLike> {
   protected RowHeightClass = `tw-h-[76.5px]`;
 
   @HostBinding("class")
-  protected readonly hostClasses = "tw-transition-all tw-cursor-pointer hover:tw-bg-surface-hover";
+  protected get hostClasses(): string {
+    const isSelected = this.selected();
+    const base =
+      "tw-block tw-rounded-xl tw-border tw-p-3.5 tw-transition-all tw-duration-200 tw-cursor-pointer tw-shadow-sm";
+    if (isSelected) {
+      return `${base} tw-border-primary tw-ring-2 tw-ring-primary/20 tw-bg-primary-50/50 dark:tw-bg-primary-950/40 tw-shadow-md`;
+    }
+    return `${base} tw-border-border tw-bg-surface-alt hover:tw-border-primary/60 hover:tw-bg-surface-hover hover:tw-shadow-md`;
+  }
 
   protected readonly menuTrigger = viewChild<MenuTriggerForDirective>("optionsMenuTrigger");
 
@@ -338,19 +346,25 @@ export class VaultCipherRowComponent<C extends CipherViewLike> {
 
   protected readonly hasUsername = computed(() => {
     const cipher = this.cipher();
-    if (!cipher) {return false;}
+    if (!cipher) {
+      return false;
+    }
     return CipherViewLikeUtils.hasCopyableValue(cipher, "username");
   });
 
   protected readonly hasPassword = computed(() => {
     const cipher = this.cipher();
-    if (!cipher) {return false;}
+    if (!cipher) {
+      return false;
+    }
     return CipherViewLikeUtils.hasCopyableValue(cipher, "password");
   });
 
   protected readonly hasTotp = computed(() => {
     const cipher = this.cipher();
-    if (!cipher) {return false;}
+    if (!cipher) {
+      return false;
+    }
     return CipherViewLikeUtils.hasCopyableValue(cipher, "totp");
   });
 

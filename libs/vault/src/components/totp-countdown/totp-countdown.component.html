@@ -1,44 +1,43 @@
 @if (totpInfo$ | async; as totpInfo) {
-  <ng-container>
-    <div class="tw-flex tw-items-center tw-justify-center">
-      <span class="tw-relative tw-flex tw-justify-center tw-items-center" aria-hidden="true">
-        <span
-          class="tw-absolute"
-          [ngClass]="{ 'tw-text-main': !totpInfo.totpLow, 'tw-text-danger': totpInfo.totpLow }"
-          bitTypography="helper"
-          >{{ totpInfo.totpSec }}</span
-        >
-        <svg class="tw-size-7" transform="rotate(-90)" viewBox="0 0 28 28">
-          <g>
-            <circle
-              class="tw-fill-none"
-              [ngClass]="{
-                'tw-stroke-text-main': !totpInfo.totpLow,
-                'tw-stroke-danger-600': totpInfo.totpLow,
-              }"
-              r="9.5"
-              cy="14"
-              cx="14"
-              stroke-width="2"
-              stroke-dasharray="60"
-              [ngStyle]="{ 'stroke-dashoffset.px': totpInfo.totpDash }"
-            ></circle>
-            <circle
-              class="tw-fill-none"
-              [ngClass]="{
-                'tw-stroke-text-main': !totpInfo.totpLow,
-                'tw-stroke-danger-600': totpInfo.totpLow,
-              }"
-              r="11"
-              cy="14"
-              cx="14"
-              stroke-width="1"
-              stroke-dasharray="71"
-              stroke-dashoffset="0"
-            ></circle>
-          </g>
-        </svg>
+  <div
+    class="tw-inline-flex tw-items-center tw-gap-2 tw-rounded-full tw-bg-surface-alt tw-px-2.5 tw-py-1 tw-border tw-border-border tw-shadow-sm"
+  >
+    <div class="tw-relative tw-flex tw-items-center tw-justify-center tw-size-8" aria-hidden="true">
+      <svg class="tw-size-8 -tw-rotate-90 tw-transform" viewBox="0 0 36 36">
+        <!-- Background track ring -->
+        <circle
+          class="tw-fill-none tw-stroke-gray-200 dark:tw-stroke-gray-700"
+          r="14"
+          cx="18"
+          cy="18"
+          stroke-width="3"
+        />
+        <!-- Progress countdown arc -->
+        <circle
+          class="tw-fill-none tw-transition-all tw-duration-1000 tw-ease-linear"
+          [ngClass]="{
+            'tw-stroke-primary-500': !totpInfo.totpLow,
+            'tw-stroke-danger-500 tw-animate-pulse': totpInfo.totpLow,
+          }"
+          r="14"
+          cx="18"
+          cy="18"
+          stroke-width="3"
+          stroke-linecap="round"
+          stroke-dasharray="88"
+          [ngStyle]="{ 'stroke-dashoffset.px': (totpInfo.totpDash / 60) * 88 }"
+        />
+      </svg>
+      <!-- Centered seconds countdown -->
+      <span
+        class="tw-absolute tw-font-bold tw-text-xs tw-tabular-nums tw-select-none"
+        [ngClass]="{
+          'tw-text-primary-600 dark:tw-text-primary-400': !totpInfo.totpLow,
+          'tw-text-danger-600 dark:tw-text-danger-400': totpInfo.totpLow,
+        }"
+      >
+        {{ totpInfo.totpSec }}
       </span>
     </div>
-  </ng-container>
+  </div>
 }
