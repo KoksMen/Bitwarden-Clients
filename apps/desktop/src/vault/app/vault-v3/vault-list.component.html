@@ -19,7 +19,7 @@
   [ngClass]="barVisible() ? 'tw-pb-[9rem]' : 'tw-pb-0'"
 >
   <div class="tw-mb-4 tw-px-6 tw-@container">
-    <bit-table [dataSource]="dataSource" layout="fixed">
+    <bit-table [dataSource]="dataSource" layout="fixed" class="tw-border-separate tw-border-spacing-y-2">
       <ng-container header>
         <tr>
           @if (showBatchBar()) {

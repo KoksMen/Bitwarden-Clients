@@ -1,7 +1,16 @@
 // FIXME: Update this file to be type safe and remove this and next line
 // @ts-strict-ignore
 import { NgClass } from "@angular/common";
-import { Component, HostListener, computed, inject, input, output, viewChild } from "@angular/core";
+import {
+  Component,
+  HostBinding,
+  HostListener,
+  computed,
+  inject,
+  input,
+  output,
+  viewChild,
+} from "@angular/core";
 
 import { PremiumBadgeComponent } from "@bitwarden/angular/billing/components/premium-badge/premium-badge.component";
 import { IconComponent } from "@bitwarden/angular/vault/components/icon.component";
@@ -63,6 +72,9 @@ interface CopyFieldConfig {
 })
 export class VaultCipherRowComponent<C extends CipherViewLike> {
   protected RowHeightClass = `tw-h-[76.5px]`;
+
+  @HostBinding("class")
+  protected readonly hostClasses = "tw-transition-all tw-cursor-pointer hover:tw-bg-surface-hover";
 
   protected readonly menuTrigger = viewChild<MenuTriggerForDirective>("optionsMenuTrigger");
 
@@ -322,6 +334,33 @@ export class VaultCipherRowComponent<C extends CipherViewLike> {
 
   protected viewCipher() {
     this.onEvent.emit({ type: "viewCipher", item: this.cipher() });
+  }
+
+  protected readonly hasUsername = computed(() => {
+    const cipher = this.cipher();
+    if (!cipher) {return false;}
+    return CipherViewLikeUtils.hasCopyableValue(cipher, "username");
+  });
+
+  protected readonly hasPassword = computed(() => {
+    const cipher = this.cipher();
+    if (!cipher) {return false;}
+    return CipherViewLikeUtils.hasCopyableValue(cipher, "password");
+  });
+
+  protected readonly hasTotp = computed(() => {
+    const cipher = this.cipher();
+    if (!cipher) {return false;}
+    return CipherViewLikeUtils.hasCopyableValue(cipher, "totp");
+  });
+
+  @HostListener("click", ["$event"])
+  protected onHostClick(event: MouseEvent) {
+    const target = event.target as HTMLElement;
+    if (target.closest("button, input, a, [bitMenuItem], bit-menu")) {
+      return;
+    }
+    this.viewCipher();
   }
 
   @HostListener("contextmenu", ["$event"])

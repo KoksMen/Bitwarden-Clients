@@ -1,7 +1,7 @@
 // FIXME: Update this file to be type safe and remove this and next line
 // @ts-strict-ignore
 import { NgClass } from "@angular/common";
-import { Component, input, output } from "@angular/core";
+import { Component, HostBinding, input, output } from "@angular/core";
 import { RouterLink } from "@angular/router";
 
 import {
@@ -38,6 +38,9 @@ import {
 export class VaultCollectionRowComponent {
   protected RowHeightClass = `tw-h-[76.5px]`;
   protected DefaultCollectionType = CollectionTypes.DefaultUserCollection;
+
+  @HostBinding("class")
+  protected readonly hostClasses = "tw-transition-all tw-cursor-pointer hover:tw-bg-surface-hover";
 
   protected readonly disabled = input<boolean>();
   protected readonly collection = input<CollectionView>();

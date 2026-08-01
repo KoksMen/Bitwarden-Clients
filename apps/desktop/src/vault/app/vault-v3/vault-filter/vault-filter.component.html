@@ -29,6 +29,7 @@
       [text]="'folders' | i18n"
       [appA11yTitle]="'folders' | i18n"
       [disableToggleOnClick]="true"
+      [open]="true"
     >
       @for (folder of folders()?.children ?? []; track folder.node.id) {
         <app-folder-filter

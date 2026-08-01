@@ -9,31 +9,26 @@
     />
   </td>
 }
-<td bitCell [ngClass]="RowHeightClass" class="tw-flex tw-items-center tw-gap-2">
+<td bitCell [ngClass]="RowHeightClass" class="tw-flex tw-items-center tw-gap-3">
   <app-vault-icon [cipher]="cipher()"></app-vault-icon>
   <div class="tw-truncate">
-    <div class="tw-inline-flex tw-w-full">
-      <button
-        bitLink
-        class="tw-overflow-hidden tw-text-ellipsis tw-text-start tw-leading-snug"
-        [disabled]="disabled()"
-        (click)="viewCipher()"
-        title="{{ 'editItemWithName' | i18n: cipher().name }}"
-        type="button"
-        aria-haspopup="true"
+    <div class="tw-inline-flex tw-items-center tw-w-full tw-gap-1.5">
+      <span
+        class="tw-font-medium tw-text-main tw-text-base tw-leading-snug tw-truncate"
+        title="{{ cipher().name }}"
       >
         {{ cipher().name }}
-      </button>
+      </span>
       @if (hasAttachments()) {
         <i
-          class="bwi bwi-paperclip tw-ml-2 tw-leading-normal"
+          class="bwi bwi-paperclip tw-leading-normal"
           title="{{ 'attachments' | i18n }}"
           aria-hidden="true"
         ></i>
         <span class="tw-sr-only">{{ "attachments" | i18n }}</span>
         @if (showFixOldAttachments()) {
           <i
-            class="bwi bwi-exclamation-triangle tw-ml-2 tw-leading-normal tw-text-warning"
+            class="bwi bwi-exclamation-triangle tw-leading-normal tw-text-warning"
             title="{{ 'attachmentsNeedFix' | i18n }}"
             aria-hidden="true"
           ></i>
@@ -41,8 +36,7 @@
         }
       }
     </div>
-    <br />
-    <span class="tw-text-sm tw-text-muted">{{ subtitle() }}</span>
+    <div class="tw-text-xs tw-text-muted tw-truncate">{{ subtitle() }}</div>
   </div>
 </td>
 @if (showOwner()) {
@@ -74,13 +68,55 @@
       }
     </bit-menu>
   } @else {
+    @if (showFavorite()) {
+      <button
+        [disabled]="disabled()"
+        [bitIconButton]="cipher().favorite ? 'bwi-star-fill' : 'bwi-star'"
+        type="button"
+        label="{{ (cipher().favorite ? 'unfavorite' : 'favorite') | i18n }}"
+        (click)="$event.stopPropagation(); toggleFavorite()"
+      ></button>
+    }
+    @if (hasUsername()) {
+      <button
+        [disabled]="disabled()"
+        bitIconButton="bwi-user"
+        appCopyField="username"
+        [cipher]="cipher()"
+        type="button"
+        label="{{ 'copyUsername' | i18n }}"
+        (click)="$event.stopPropagation()"
+      ></button>
+    }
+    @if (hasPassword()) {
+      <button
+        [disabled]="disabled()"
+        bitIconButton="bwi-key"
+        appCopyField="password"
+        [cipher]="cipher()"
+        type="button"
+        label="{{ 'copyPassword' | i18n }}"
+        (click)="$event.stopPropagation()"
+      ></button>
+    }
+    @if (hasTotp()) {
+      <button
+        [disabled]="disabled()"
+        bitIconButton="bwi-clock"
+        appCopyField="totp"
+        [cipher]="cipher()"
+        type="button"
+        label="{{ 'copyVerificationCode' | i18n }}"
+        (click)="$event.stopPropagation()"
+      ></button>
+    }
     @if (canLaunch()) {
       <button
         [disabled]="disabled()"
         bitIconButton="bwi-external-link"
         type="button"
         label="{{ 'launch' | i18n }}"
-        (click)="handleLaunch()"
+        (click)="$event.stopPropagation(); handleLaunch()"
       ></button>
     }
     @if (showCopyButton()) {
@@ -90,6 +126,7 @@
         bitIconButton="bwi-clone"
         type="button"
         label="{{ 'copyValue' | i18n }}"
+        (click)="$event.stopPropagation()"
       ></button>
       <bit-menu #copyOptions>
         @for (copyField of copyFields(); track copyField.field) {
@@ -108,6 +145,7 @@
       bitIconButton="bwi-ellipsis-v"
       type="button"
       label="{{ 'options' | i18n }}"
+      (click)="$event.stopPropagation()"
     ></button>
     <bit-menu #cipherOptions>
       @if (showFavorite()) {
@@ -151,7 +189,6 @@
           <button bitMenuItem (click)="badge.promptForPremium($event)" type="button">
             <i class="bwi bwi-fw bwi-archive" aria-hidden="true"></i>
             {{ "archiveVerb" | i18n }}
-            <!-- Hide app-premium badge from accessibility tools as it results in a button within a button -->
             <div slot="end" class="-tw-mt-0.5" aria-hidden>
               <app-premium-badge #badge></app-premium-badge>
             </div>
