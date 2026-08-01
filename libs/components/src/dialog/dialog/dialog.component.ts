@@ -90,7 +90,12 @@ export class DialogComponent implements AfterViewInit {
       const deltaX = startX - moveEvent.clientX; // Moving left increases width
       const newWidth = Math.max(380, Math.min(1400, startWidth + deltaX));
       this.drawerService.declarePushWidth(newWidth);
-      this.elementRef.nativeElement.style.width = `${newWidth}px`;
+      this.elementRef.nativeElement.style.width = "100%";
+      const parent = this.elementRef.nativeElement.parentElement;
+      if (parent) {
+        parent.style.width = `${newWidth}px`;
+      }
+      window.dispatchEvent(new Event("resize"));
     };
 
     const onMouseUp = () => {
