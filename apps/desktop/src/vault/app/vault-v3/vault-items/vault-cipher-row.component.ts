@@ -71,17 +71,17 @@ interface CopyFieldConfig {
   ],
 })
 export class VaultCipherRowComponent<C extends CipherViewLike> {
-  protected RowHeightClass = `tw-h-[76.5px]`;
+  protected RowHeightClass = `tw-h-[64px]`;
 
   @HostBinding("class")
   protected get hostClasses(): string {
     const isSelected = this.selected();
     const base =
-      "tw-block tw-rounded-xl tw-border tw-p-3.5 tw-transition-all tw-duration-200 tw-cursor-pointer tw-shadow-sm";
+      "tw-block tw-rounded-xl tw-border tw-py-2 tw-px-3.5 tw-transition-all tw-duration-150 tw-cursor-pointer tw-shadow-xs";
     if (isSelected) {
-      return `${base} tw-border-primary tw-ring-2 tw-ring-primary/20 tw-bg-primary-50/50 dark:tw-bg-primary-950/40 tw-shadow-md`;
+      return `${base} tw-border-blue-600 dark:tw-border-blue-400 tw-ring-2 tw-ring-blue-500/30 tw-bg-blue-50/70 dark:tw-bg-blue-950/50 tw-shadow-md`;
     }
-    return `${base} tw-border-border tw-bg-surface-alt hover:tw-border-primary/60 hover:tw-bg-surface-hover hover:tw-shadow-md`;
+    return `${base} tw-border-border tw-bg-surface-alt hover:tw-border-blue-400/70 hover:tw-bg-surface-hover hover:tw-shadow-sm`;
   }
 
   protected readonly menuTrigger = viewChild<MenuTriggerForDirective>("optionsMenuTrigger");

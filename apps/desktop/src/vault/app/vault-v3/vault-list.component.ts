@@ -43,8 +43,8 @@ import { VaultCollectionRowComponent } from "./vault-items/vault-collection-row.
 import { VaultItemEvent } from "./vault-items/vault-item-event";
 
 // Fixed manual row height required due to how cdk-virtual-scroll works
-export const RowHeight = 76.5;
-export const RowHeightClass = `tw-h-[76.5px]`;
+export const RowHeight = 64;
+export const RowHeightClass = `tw-h-[64px]`;
 type EmptyStateItem = {
   title: string;
   description: string;
