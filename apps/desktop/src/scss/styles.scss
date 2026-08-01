@@ -18,56 +18,157 @@
 @import "../../../../libs/angular/src/scss/icons.scss";
 @import "../../../../libs/components/src/multi-select/scss/bw.theme";
 
-/* Custom Desktop UI Card & Sidebar Styling */
+/* Custom Desktop UI Card & Sidebar Styling - High Contrast & Dark Mode Safe */
+
+/* 1. Vault Cipher & Collection Cards */
 tr[appVaultCipherRow],
 tr[appVaultCollectionRow] {
   display: flex !important;
   align-items: center !important;
   border-radius: 14px !important;
-  border: 1.5px solid #e5e7eb !important;
+  border: 1.5px solid #cbd5e1 !important;
   background-color: #ffffff !important;
   padding: 10px 16px !important;
   margin-bottom: 8px !important;
-  transition: all 0.2s ease-in-out !important;
+  transition: all 0.15s ease-in-out !important;
   cursor: pointer !important;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
 
+  /* Default Light Mode Text */
+  &,
+  .tw-text-main,
+  span,
+  div,
+  p {
+    color: #0f172a !important; /* Crisp dark navy text */
+  }
+
+  .tw-text-muted {
+    color: #64748b !important; /* Medium slate text */
+  }
+
+  i,
+  .bwi {
+    color: #475569 !important;
+  }
+
   &:hover {
-    background-color: #dbeafe !important; /* Rich light blue hover */
-    border-color: #60a5fa !important; /* Vibrant blue border */
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2) !important;
+    background-color: #f0f9ff !important; /* Soft light blue hover */
+    border-color: #3b82f6 !important;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15) !important;
+
+    &,
+    .tw-text-main,
+    span,
+    div,
+    p {
+      color: #0369a1 !important; /* Dark sky blue text on hover */
+    }
+
+    .tw-text-muted,
+    i,
+    .bwi {
+      color: #0284c7 !important;
+    }
   }
 }
 
-/* Active / Selected Card State */
+/* 2. Active / Selected Card State (Light Mode) */
 tr[appVaultCipherRow].tw-border-blue-600,
-tr[appVaultCollectionRow].tw-border-blue-600 {
-  background-color: #bfdbfe !important; /* Prominent active blue fill */
-  border-color: #2563eb !important; /* Solid blue active border */
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.3) !important;
+tr[appVaultCipherRow][selected],
+tr[appVaultCollectionRow].tw-border-blue-600,
+tr[appVaultCollectionRow][selected] {
+  background-color: #2563eb !important; /* SOLID VIBRANT BLUE CARD */
+  border-color: #1d4ed8 !important;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4) !important;
+
+  /* FORCE ALL TEXT & ICONS TO PURE WHITE ON ACTIVE BLUE CARD */
+  &,
+  .tw-text-main,
+  .tw-text-muted,
+  span,
+  div,
+  i,
+  p,
+  b,
+  strong,
+  button,
+  .bwi {
+    color: #ffffff !important;
+  }
 }
 
-/* Dark theme card overrides */
+/* 3. Dark Theme Card Overrides */
 .dark tr[appVaultCipherRow],
 .dark tr[appVaultCollectionRow],
-[data-theme="dark"] tr[appVaultCipherRow] {
-  border-color: #374151 !important;
-  background-color: #1f2937 !important;
+[data-theme="dark"] tr[appVaultCipherRow],
+[data-theme="dark"] tr[appVaultCollectionRow] {
+  border-color: #334155 !important;
+  background-color: #1e293b !important; /* Dark slate card background */
+
+  /* Dark Mode Default Text - Pure Crisp Light Text */
+  &,
+  .tw-text-main,
+  span,
+  div,
+  p {
+    color: #f8fafc !important;
+  }
+
+  .tw-text-muted {
+    color: #cbd5e1 !important;
+  }
+
+  i,
+  .bwi {
+    color: #94a3b8 !important;
+  }
 
   &:hover {
-    background-color: #1e3a8a !important;
+    background-color: #1e3a8a !important; /* Dark royal blue hover */
     border-color: #60a5fa !important;
+
+    &,
+    .tw-text-main,
+    span,
+    div,
+    p,
+    .tw-text-muted,
+    i,
+    .bwi {
+      color: #ffffff !important;
+    }
   }
 }
 
+/* 4. Active / Selected Card State (Dark Mode) */
 .dark tr[appVaultCipherRow].tw-border-blue-600,
-.dark tr[appVaultCollectionRow].tw-border-blue-600 {
-  background-color: #1e40af !important;
-  border-color: #3b82f6 !important;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.4) !important;
+.dark tr[appVaultCipherRow][selected],
+.dark tr[appVaultCollectionRow].tw-border-blue-600,
+.dark tr[appVaultCollectionRow][selected],
+[data-theme="dark"] tr[appVaultCipherRow].tw-border-blue-600,
+[data-theme="dark"] tr[appVaultCollectionRow].tw-border-blue-600 {
+  background-color: #2563eb !important; /* SOLID VIBRANT BLUE CARD */
+  border-color: #60a5fa !important;
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.4) !important;
+
+  /* FORCE ALL TEXT & ICONS TO PURE WHITE ON ACTIVE BLUE CARD */
+  &,
+  .tw-text-main,
+  .tw-text-muted,
+  span,
+  div,
+  i,
+  p,
+  b,
+  strong,
+  button,
+  .bwi {
+    color: #ffffff !important;
+  }
 }
 
-/* Sidebar Navigation Items - Large Click Targets */
+/* 5. Sidebar Navigation Items - Contrast & Click Target Fix */
 bit-nav-item,
 app-folder-filter,
 app-collection-filter,
@@ -79,16 +180,83 @@ app-organization-filter {
     margin-top: 4px !important;
     margin-bottom: 4px !important;
     border-radius: 12px !important;
-    transition: all 0.2s ease !important;
+    transition: all 0.15s ease !important;
+
+    a,
+    button,
+    span,
+    i,
+    div {
+      color: var(--color-text-main, #0f172a) !important;
+      font-weight: 500 !important;
+    }
 
     &:hover {
-      background-color: #dbeafe !important;
+      background-color: #e0f2fe !important;
       border-color: #93c5fd !important;
+
+      a,
+      button,
+      span,
+      i,
+      div {
+        color: #0369a1 !important; /* Dark blue text on hover pill in light mode */
+      }
+    }
+  }
+
+  /* Active sidebar item */
+  [aria-current="page"],
+  .tw-font-semibold,
+  .active {
+    background-color: #2563eb !important;
+    border-radius: 12px !important;
+
+    a,
+    button,
+    span,
+    i,
+    div {
+      color: #ffffff !important; /* White text on active blue pill */
+      font-weight: 700 !important;
     }
   }
 }
 
-/* Prominent "+ New / Добавить" Button */
+/* Dark Mode Sidebar Item Overrides */
+.dark bit-nav-item,
+.dark app-folder-filter,
+.dark app-collection-filter,
+.dark app-type-filter,
+[data-theme="dark"] bit-nav-item,
+[data-theme="dark"] app-folder-filter,
+[data-theme="dark"] app-collection-filter,
+[data-theme="dark"] app-type-filter {
+  .tw-rounded-xl {
+    a,
+    button,
+    span,
+    i,
+    div {
+      color: #f8fafc !important;
+    }
+
+    &:hover {
+      background-color: #1e3a8a !important; /* Dark blue hover pill */
+      border-color: #3b82f6 !important;
+
+      a,
+      button,
+      span,
+      i,
+      div {
+        color: #ffffff !important; /* White text on dark blue hover */
+      }
+    }
+  }
+}
+
+/* 6. "+ New / Добавить" Dropdown Menu & Button Fix */
 #newItemButton,
 #newItemDropdown {
   background-color: #2563eb !important;
@@ -102,5 +270,22 @@ app-organization-filter {
   &:hover {
     background-color: #1d4ed8 !important;
     box-shadow: 0 6px 18px rgba(37, 99, 235, 0.5) !important;
+  }
+}
+
+/* Fix dropdown menu text contrast in dark mode */
+.cdk-overlay-container,
+.mat-menu-panel,
+.bit-menu-panel,
+[role="menu"] {
+  button,
+  a,
+  .mat-menu-item,
+  .bit-menu-item {
+    color: #f8fafc !important;
+    &:hover {
+      background-color: #1e3a8a !important;
+      color: #ffffff !important;
+    }
   }
 }
