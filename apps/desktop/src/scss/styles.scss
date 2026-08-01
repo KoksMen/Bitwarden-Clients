@@ -1,5 +1,6 @@
 @import "../../../../libs/angular/src/scss/bwicons/styles/style.scss";
 @import "@angular/cdk/overlay-prebuilt.css";
+@import "../../../../libs/components/src/tw-theme.css";
 @import "variables.scss";
 @import "base.scss";
 @import "grid.scss";
@@ -16,3 +17,90 @@
 @import "migration.scss";
 @import "../../../../libs/angular/src/scss/icons.scss";
 @import "../../../../libs/components/src/multi-select/scss/bw.theme";
+
+/* Custom Desktop UI Card & Sidebar Styling */
+tr[appVaultCipherRow],
+tr[appVaultCollectionRow] {
+  display: flex !important;
+  align-items: center !important;
+  border-radius: 14px !important;
+  border: 1.5px solid #e5e7eb !important;
+  background-color: #ffffff !important;
+  padding: 10px 16px !important;
+  margin-bottom: 8px !important;
+  transition: all 0.2s ease-in-out !important;
+  cursor: pointer !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+
+  &:hover {
+    background-color: #dbeafe !important; /* Rich light blue hover */
+    border-color: #60a5fa !important; /* Vibrant blue border */
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2) !important;
+  }
+}
+
+/* Active / Selected Card State */
+tr[appVaultCipherRow].tw-border-blue-600,
+tr[appVaultCollectionRow].tw-border-blue-600 {
+  background-color: #bfdbfe !important; /* Prominent active blue fill */
+  border-color: #2563eb !important; /* Solid blue active border */
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.3) !important;
+}
+
+/* Dark theme card overrides */
+.dark tr[appVaultCipherRow],
+.dark tr[appVaultCollectionRow],
+[data-theme="dark"] tr[appVaultCipherRow] {
+  border-color: #374151 !important;
+  background-color: #1f2937 !important;
+
+  &:hover {
+    background-color: #1e3a8a !important;
+    border-color: #60a5fa !important;
+  }
+}
+
+.dark tr[appVaultCipherRow].tw-border-blue-600,
+.dark tr[appVaultCollectionRow].tw-border-blue-600 {
+  background-color: #1e40af !important;
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.4) !important;
+}
+
+/* Sidebar Navigation Items - Large Click Targets */
+bit-nav-item,
+app-folder-filter,
+app-collection-filter,
+app-type-filter,
+app-status-filter,
+app-organization-filter {
+  .tw-rounded-xl {
+    min-height: 44px !important;
+    margin-top: 4px !important;
+    margin-bottom: 4px !important;
+    border-radius: 12px !important;
+    transition: all 0.2s ease !important;
+
+    &:hover {
+      background-color: #dbeafe !important;
+      border-color: #93c5fd !important;
+    }
+  }
+}
+
+/* Prominent "+ New / Добавить" Button */
+#newItemButton,
+#newItemDropdown {
+  background-color: #2563eb !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  padding: 10px 22px !important;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35) !important;
+  transition: all 0.2s ease !important;
+
+  &:hover {
+    background-color: #1d4ed8 !important;
+    box-shadow: 0 6px 18px rgba(37, 99, 235, 0.5) !important;
+  }
+}

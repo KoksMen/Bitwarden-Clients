@@ -32,6 +32,8 @@ module.exports = {
   corePlugins: { preflight: false },
   theme: {
     colors: {
+      blue: colors.blue,
+      gray: colors.gray,
       transparent: {
         DEFAULT: colors.transparent,
         hover: "var(--color-transparent-hover)",
