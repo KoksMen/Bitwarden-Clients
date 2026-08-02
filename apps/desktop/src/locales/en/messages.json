@@ -2031,7 +2031,7 @@
     "message": "Update available"
   },
   "updateAvailableDesc": {
-    "message": "An update was found. Do you want to download it now?"
+    "message": "This is a source-built fork. Update the fork's source code and build a new version of the application."
   },
   "restart": {
     "message": "Restart"
