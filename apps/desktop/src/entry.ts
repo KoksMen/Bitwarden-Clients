@@ -5,6 +5,13 @@ import * as path from "path";
 
 import { app } from "electron";
 
+app.setName("Bitwarden");
+if (process.platform === "win32") {
+  // Set this before the first BrowserWindow is created so Windows uses the
+  // Bitwarden identity in the taskbar, jump list, notifications, and pinned shortcuts.
+  app.setAppUserModelId("com.bitwarden.desktop");
+}
+
 if (
   process.platform === "darwin" &&
   process.argv.some((arg) => arg.indexOf("chrome-extension://") !== -1 || arg.indexOf("{") !== -1)

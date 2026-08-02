@@ -126,7 +126,15 @@ export class MessagingMain {
           this.main.logService.error("Error setting autostart", e);
         });
     } else {
-      app.setLoginItemSettings({ openAtLogin: enabled, args: enabled ? [AUTOSTART_FLAG] : [] });
+      // A packaged build can be started with the flag alone. During local development,
+      // however, the registered executable is electron.exe, so Electron also needs the
+      // application path; otherwise Windows opens Electron's default "path-to-app" page.
+      const args = enabled
+        ? app.isPackaged
+          ? [AUTOSTART_FLAG]
+          : [app.getAppPath(), AUTOSTART_FLAG]
+        : [];
+      app.setLoginItemSettings({ openAtLogin: enabled, args });
     }
   }
 
