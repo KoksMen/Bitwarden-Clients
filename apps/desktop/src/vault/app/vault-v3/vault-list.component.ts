@@ -30,6 +30,7 @@ import {
   TableModule,
   MenuModule,
   ButtonModule,
+  IconModule,
   IconButtonModule,
   NoItemsModule,
   CalloutComponent,
@@ -56,6 +57,9 @@ type EmptyStateItem = {
 @Component({
   selector: "app-vault-list",
   templateUrl: "vault-list.component.html",
+  host: {
+    class: "tw-flex tw-min-h-0 tw-flex-col",
+  },
   imports: [
     ScrollingModule,
     TableModule,
@@ -64,6 +68,7 @@ type EmptyStateItem = {
     NgClass,
     MenuModule,
     ButtonModule,
+    IconModule,
     IconButtonModule,
     VaultCollectionRowComponent,
     VaultCipherRowComponent,
@@ -92,7 +97,7 @@ export class VaultListComponent<C extends CipherViewLike> {
   readonly showPremiumCallout = input<boolean>(false);
 
   protected onEvent = output<VaultItemEvent<C>>();
-  readonly activeCipherId = input<string | undefined>();
+  readonly pinnedCipher = input<C | null>(null);
 
   protected onAddCipher = output<CipherType>();
   protected onAddFolder = output<void>();

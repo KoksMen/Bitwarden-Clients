@@ -12,10 +12,48 @@
     </bit-callout>
   </div>
 }
+@if (pinnedCipher(); as pinned) {
+  <section
+    class="tw-mx-6 tw-mb-3 tw-shrink-0 tw-rounded-2xl tw-border tw-border-solid tw-border-primary-300 tw-bg-primary-100/60 tw-p-2 tw-shadow-md"
+    [attr.aria-label]="'viewItem' | i18n"
+  >
+    <div
+      class="tw-flex tw-items-center tw-gap-1.5 tw-px-2 tw-pb-1 tw-text-xs tw-font-semibold tw-uppercase tw-tracking-wide tw-text-primary-700"
+    >
+      <bit-icon name="bwi-eye" />
+      {{ "viewItem" | i18n }}
+    </div>
+    <table class="tw-w-full tw-table-fixed tw-border-collapse">
+      <tbody>
+        <tr
+          bitRow
+          appVaultCipherRow
+          alignContent="middle"
+          [disabled]="disabled()"
+          [cipher]="pinned"
+          [showOwner]="showOwner()"
+          [showPremiumFeatures]="showPremiumFeatures()"
+          [cloneable]="canClone$({ cipher: pinned }) | async"
+          [organizations]="allOrganizations()"
+          [canEditCipher]="canEditCipher(pinned)"
+          [canAssignCollections]="canAssignCollections(pinned)"
+          [canManageCollection]="canManageCollection(pinned)"
+          [canDeleteCipher]="cipherAuthorizationService.canDeleteCipher$(pinned) | async"
+          [canRestoreCipher]="cipherAuthorizationService.canRestoreCipher$(pinned) | async"
+          [userCanArchive]="userCanArchive()"
+          [enforceOrgDataOwnershipPolicy]="enforceOrgDataOwnershipPolicy()"
+          [showBatchBar]="false"
+          [selected]="true"
+          (onEvent)="event($event)"
+        ></tr>
+      </tbody>
+    </table>
+  </section>
+}
 <cdk-virtual-scroll-viewport
   [itemSize]="RowHeight"
   bitScrollLayout
-  class="tw-transition-[padding-bottom] tw-duration-300 tw-ease-in-out"
+  class="tw-min-h-0 tw-flex-1 tw-transition-[padding-bottom] tw-duration-300 tw-ease-in-out"
   [ngClass]="barVisible() ? 'tw-pb-[9rem]' : 'tw-pb-0'"
 >
   <div class="tw-mb-4 tw-px-6 tw-@container">
@@ -60,10 +98,7 @@
               [userCanArchive]="userCanArchive()"
               [enforceOrgDataOwnershipPolicy]="enforceOrgDataOwnershipPolicy()"
               [showBatchBar]="showBatchBar()"
-              [selected]="
-                selection.isSelected(item) ||
-                (activeCipherId() != null && activeCipherId() === item.cipher?.id)
-              "
+              [selected]="selection.isSelected(item)"
               (checkboxChange)="selection.toggle(item)"
             ></tr>
           }

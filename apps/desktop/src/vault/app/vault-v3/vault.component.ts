@@ -282,6 +282,7 @@ export class VaultComponent<C extends CipherViewLike> implements OnInit, OnDestr
   protected collectionsToDisplay: CollectionView[] = [];
   protected searchPlaceholderText: string;
   protected ciphers: C[] = [];
+  protected pinnedCipher: C | null = null;
   protected isEmpty: boolean;
   protected currentSearchText$: Observable<string> = this.route.queryParams.pipe(
     map((queryParams) => queryParams.search),
@@ -510,7 +511,23 @@ export class VaultComponent<C extends CipherViewLike> implements OnInit, OnDestr
           (cipher) => !this.restrictedItemTypesService.isCipherRestricted(cipher, restrictedTypes),
         ),
       ),
+      shareReplay({ refCount: true, bufferSize: 1 }),
     );
+
+    // Keep the separately displayed open item in sync with edits, even when the
+    // active search or vault filter excludes it from the regular result list.
+    allowedCiphers$.pipe(takeUntil(this.destroy$)).subscribe((ciphers) => {
+      const pinnedId = this.pinnedCipher?.id;
+      if (pinnedId == null) {
+        return;
+      }
+
+      const updatedCipher = ciphers.find((cipher) => cipher.id === pinnedId);
+      if (updatedCipher != null) {
+        this.pinnedCipher = updatedCipher as C;
+        this.changeDetectorRef.markForCheck();
+      }
+    });
 
     const ciphers$ = combineLatest([allowedCiphers$, filter$, this.currentSearchText$]).pipe(
       filter(([ciphers, filter]) => ciphers != undefined && filter != undefined),
@@ -588,7 +605,7 @@ export class VaultComponent<C extends CipherViewLike> implements OnInit, OnDestr
         this.allOrganizations = allOrganizations;
         this.ciphers = ciphers;
         this.collectionsToDisplay = collections;
-        this.isEmpty = collections?.length === 0 && ciphers?.length === 0;
+        this.isEmpty = collections?.length === 0 && ciphers.length === 0;
         this.performingInitialLoad = false;
         this.refreshing = false;
 
@@ -699,6 +716,8 @@ export class VaultComponent<C extends CipherViewLike> implements OnInit, OnDestr
     );
     if (await this.openDialog("view", formConfig)) {
       this.cipher.set(cipher);
+      this.pinnedCipher = c as C;
+      this.changeDetectorRef.markForCheck();
     }
   }
 
@@ -1054,6 +1073,8 @@ export class VaultComponent<C extends CipherViewLike> implements OnInit, OnDestr
       if (this.activeDrawerRef === drawerRef) {
         this.activeDrawerRef = undefined;
         this.cipher.set(null);
+        this.pinnedCipher = null;
+        this.changeDetectorRef.markForCheck();
       }
       void this.router.navigate([], {
         queryParams: { action: null, itemId: null },

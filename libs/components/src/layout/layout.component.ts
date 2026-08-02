@@ -117,7 +117,8 @@ export class LayoutComponent {
     const containerWidth = this.containerWidthPx();
     const rootFontSizePx = getRootFontSizePx();
     const siderailWidthPx = SIDERAIL_WIDTH_REM * rootFontSizePx;
-    const drawerMinWidthPx = drawerSizeToWidthRem.small * rootFontSizePx;
+    const drawerMinWidthPx =
+      this.drawerService.minimumPushWidthPx() || drawerSizeToWidthRem.small * rootFontSizePx;
     const mainMinWidthPx = MAIN_MIN_WIDTH_REM * rootFontSizePx;
 
     // Push vs overlay: switch to overlay only when the minimum push width won't fit.
@@ -165,7 +166,7 @@ export class LayoutComponent {
     } else if (!drawerPush) {
       col3 = "1fr";
     } else if (declaredDrawerWidth > 0) {
-      col3 = `minmax(0px, ${declaredDrawerWidth}px)`;
+      col3 = `minmax(${drawerMinWidthPx}px, ${declaredDrawerWidth}px)`;
     } else {
       col3 = "auto"; // fallback before dialog's effect declares its width
     }
@@ -185,7 +186,8 @@ export class LayoutComponent {
         const siderailPx = SIDERAIL_WIDTH_REM * rootFontSizePx;
         const mainMinPx = MAIN_MIN_WIDTH_REM * rootFontSizePx;
         const navWidthPx = this.sideNavService.widthRem() * rootFontSizePx;
-        const drawerMinPx = drawerSizeToWidthRem.small * rootFontSizePx;
+        const drawerMinPx =
+          this.drawerService.minimumPushWidthPx() || drawerSizeToWidthRem.small * rootFontSizePx;
 
         this.containerWidthPx.set(containerWidth);
 

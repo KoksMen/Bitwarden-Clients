@@ -30,6 +30,16 @@ export class DrawerService {
    */
   readonly pushWidthPx = signal(0);
 
+  /** Natural minimum width of the currently active drawer. */
+  readonly minimumPushWidthPx = signal(0);
+
+  /**
+   * The last width explicitly chosen for a drawer. Unlike `pushWidthPx`, this is
+   * intentionally retained while no drawer is open so switching items or routes
+   * does not reset the detail panel back to its initial size.
+   */
+  private readonly preferredPushWidthPx = signal(0);
+
   /**
    * Whether the drawer is currently in push mode (occupying its own grid column).
    * Set by LayoutComponent via ResizeObserver; read by the drawer content for display.
@@ -64,6 +74,7 @@ export class DrawerService {
     this.stack.update((s) => s.slice(0, -1));
     if (this.stack().length === 0) {
       this.pushWidthPx.set(0);
+      this.minimumPushWidthPx.set(0);
       this.isPushMode.set(false);
     }
   }
@@ -99,6 +110,7 @@ export class DrawerService {
     const refs = [...this.stack()].reverse();
     this.stack.set([]);
     this.pushWidthPx.set(0);
+    this.minimumPushWidthPx.set(0);
     this.isPushMode.set(false);
     for (const ref of refs) {
       ref._forceClose();
@@ -111,6 +123,19 @@ export class DrawerService {
    * without measuring the DOM (which is unreliable when the column is 1fr).
    */
   declarePushWidth(px: number) {
-    this.pushWidthPx.set(px);
+    const width = Math.max(px, this.minimumPushWidthPx());
+    this.pushWidthPx.set(width);
+    this.preferredPushWidthPx.set(width);
+  }
+
+  /**
+   * Opens a drawer at the user's previous width, while respecting the natural
+   * minimum width of the newly opened drawer.
+   */
+  initializePushWidth(defaultPx: number) {
+    const width = Math.max(defaultPx, this.preferredPushWidthPx());
+    this.minimumPushWidthPx.set(defaultPx);
+    this.pushWidthPx.set(width);
+    this.preferredPushWidthPx.set(width);
   }
 }

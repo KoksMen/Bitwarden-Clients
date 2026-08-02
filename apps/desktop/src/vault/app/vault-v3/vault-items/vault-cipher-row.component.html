@@ -9,12 +9,16 @@
     />
   </td>
 }
-<td bitCell [ngClass]="RowHeightClass" class="tw-flex tw-items-center tw-gap-3">
-  <app-vault-icon [cipher]="cipher()"></app-vault-icon>
-  <div class="tw-truncate">
-    <div class="tw-inline-flex tw-items-center tw-w-full tw-gap-1.5">
+<td
+  bitCell
+  [ngClass]="RowHeightClass"
+  class="tw-flex tw-min-w-0 tw-flex-1 tw-items-center tw-gap-3"
+>
+  <app-vault-icon class="tw-shrink-0" [cipher]="cipher()"></app-vault-icon>
+  <div class="tw-min-w-0 tw-flex-1 tw-truncate">
+    <div class="tw-inline-flex tw-w-full tw-min-w-0 tw-items-center tw-gap-1.5">
       <span
-        class="tw-font-medium tw-text-main tw-text-base tw-leading-snug tw-truncate"
+        class="tw-min-w-0 tw-flex-1 tw-truncate tw-font-medium tw-text-base tw-leading-snug tw-text-main"
         title="{{ cipher().name }}"
       >
         {{ cipher().name }}
@@ -40,8 +44,13 @@
   </div>
 </td>
 @if (showOwner()) {
-  <td bitCell [ngClass]="RowHeightClass" class="tw-hidden @md:tw-table-cell">
+  <td
+    bitCell
+    [ngClass]="RowHeightClass"
+    class="tw-hidden tw-w-16 tw-shrink-0 tw-items-center tw-justify-center @md:tw-flex"
+  >
     <app-org-badge
+      class="tw-flex tw-items-center"
       [disabled]="disabled()"
       [organizationId]="cipher().organizationId"
       [organizationName]="cipher().organizationId | orgNameFromId: organizations()"
@@ -49,12 +58,15 @@
     </app-org-badge>
   </td>
 }
-<td bitCell [ngClass]="RowHeightClass" class="tw-text-right tw-whitespace-nowrap">
+<td
+  bitCell
+  [ngClass]="RowHeightClass"
+  class="tw-flex tw-w-40 tw-shrink-0 tw-flex-nowrap tw-items-center tw-justify-end tw-whitespace-nowrap tw-text-right"
+>
   @if (decryptionFailure()) {
     <button
       [disabled]="disabled() || !canManageCollection()"
       [bitMenuTriggerFor]="corruptedCipherOptions"
-      size="small"
       bitIconButton="bwi-ellipsis-v"
       type="button"
       label="{{ 'options' | i18n }}"
@@ -75,39 +87,6 @@
         type="button"
         label="{{ (cipher().favorite ? 'unfavorite' : 'favorite') | i18n }}"
         (click)="$event.stopPropagation(); toggleFavorite()"
-      ></button>
-    }
-    @if (hasUsername()) {
-      <button
-        [disabled]="disabled()"
-        bitIconButton="bwi-user"
-        appCopyField="username"
-        [cipher]="cipher()"
-        type="button"
-        label="{{ 'copyUsername' | i18n }}"
-        (click)="$event.stopPropagation()"
-      ></button>
-    }
-    @if (hasPassword()) {
-      <button
-        [disabled]="disabled()"
-        bitIconButton="bwi-key"
-        appCopyField="password"
-        [cipher]="cipher()"
-        type="button"
-        label="{{ 'copyPassword' | i18n }}"
-        (click)="$event.stopPropagation()"
-      ></button>
-    }
-    @if (hasTotp()) {
-      <button
-        [disabled]="disabled()"
-        bitIconButton="bwi-clock"
-        appCopyField="totp"
-        [cipher]="cipher()"
-        type="button"
-        label="{{ 'copyVerificationCode' | i18n }}"
-        (click)="$event.stopPropagation()"
       ></button>
     }
     @if (canLaunch()) {

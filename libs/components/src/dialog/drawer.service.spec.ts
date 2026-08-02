@@ -94,4 +94,36 @@ describe("DrawerService", () => {
       expect(service.stackDepth()).toBe(0);
     });
   });
+
+  describe("drawer width", () => {
+    it("restores the last user width after the drawer is closed", () => {
+      service.initializePushWidth(600);
+      service.declarePushWidth(900);
+
+      service.forceCloseAll();
+      service.initializePushWidth(600);
+
+      expect(service.pushWidthPx()).toBe(900);
+      expect(service.minimumPushWidthPx()).toBe(600);
+    });
+
+    it("does not allow a drawer to become narrower than its natural width", () => {
+      service.initializePushWidth(800);
+
+      service.declarePushWidth(500);
+
+      expect(service.pushWidthPx()).toBe(800);
+    });
+
+    it("uses a larger natural width when the next drawer requires it", () => {
+      service.initializePushWidth(600);
+      service.declarePushWidth(700);
+
+      service.forceCloseAll();
+      service.initializePushWidth(850);
+
+      expect(service.pushWidthPx()).toBe(850);
+      expect(service.minimumPushWidthPx()).toBe(850);
+    });
+  });
 });

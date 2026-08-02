@@ -170,6 +170,27 @@ describe("VaultCipherRowComponent", () => {
     });
   });
 
+  describe("active state", () => {
+    beforeEach(() => {
+      fixture.componentRef.setInput("cipher", createLoginCipher());
+      fixture.componentRef.setInput("disabled", false);
+    });
+
+    it("exposes a stable active marker for theme styling", () => {
+      fixture.componentRef.setInput("selected", true);
+      fixture.detectChanges();
+
+      expect(fixture.nativeElement.getAttribute("data-active")).toBe("true");
+    });
+
+    it("removes the active marker when the row is not selected", () => {
+      fixture.componentRef.setInput("selected", false);
+      fixture.detectChanges();
+
+      expect(fixture.nativeElement.hasAttribute("data-active")).toBe(false);
+    });
+  });
+
   describe("batch bar checkbox", () => {
     beforeEach(() => {
       fixture.componentRef.setInput("cipher", createLoginCipher());

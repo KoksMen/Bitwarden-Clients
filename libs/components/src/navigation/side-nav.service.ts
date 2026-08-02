@@ -16,7 +16,7 @@ const BIT_SIDE_NAV_WIDTH_KEY_DEF = new KeyDefinition<number>(BIT_SIDE_NAV_DISK, 
 export class SideNavService {
   // Units in rem
   readonly DEFAULT_OPEN_WIDTH = 18;
-  readonly MIN_OPEN_WIDTH = 15;
+  readonly MIN_OPEN_WIDTH = this.DEFAULT_OPEN_WIDTH;
   readonly MAX_OPEN_WIDTH = 24;
 
   private rootFontSizePx: number;
@@ -71,7 +71,7 @@ export class SideNavService {
 
     // Initialize the resizable width from state provider
     this.widthState$.pipe(first()).subscribe((width: number) => {
-      this._width$.next(width);
+      this._setWidthWithinMinMax(width);
     });
 
     // Periodically sync to state provider when component state changes

@@ -22,20 +22,23 @@
    Custom Desktop UI Card, Sidebar & Dropdown Styling
    ========================================================================== */
 
-/* 1. Vault Cipher & Collection Cards (Light Theme) */
-html:not(.dark) tr[appVaultCipherRow],
-html:not(.dark) tr[appVaultCollectionRow],
-body:not(.dark) tr[appVaultCipherRow],
-body:not(.dark) tr[appVaultCollectionRow] {
+/* --- BASE CARD STYLES (shared by both themes) --- */
+tr[appVaultCipherRow],
+tr[appVaultCollectionRow] {
   display: flex !important;
   align-items: center !important;
   border-radius: 14px !important;
-  border: 1.5px solid #e2e8f0 !important;
-  background-color: #ffffff !important;
   padding: 10px 16px !important;
   margin-bottom: 8px !important;
   transition: all 0.15s ease-in-out !important;
   cursor: pointer !important;
+}
+
+/* 1. LIGHT Theme Cards — html.theme_light is the actual Bitwarden class */
+html.theme_light tr[appVaultCipherRow],
+html.theme_light tr[appVaultCollectionRow] {
+  border: 1.5px solid #e2e8f0 !important;
+  background-color: #ffffff !important;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
 
   &,
@@ -75,20 +78,11 @@ body:not(.dark) tr[appVaultCollectionRow] {
   }
 }
 
-/* 2. Vault Cipher & Collection Cards (Dark Theme) */
-.dark tr[appVaultCipherRow],
-.dark tr[appVaultCollectionRow],
-[data-theme="dark"] tr[appVaultCipherRow],
-[data-theme="dark"] tr[appVaultCollectionRow] {
-  display: flex !important;
-  align-items: center !important;
-  border-radius: 14px !important;
+/* 2. DARK Theme Cards — html.theme_dark is the actual Bitwarden class */
+html.theme_dark tr[appVaultCipherRow],
+html.theme_dark tr[appVaultCollectionRow] {
   border: 1.5px solid #334155 !important;
-  background-color: #1e293b !important; /* SLEEK DARK SLATE CARD BACKGROUND */
-  padding: 10px 16px !important;
-  margin-bottom: 8px !important;
-  transition: all 0.15s ease-in-out !important;
-  cursor: pointer !important;
+  background-color: #1e293b !important;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2) !important;
 
   &,
@@ -96,7 +90,7 @@ body:not(.dark) tr[appVaultCollectionRow] {
   span,
   div,
   p {
-    color: #f8fafc !important; /* Pure white text */
+    color: #f8fafc !important;
   }
 
   .tw-text-muted {
@@ -109,7 +103,7 @@ body:not(.dark) tr[appVaultCollectionRow] {
   }
 
   &:hover {
-    background-color: #1e3a8a !important; /* Royal dark blue hover */
+    background-color: #1e3a8a !important;
     border-color: #60a5fa !important;
 
     &,
@@ -125,18 +119,12 @@ body:not(.dark) tr[appVaultCollectionRow] {
   }
 }
 
-/* 3. Active / Selected Card State (Light & Dark Theme) */
-tr[appVaultCipherRow].tw-border-blue-600,
-tr[appVaultCipherRow][selected],
-tr[appVaultCollectionRow].tw-border-blue-600,
-tr[appVaultCollectionRow][selected],
-.dark tr[appVaultCipherRow].tw-border-blue-600,
-.dark tr[appVaultCipherRow][selected],
-.dark tr[appVaultCollectionRow].tw-border-blue-600,
-.dark tr[appVaultCollectionRow][selected],
-[data-theme="dark"] tr[appVaultCipherRow].tw-border-blue-600,
-[data-theme="dark"] tr[appVaultCipherRow][selected] {
-  background-color: #2563eb !important; /* SOLID VIBRANT BLUE ACTIVE CARD */
+/* 3. Active / Selected Card State (both themes) */
+html.theme_light tr[appVaultCipherRow][data-active="true"],
+html.theme_light tr[appVaultCollectionRow][data-active="true"],
+html.theme_dark tr[appVaultCipherRow][data-active="true"],
+html.theme_dark tr[appVaultCollectionRow][data-active="true"] {
+  background-color: #2563eb !important;
   border-color: #60a5fa !important;
   box-shadow: 0 4px 16px rgba(37, 99, 235, 0.4) !important;
 
@@ -151,7 +139,13 @@ tr[appVaultCollectionRow][selected],
   strong,
   button,
   .bwi {
-    color: #ffffff !important; /* Pure white text on active blue card */
+    color: #ffffff !important;
+  }
+
+  [bit-chip-action] {
+    background-color: rgba(255, 255, 255, 0.18) !important;
+    border-color: rgba(255, 255, 255, 0.4) !important;
+    color: #ffffff !important;
   }
 }
 
@@ -189,9 +183,9 @@ app-type-filter [data-spotlight-target] {
   margin-top: 10px !important;
 }
 
-[role="menu"],
-.mat-menu-panel,
-.bit-menu-panel {
+html.theme_dark [role="menu"],
+html.theme_dark .mat-menu-panel,
+html.theme_dark .bit-menu-panel {
   border-radius: 14px !important;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4) !important;
   border: 1px solid #334155 !important;
@@ -213,6 +207,35 @@ app-type-filter [data-spotlight-target] {
     &:hover {
       background-color: #2563eb !important;
       color: #ffffff !important;
+    }
+  }
+}
+
+html.theme_light [role="menu"],
+html.theme_light .mat-menu-panel,
+html.theme_light .bit-menu-panel {
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 14px !important;
+  background-color: #ffffff !important;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.16) !important;
+  padding: 6px !important;
+
+  button,
+  a,
+  .mat-menu-item,
+  .bit-menu-item {
+    color: #0f172a !important;
+    border-radius: 10px !important;
+    margin-bottom: 2px !important;
+    padding: 8px 14px !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    transition: all 0.15s ease !important;
+
+    &:hover,
+    &:focus-visible {
+      background-color: #eff6ff !important;
+      color: #1d4ed8 !important;
     }
   }
 }

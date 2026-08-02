@@ -40,12 +40,6 @@ const dialogSizeToWidth = {
   large: "md:tw-max-w-3xl",
 } as const;
 
-const drawerSizeToWidth = {
-  small: "md:tw-max-w-sm",
-  default: "md:tw-max-w-lg",
-  large: "md:tw-max-w-2xl",
-} as const;
-
 /** Width in rem for each drawer size, used to declare push-mode column widths. */
 export const drawerSizeToWidthRem: Record<string, number> = {
   small: 26,
@@ -84,25 +78,26 @@ export class DialogComponent implements AfterViewInit {
   protected startResizing(event: MouseEvent) {
     event.preventDefault();
     const startX = event.clientX;
-    const startWidth = this.elementRef.nativeElement.offsetWidth || 768;
+    const startWidth =
+      this.drawerService.pushWidthPx() || this.elementRef.nativeElement.offsetWidth || 768;
+    const rootFontSizePx = getRootFontSizePx();
+    const minimumWidth = (drawerSizeToWidthRem[this.dialogSize()] ?? 32) * rootFontSizePx;
 
     const onMouseMove = (moveEvent: MouseEvent) => {
       const deltaX = startX - moveEvent.clientX; // Moving left increases width
-      const newWidth = Math.max(380, Math.min(1400, startWidth + deltaX));
+      const newWidth = Math.max(minimumWidth, Math.min(1400, startWidth + deltaX));
       this.drawerService.declarePushWidth(newWidth);
-      this.elementRef.nativeElement.style.width = "100%";
-      const parent = this.elementRef.nativeElement.parentElement;
-      if (parent) {
-        parent.style.width = `${newWidth}px`;
-      }
-      window.dispatchEvent(new Event("resize"));
     };
 
     const onMouseUp = () => {
       window.removeEventListener("mousemove", onMouseMove);
       window.removeEventListener("mouseup", onMouseUp);
+      document.body.style.removeProperty("cursor");
+      document.body.style.removeProperty("user-select");
     };
 
+    document.body.style.cursor = "col-resize";
+    document.body.style.userSelect = "none";
     window.addEventListener("mousemove", onMouseMove);
     window.addEventListener("mouseup", onMouseUp);
   }
@@ -114,7 +109,7 @@ export class DialogComponent implements AfterViewInit {
       }
       const size = this.dialogSize();
       const rootFontSizePx = getRootFontSizePx();
-      this.drawerService.declarePushWidth((drawerSizeToWidthRem[size] ?? 32) * rootFontSizePx);
+      this.drawerService.initializePushWidth((drawerSizeToWidthRem[size] ?? 32) * rootFontSizePx);
     });
   }
 
@@ -171,10 +166,9 @@ export class DialogComponent implements AfterViewInit {
   protected readonly width = computed(() => {
     const size = this.dialogSize();
 
-    if (this.dialogRef?.isDrawer) {
-      return this.drawerService.isPushMode() ? drawerSizeToWidth[size] : "";
-    }
-    return dialogSizeToWidth[size];
+    // LayoutComponent owns a drawer's width through its grid track. Applying a
+    // max-width here leaves unused space in that track after the user resizes it.
+    return this.dialogRef?.isDrawer ? "" : dialogSizeToWidth[size];
   });
 
   protected readonly classes = computed(() => {
