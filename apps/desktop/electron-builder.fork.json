@@ -1,0 +1,15 @@
+{
+  "extends": "./electron-builder.json",
+  "win": {
+    "target": ["nsis"]
+  },
+  "nsis": {
+    "oneClick": false,
+    "perMachine": false,
+    "allowToChangeInstallationDirectory": false,
+    "artifactName": "${productName}-Fork-Installer-${version}.${ext}",
+    "uninstallDisplayName": "${productName}",
+    "deleteAppDataOnUninstall": true,
+    "include": "installer.nsh"
+  }
+}
