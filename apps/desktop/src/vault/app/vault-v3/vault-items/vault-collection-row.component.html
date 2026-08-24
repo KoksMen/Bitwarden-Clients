@@ -9,8 +9,8 @@
     />
   </td>
 }
-<td bitCell [ngClass]="RowHeightClass">
-  <div class="tw-flex tw-gap-3">
+<td bitCell [ngClass]="RowHeightClass" class="tw-flex tw-min-w-0 tw-flex-1 tw-items-center">
+  <div class="tw-flex tw-min-w-0 tw-flex-1 tw-items-center tw-gap-3">
     <div aria-hidden="true">
       <bit-icon
         fixedWidth
@@ -25,7 +25,7 @@
       bitLink
       [disabled]="disabled()"
       type="button"
-      class="tw-flex tw-text-start tw-leading-snug tw-truncate"
+      class="tw-min-w-0 tw-flex-1 tw-text-start tw-leading-snug tw-truncate"
       linkType="secondary"
       title="{{ 'viewCollectionWithName' | i18n: collection().name }}"
       [routerLink]="[]"
@@ -46,4 +46,4 @@
     </app-org-badge>
   </td>
 }
-<td bitCell [ngClass]="RowHeightClass" class="tw-text-right"></td>
+<td bitCell [ngClass]="RowHeightClass" class="tw-w-40 tw-shrink-0"></td>

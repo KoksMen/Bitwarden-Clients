@@ -43,7 +43,7 @@ export class VaultCollectionRowComponent {
   protected get hostClasses(): string {
     const isSelected = this.selected();
     const base =
-      "tw-block tw-rounded-xl tw-border tw-py-2.5 tw-px-3.5 tw-transition-all tw-duration-150 tw-cursor-pointer tw-shadow-xs";
+      "tw-block tw-w-full tw-rounded-xl tw-border tw-py-2.5 tw-px-3.5 tw-transition-all tw-duration-150 tw-cursor-pointer tw-shadow-xs";
     if (isSelected) {
       return `${base} tw-border-blue-600 dark:tw-border-blue-400 tw-ring-2 tw-ring-blue-500/40 tw-bg-blue-100 dark:tw-bg-blue-900/60 tw-shadow-md`;
     }

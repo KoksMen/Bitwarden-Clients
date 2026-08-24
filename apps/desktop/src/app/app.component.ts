@@ -24,7 +24,6 @@ import { FingerprintDialogComponent } from "@bitwarden/auth/angular";
 import {
   AuthRequestServiceAbstraction,
   DESKTOP_SSO_CALLBACK,
-  LockService,
   LogoutReason,
   UserDecryptionOptionsServiceAbstraction,
 } from "@bitwarden/auth/common";
@@ -69,12 +68,14 @@ import { RestrictedItemTypesService } from "@bitwarden/common/vault/services/res
 import { DialogRef, DialogService, ToastOptions, ToastService } from "@bitwarden/components";
 import { CredentialGeneratorHistoryDialogComponent } from "@bitwarden/generator-components";
 import { KeyService, BiometricStateService } from "@bitwarden/key-management";
+// eslint-disable-next-line no-restricted-imports
+import { LegacyCompatKeyService } from "@bitwarden/legacy-crypto";
 import { TroubleshootingDialogComponent } from "@bitwarden/logging-angular";
+import { LockService, LockSource } from "@bitwarden/unlock";
 import { AddEditFolderDialogComponent, AddEditFolderDialogResult } from "@bitwarden/vault";
 
 import { DeviceManagementDialogComponent } from "../auth/device-management/device-management-dialog.component";
 import { ChangePasswordDialogComponent } from "../auth/password-management/change-password-dialog.component";
-import { PremiumComponent } from "../billing/app/accounts/premium.component";
 import { MenuAccount, MenuUpdateRequest } from "../main/menu/menu.updater";
 import { SSO_COOKIE_VENDOR_CALLBACK_COMMAND } from "../platform/services/server-communication-config/server-communication-config-platform-api.service";
 
@@ -95,8 +96,6 @@ const SyncInterval = 6 * 60 * 60 * 1000; // 6 hours
   styles: [],
   template: `
     <ng-template #settings></ng-template>
-    <ng-template #premium></ng-template>
-    <ng-template #loginApproval></ng-template>
     @if (showHeader$ | async) {
       <div class="header"></div>
     }
@@ -119,13 +118,6 @@ export class AppComponent implements OnInit, OnDestroy {
   // FIXME(https://bitwarden.atlassian.net/browse/CL-903): Migrate to Signals
   // eslint-disable-next-line @angular-eslint/prefer-signals
   @ViewChild("settings", { read: ViewContainerRef, static: true }) settingsRef: ViewContainerRef;
-  // FIXME(https://bitwarden.atlassian.net/browse/CL-903): Migrate to Signals
-  // eslint-disable-next-line @angular-eslint/prefer-signals
-  @ViewChild("premium", { read: ViewContainerRef, static: true }) premiumRef: ViewContainerRef;
-  // FIXME(https://bitwarden.atlassian.net/browse/CL-903): Migrate to Signals
-  // eslint-disable-next-line @angular-eslint/prefer-signals
-  @ViewChild("loginApproval", { read: ViewContainerRef, static: true })
-  loginApprovalModalRef: ViewContainerRef;
 
   showHeader$ = this.accountService.showHeader$;
   loading = false;
@@ -155,6 +147,7 @@ export class AppComponent implements OnInit, OnDestroy {
     private ngZone: NgZone,
     private vaultTimeoutSettingsService: VaultTimeoutSettingsService,
     private keyService: KeyService,
+    private legacyCompatKeyService: LegacyCompatKeyService,
     private logService: LogService,
     private messagingService: MessagingService,
     private notificationsService: ServerNotificationsService,
@@ -251,10 +244,10 @@ export class AppComponent implements OnInit, OnDestroy {
             this.loading = false;
             break;
           case "lockVault":
-            await this.lockService.lock(message.userId ?? this.activeUserId);
+            await this.lockService.lock(message.userId ?? this.activeUserId, LockSource.Manual);
             break;
           case "lockAllVaults": {
-            await this.lockService.lockAll();
+            await this.lockService.lockAll(LockSource.Manual);
             break;
           }
           case "locked":
@@ -271,9 +264,7 @@ export class AppComponent implements OnInit, OnDestroy {
             await this.processReloadService.startProcessReload();
             break;
           case "startProcessReload":
-            // FIXME: Verify that this floating promise is intentional. If it is, add an explanatory comment and ensure there is proper error handling.
-            // eslint-disable-next-line @typescript-eslint/no-floating-promises
-            this.processReloadService.startProcessReload();
+            void this.processReloadService.startProcessReload();
             break;
           case "cancelProcessReload":
             this.processReloadService.cancelProcessReload();
@@ -323,7 +314,10 @@ export class AppComponent implements OnInit, OnDestroy {
                   " fingerprint can't be displayed.",
               );
             } else {
-              const fingerprint = await this.keyService.getFingerprint(activeUserId, publicKey);
+              const fingerprint = await this.legacyCompatKeyService.getFingerprint(
+                activeUserId,
+                publicKey,
+              );
               const dialogRef = FingerprintDialogComponent.open(this.dialogService, {
                 fingerprint,
               });
@@ -342,9 +336,7 @@ export class AppComponent implements OnInit, OnDestroy {
             break;
           case "copiedToClipboard":
             if (!message.clearing) {
-              // FIXME: Verify that this floating promise is intentional. If it is, add an explanatory comment and ensure there is proper error handling.
-              // eslint-disable-next-line @typescript-eslint/no-floating-promises
-              this.systemService.clearClipboard(message.clipboardValue, message.clearMs);
+              void this.systemService.clearClipboard(message.clipboardValue, message.clearMs);
             }
             break;
           case "ssoCallback": {
@@ -376,18 +368,6 @@ export class AppComponent implements OnInit, OnDestroy {
             this.router.navigate(["sso"], {
               queryParams: queryParams,
             });
-            break;
-          }
-          case "premiumRequired": {
-            const premiumConfirmed = await this.dialogService.openSimpleDialog({
-              title: { key: "premiumRequired" },
-              content: { key: "premiumRequiredDesc" },
-              acceptButtonText: { key: "learnMore" },
-              type: "success",
-            });
-            if (premiumConfirmed) {
-              await this.openModal<PremiumComponent>(PremiumComponent, this.premiumRef);
-            }
             break;
           }
           case "emailVerificationRequired": {
@@ -855,17 +835,14 @@ export class AppComponent implements OnInit, OnDestroy {
 
     [this.modal] = await this.modalService.openViewRef(type, ref);
 
-    // eslint-disable-next-line rxjs-angular/prefer-takeuntil
-    this.modal.onClosed.subscribe(() => {
+    this.modal.onClosed.pipe(takeUntil(this.destroy$)).subscribe(() => {
       this.modal = null;
     });
   }
 
   private routeToVault(action: string, cipherType: CipherType) {
     if (!this.router.url.includes("vault")) {
-      // FIXME: Verify that this floating promise is intentional. If it is, add an explanatory comment and ensure there is proper error handling.
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      this.router.navigate(["/vault"], {
+      void this.router.navigate(["/vault"], {
         queryParams: {
           action: action,
           addType: cipherType,
@@ -890,7 +867,7 @@ export class AppComponent implements OnInit, OnDestroy {
       if (options[0] === timeout) {
         options[1] === "logOut"
           ? await this.logOut("vaultTimeout", userId as UserId)
-          : await this.lockService.lock(userId as UserId);
+          : await this.lockService.lock(userId as UserId, LockSource.VaultTimeout);
       }
     }
   }

@@ -9,30 +9,31 @@
     />
   </td>
 }
-<td
-  bitCell
-  [ngClass]="RowHeightClass"
-  class="tw-flex tw-min-w-0 tw-flex-1 tw-items-center tw-gap-3"
->
+<td bitCell [ngClass]="RowHeightClass" class="tw-flex tw-min-w-0 tw-flex-1 tw-items-center tw-gap-3">
   <app-vault-icon class="tw-shrink-0" [cipher]="cipher()"></app-vault-icon>
   <div class="tw-min-w-0 tw-flex-1 tw-truncate">
     <div class="tw-inline-flex tw-w-full tw-min-w-0 tw-items-center tw-gap-1.5">
-      <span
-        class="tw-min-w-0 tw-flex-1 tw-truncate tw-font-medium tw-text-base tw-leading-snug tw-text-main"
-        title="{{ cipher().name }}"
+      <button
+        bitLink
+        class="tw-min-w-0 tw-flex-1 tw-overflow-hidden tw-text-ellipsis tw-text-start tw-leading-snug"
+        [disabled]="disabled()"
+        (click)="viewCipher()"
+        title="{{ 'editItemWithName' | i18n: cipher().name }}"
+        type="button"
+        aria-haspopup="true"
       >
         {{ cipher().name }}
-      </span>
+      </button>
       @if (hasAttachments()) {
         <i
-          class="bwi bwi-paperclip tw-leading-normal"
+          class="bwi bwi-paperclip tw-ml-2 tw-leading-normal"
           title="{{ 'attachments' | i18n }}"
           aria-hidden="true"
         ></i>
         <span class="tw-sr-only">{{ "attachments" | i18n }}</span>
         @if (showFixOldAttachments()) {
           <i
-            class="bwi bwi-exclamation-triangle tw-leading-normal tw-text-warning"
+            class="bwi bwi-exclamation-triangle tw-ml-2 tw-leading-normal tw-text-warning"
             title="{{ 'attachmentsNeedFix' | i18n }}"
             aria-hidden="true"
           ></i>
@@ -44,6 +45,7 @@
   </div>
 </td>
 @if (showOwner()) {
+  <!-- Breakpoint must match the Owner header cell in vault-list.component.html. -->
   <td
     bitCell
     [ngClass]="RowHeightClass"
@@ -67,9 +69,10 @@
     <button
       [disabled]="disabled() || !canManageCollection()"
       [bitMenuTriggerFor]="corruptedCipherOptions"
+      size="small"
       bitIconButton="bwi-ellipsis-v"
       type="button"
-      label="{{ 'options' | i18n }}"
+      label="{{ 'moreOptions' | i18n }}"
     ></button>
     <bit-menu #corruptedCipherOptions>
       @if (canDeleteCipher()) {
@@ -80,41 +83,23 @@
       }
     </bit-menu>
   } @else {
-    @if (showFavorite()) {
-      <button
-        [disabled]="disabled()"
-        [bitIconButton]="cipher().favorite ? 'bwi-star-fill' : 'bwi-star'"
-        type="button"
-        label="{{ (cipher().favorite ? 'unfavorite' : 'favorite') | i18n }}"
-        (click)="$event.stopPropagation(); toggleFavorite()"
-      ></button>
-    }
     @if (canLaunch()) {
       <button
         [disabled]="disabled()"
         bitIconButton="bwi-external-link"
         type="button"
-        label="{{ 'launch' | i18n }}"
+        [label]="'launchWebsite' | i18n"
         (click)="$event.stopPropagation(); handleLaunch()"
       ></button>
     }
-    @if (showCopyButton()) {
-      <button
-        [bitMenuTriggerFor]="copyOptions"
+    @if (showCopyActions()) {
+      <vault-item-copy-actions
+        class="tw-inline-flex tw-align-middle"
+        [cipher]="cipher()"
+        [showQuickCopyActions]="showQuickCopyActions()"
         [disabled]="disabled()"
-        bitIconButton="bwi-clone"
-        type="button"
-        label="{{ 'copyValue' | i18n }}"
         (click)="$event.stopPropagation()"
-      ></button>
-      <bit-menu #copyOptions>
-        @for (copyField of copyFields(); track copyField.field) {
-          <button type="button" bitMenuItem [appCopyField]="copyField.field" [cipher]="cipher()">
-            <i class="bwi bwi-fw bwi-clone" aria-hidden="true"></i>
-            {{ copyField.title | i18n }}
-          </button>
-        }
-      </bit-menu>
+      ></vault-item-copy-actions>
     }
 
     <button
@@ -123,7 +108,7 @@
       [disabled]="disabled()"
       bitIconButton="bwi-ellipsis-v"
       type="button"
-      label="{{ 'options' | i18n }}"
+      label="{{ 'moreOptions' | i18n }}"
       (click)="$event.stopPropagation()"
     ></button>
     <bit-menu #cipherOptions>
@@ -154,7 +139,7 @@
       @if (showAssignToCollections()) {
         <button bitMenuItem type="button" (click)="assignToCollections()">
           <bit-icon fixedWidth [name]="'bwi-collection-shared' | vfo1Icon" slot="start" />
-          {{ "assignToCollections" | i18n }}
+          {{ "assignToCollections" | vfo1I18n: "addToSharedFolder" }}
         </button>
       }
       @if (showArchiveButton()) {
@@ -168,6 +153,7 @@
           <button bitMenuItem (click)="badge.promptForPremium($event)" type="button">
             <i class="bwi bwi-fw bwi-archive" aria-hidden="true"></i>
             {{ "archiveVerb" | i18n }}
+            <!-- Hide app-premium badge from accessibility tools as it results in a button within a button -->
             <div slot="end" class="-tw-mt-0.5" aria-hidden>
               <app-premium-badge #badge></app-premium-badge>
             </div>
