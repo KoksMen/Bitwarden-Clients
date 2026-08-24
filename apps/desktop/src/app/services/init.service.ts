@@ -102,9 +102,7 @@ export class InitService {
       );
 
       await this.serverCommunicationConfigService.init();
-      // FIXME: Verify that this floating promise is intentional. If it is, add an explanatory comment and ensure there is proper error handling.
-
-      this.syncService.fullSync(true);
+      void this.syncService.fullSync(true);
       await this.vaultTimeoutService.init(true);
       await (this.i18nService as I18nRendererService).init();
       (this.eventUploadService as EventUploadService).init(true);

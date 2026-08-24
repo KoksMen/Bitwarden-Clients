@@ -9,13 +9,13 @@
     />
   </td>
 }
-<td bitCell [ngClass]="RowHeightClass" class="tw-flex tw-items-center tw-gap-2">
-  <app-vault-icon [cipher]="cipher()"></app-vault-icon>
-  <div class="tw-truncate">
-    <div class="tw-inline-flex tw-w-full">
+<td bitCell [ngClass]="RowHeightClass" class="tw-flex tw-min-w-0 tw-flex-1 tw-items-center tw-gap-3">
+  <app-vault-icon class="tw-shrink-0" [cipher]="cipher()"></app-vault-icon>
+  <div class="tw-min-w-0 tw-flex-1 tw-truncate">
+    <div class="tw-inline-flex tw-w-full tw-min-w-0 tw-items-center tw-gap-1.5">
       <button
         bitLink
-        class="tw-overflow-hidden tw-text-ellipsis tw-text-start tw-leading-snug"
+        class="tw-min-w-0 tw-flex-1 tw-overflow-hidden tw-text-ellipsis tw-text-start tw-leading-snug"
         [disabled]="disabled()"
         (click)="viewCipher()"
         title="{{ 'editItemWithName' | i18n: cipher().name }}"
@@ -41,8 +41,7 @@
         }
       }
     </div>
-    <br />
-    <span class="tw-text-sm tw-text-muted">{{ subtitle() }}</span>
+    <div class="tw-text-xs tw-text-muted tw-truncate">{{ subtitle() }}</div>
   </div>
 </td>
 @if (showOwner()) {
@@ -61,7 +60,11 @@
     </app-org-badge>
   </td>
 }
-<td bitCell [ngClass]="RowHeightClass" class="tw-text-right tw-whitespace-nowrap">
+<td
+  bitCell
+  [ngClass]="RowHeightClass"
+  class="tw-flex tw-w-40 tw-shrink-0 tw-flex-nowrap tw-items-center tw-justify-end tw-whitespace-nowrap tw-text-right"
+>
   @if (decryptionFailure()) {
     <button
       [disabled]="disabled() || !canManageCollection()"

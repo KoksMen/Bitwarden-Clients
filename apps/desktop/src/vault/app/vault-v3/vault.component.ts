@@ -125,7 +125,6 @@ import { AssignCollectionsDesktopComponent } from "../vault/assign-collections";
 import { AssignCollectionsDesktopDialogAdapter } from "./bulk-action-dialogs/assign-collections-desktop-dialog.adapter";
 import { BulkDeleteDialogDesktopAdapter } from "./bulk-action-dialogs/bulk-delete-dialog-desktop.adapter";
 import { VaultItemEvent } from "./vault-items/vault-item-event";
-import { VaultListTableComponent } from "./vault-list-table/vault-list-table.component";
 import { VaultListComponent } from "./vault-list.component";
 
 const BroadcasterSubscriptionId = "VaultComponent";
@@ -148,7 +147,6 @@ type EmptyStateMap = Record<EmptyStateType, EmptyStateItem>;
   imports: [
     CommonModule,
     VaultListComponent,
-    VaultListTableComponent,
     DesktopHeaderComponent,
     NewCipherMenuComponent,
     SearchModule,

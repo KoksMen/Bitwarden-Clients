@@ -74,7 +74,7 @@ export class VaultCipherRowComponent<C extends CipherViewLike> {
   @HostBinding("class")
   protected get hostClasses(): string {
     const base =
-      "tw-block tw-rounded-xl tw-border tw-py-2.5 tw-px-3.5 tw-transition-all tw-duration-150 tw-cursor-pointer tw-shadow-xs";
+      "tw-block tw-w-full tw-rounded-xl tw-border tw-py-2.5 tw-px-3.5 tw-transition-all tw-duration-150 tw-cursor-pointer tw-shadow-xs";
     return this.selected()
       ? `${base} tw-border-blue-600 dark:tw-border-blue-400 tw-ring-2 tw-ring-blue-500/40 tw-bg-blue-100 dark:tw-bg-blue-900/60 tw-shadow-md`
       : `${base} tw-border-gray-200 dark:tw-border-gray-700 tw-bg-surface-alt hover:tw-border-blue-400 hover:tw-bg-blue-50 dark:hover:tw-bg-blue-950/70 hover:tw-shadow-sm`;
@@ -90,6 +90,8 @@ export class VaultCipherRowComponent<C extends CipherViewLike> {
   protected readonly disabled = input<boolean>();
   protected readonly cipher = input<C>();
   protected readonly showOwner = input<boolean>();
+  // Kept for the desktop card layout; upstream copy actions decide their available fields internally.
+  protected readonly showPremiumFeatures = input<boolean>();
   protected readonly useEvents = input<boolean>();
   protected readonly cloneable = input<boolean>();
   protected readonly organizations = input<Organization[]>();

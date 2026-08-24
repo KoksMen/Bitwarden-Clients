@@ -264,9 +264,7 @@ export class AppComponent implements OnInit, OnDestroy {
             await this.processReloadService.startProcessReload();
             break;
           case "startProcessReload":
-            // FIXME: Verify that this floating promise is intentional. If it is, add an explanatory comment and ensure there is proper error handling.
-
-            this.processReloadService.startProcessReload();
+            void this.processReloadService.startProcessReload();
             break;
           case "cancelProcessReload":
             this.processReloadService.cancelProcessReload();
@@ -338,9 +336,7 @@ export class AppComponent implements OnInit, OnDestroy {
             break;
           case "copiedToClipboard":
             if (!message.clearing) {
-              // FIXME: Verify that this floating promise is intentional. If it is, add an explanatory comment and ensure there is proper error handling.
-
-              this.systemService.clearClipboard(message.clipboardValue, message.clearMs);
+              void this.systemService.clearClipboard(message.clipboardValue, message.clearMs);
             }
             break;
           case "ssoCallback": {
@@ -839,16 +835,14 @@ export class AppComponent implements OnInit, OnDestroy {
 
     [this.modal] = await this.modalService.openViewRef(type, ref);
 
-    this.modal.onClosed.subscribe(() => {
+    this.modal.onClosed.pipe(takeUntil(this.destroy$)).subscribe(() => {
       this.modal = null;
     });
   }
 
   private routeToVault(action: string, cipherType: CipherType) {
     if (!this.router.url.includes("vault")) {
-      // FIXME: Verify that this floating promise is intentional. If it is, add an explanatory comment and ensure there is proper error handling.
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      this.router.navigate(["/vault"], {
+      void this.router.navigate(["/vault"], {
         queryParams: {
           action: action,
           addType: cipherType,
