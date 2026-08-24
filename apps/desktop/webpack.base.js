@@ -61,6 +61,11 @@ module.exports.buildConfig = function buildConfig(params) {
         path.resolve(__dirname, "../../node_modules"),
         path.resolve(process.cwd(), "node_modules"),
       ],
+      alias: {
+        // Sass emits URLs for shared Angular fonts and card images. Unlike TypeScript imports,
+        // those URLs do not go through TsconfigPathsPlugin, so resolve the workspace alias here.
+        "@bitwarden/angular": path.resolve(__dirname, "../../libs/angular"),
+      },
     },
   };
 
