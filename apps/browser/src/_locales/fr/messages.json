@@ -119,6 +119,9 @@
   "vault": {
     "message": "Coffre"
   },
+  "vaults": {
+    "message": "Coffres"
+  },
   "myVault": {
     "message": "Mon coffre"
   },
@@ -505,6 +508,45 @@
   "options": {
     "message": "Options"
   },
+  "optionsForItem": {
+    "message": "Options pour $NAME$",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Google Login"
+      }
+    }
+  },
+  "noSharedFolder": {
+    "message": "Aucun dossier partagé"
+  },
+  "filterByName": {
+    "message": "Filtrer par $NAME$",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Engineering"
+      }
+    }
+  },
+  "favoritesFilterTooltip": {
+    "message": "Marquer les éléments comme favoris pour les filtrer ici."
+  },
+  "foldersFilterTooltip": {
+    "message": "Ajouter des dossiers aux éléments pour les filtrer ici."
+  },
+  "editItemWithName": {
+    "message": "Modifier l'élément - $NAME$",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Google Login"
+      }
+    }
+  },
+  "noItemsInVault": {
+    "message": "Aucun élément dans le coffre"
+  },
   "length": {
     "message": "Longueur"
   },
@@ -708,15 +750,6 @@
   },
   "launchWebsite": {
     "message": "Ouvrir le site web"
-  },
-  "launchWebsiteName": {
-    "message": "Lancer le site web $ITEMNAME$",
-    "placeholders": {
-      "itemname": {
-        "content": "$1",
-        "example": "Secret item"
-      }
-    }
   },
   "website": {
     "message": "Site web"
@@ -1557,6 +1590,21 @@
   "copyVerificationCode": {
     "message": "Copier le code de vérification"
   },
+  "noUsername": {
+    "message": "Aucun nom d'utilisateur"
+  },
+  "noPassword": {
+    "message": "Aucun mot de passe"
+  },
+  "noVerificationCode": {
+    "message": "Aucun code de vérification"
+  },
+  "noNumber": {
+    "message": "Aucun numéro"
+  },
+  "noSecurityCode": {
+    "message": "Aucun code de sécurité"
+  },
   "attachments": {
     "message": "Pièces jointes"
   },
@@ -1626,12 +1674,6 @@
   "premiumRefresh": {
     "message": "Actualiser l'adhésion"
   },
-  "premiumNotCurrentMember": {
-    "message": "Vous n'êtes pas actuellement un membre Premium."
-  },
-  "premiumSignUpAndGet": {
-    "message": "Inscrivez-vous pour une adhésion Premium et obtenez :"
-  },
   "premiumSignUpStorage": {
     "message": "1 Go de stockage chiffré pour les fichiers joints."
   },
@@ -1676,12 +1718,6 @@
   },
   "premiumPurchaseAlertV2": {
     "message": "Vous pouvez acheter la version Premium depuis les paramètres de votre compte dans l'application web Bitwarden."
-  },
-  "premiumCurrentMember": {
-    "message": "Vous êtes un membre Premium !"
-  },
-  "premiumCurrentMemberThanks": {
-    "message": "Merci de soutenir Bitwarden."
   },
   "premiumFeatures": {
     "message": "Mettre à niveau à la version Premium et recevez :"
@@ -1950,6 +1986,9 @@
   "showInlineMenuCardsLabel": {
     "message": "Afficher les cartes de paiement sous forme de suggestions"
   },
+  "showInlineMenuSSHKeysLabel": {
+    "message": "Afficher les clés SSH sous forme de suggestions"
+  },
   "showInlineMenuOnIconSelectionLabel": {
     "message": "Afficher les suggestions lorsque l'icône est sélectionnée"
   },
@@ -2152,9 +2191,6 @@
   },
   "securityCode": {
     "message": "Code de sécurité"
-  },
-  "cardNumber": {
-    "message": "numéro de carte"
   },
   "ex": {
     "message": "ex."
@@ -2565,6 +2601,15 @@
   },
   "nCollections": {
     "message": "$COUNT$ collection(s)",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "2"
+      }
+    }
+  },
+  "nSharedFolders": {
+    "message": "$COUNT$ dossiers partagés",
     "placeholders": {
       "count": {
         "content": "$1",
@@ -5002,6 +5047,79 @@
   "noFileChosen": {
     "message": "Aucun fichier choisi"
   },
+  "noFileSelected": {
+    "message": "Aucun fichier sélectionné"
+  },
+  "fileChosen": {
+    "message": "Fichier choisi : $FILE_NAME$",
+    "placeholders": {
+      "file_name": {
+        "content": "$1",
+        "example": "image.png"
+      }
+    }
+  },
+  "fileAdded": {
+    "message": "Fichier ajouté : $FILE_NAME$",
+    "placeholders": {
+      "file_name": {
+        "content": "$1",
+        "example": "image.png"
+      }
+    }
+  },
+  "filesAdded": {
+    "message": "$COUNT$ fichiers ajoutés : $FILE_NAMES$",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "3"
+      },
+      "file_names": {
+        "content": "$2",
+        "example": "a.txt, b.txt, c.txt"
+      }
+    }
+  },
+  "fileRemoved": {
+    "message": "Fichier supprimé : $FILE_NAME$",
+    "placeholders": {
+      "file_name": {
+        "content": "$1",
+        "example": "image.png"
+      }
+    }
+  },
+  "oneFileUploaded": {
+    "message": "1 fichier téléversé"
+  },
+  "filesUploaded": {
+    "message": "$COUNT$ fichiers téléversés",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "3"
+      }
+    }
+  },
+  "uploadedFiles": {
+    "message": "Fichiers téléversés"
+  },
+  "clickToUploadOrDragAndDrop": {
+    "message": "Cliquez pour téléverser ou glissez-déposez"
+  },
+  "chooseFiles": {
+    "message": "Choisir les fichiers"
+  },
+  "maxFileSizeParam": {
+    "message": "Taille maximale du fichier : $SIZE$ Mo",
+    "placeholders": {
+      "size": {
+        "content": "$1",
+        "example": "500"
+      }
+    }
+  },
   "orCopyPasteFileContents": {
     "message": "ou copiez/collez les contenus du fichier d'importation"
   },
@@ -5618,26 +5736,6 @@
   "clearFiltersOrTryAnother": {
     "message": "Effacer les filtres ou essayer un autre terme de recherche"
   },
-  "copyInfoTitle": {
-    "message": "Copier les informations - $ITEMNAME$",
-    "description": "Title for a button that opens a menu with options to copy information from an item.",
-    "placeholders": {
-      "itemname": {
-        "content": "$1",
-        "example": "Secret Item"
-      }
-    }
-  },
-  "copyNoteTitle": {
-    "message": "Copier la note - $ITEMNAME$",
-    "description": "Title for a button copies a note to the clipboard.",
-    "placeholders": {
-      "itemname": {
-        "content": "$1",
-        "example": "Secret Note Item"
-      }
-    }
-  },
   "moreOptionsLabel": {
     "message": "Plus d'options, $ITEMNAME$",
     "description": "Aria label for a button that opens a menu with more options for an item.",
@@ -5709,29 +5807,21 @@
       }
     }
   },
-  "copyFieldCipherName": {
-    "message": "Copier $FIELD$, $CIPHERNAME$",
-    "description": "Title for a button that copies a field value to the clipboard.",
-    "placeholders": {
-      "field": {
-        "content": "$1",
-        "example": "Username"
-      },
-      "ciphername": {
-        "content": "$2",
-        "example": "Login Item"
-      }
-    }
-  },
   "noValueEntered": {
     "message": "Aucune valeur saisie",
     "description": "Screen reader announcement appended to a custom field's name when the field has no value entered."
   },
-  "noValuesToCopy": {
-    "message": "Aucune valeur à copier"
+  "noDetailsToCopy": {
+    "message": "Aucune information à copier"
   },
   "assignToCollections": {
     "message": "Assigner aux collections"
+  },
+  "addToSharedFolder": {
+    "message": "Ajouter au dossier partagé"
+  },
+  "transferAndAdd": {
+    "message": "Transférer et ajouter"
   },
   "copyEmail": {
     "message": "Copier le courriel"
@@ -6200,8 +6290,14 @@
   "bulkCollectionAssignmentDialogDescriptionSingular": {
     "message": "Seuls les membres de l'organisation ayant accès à ces collections pourront voir l'élément."
   },
+  "bulkVaultSharedFolderAssignmentDialogDescriptionSingular": {
+    "message": "Seuls les membres du coffre ayant accès à ces dossiers partagés pourront voir l'élément."
+  },
   "bulkCollectionAssignmentDialogDescriptionPlural": {
     "message": "Seuls les membres de l'organisation ayant accès à ces collections pourront voir les éléments."
+  },
+  "bulkVaultSharedFolderAssignmentDialogDescriptionPlural": {
+    "message": "Seuls les membres du coffre ayant accès à ces dossiers partagés pourront voir les éléments."
   },
   "bulkCollectionAssignmentWarning": {
     "message": "Vous avez sélectionné $TOTAL_COUNT$ éléments. Vous ne pouvez pas mettre à jour $READONLY_COUNT$ de ces éléments parce que vous n'avez pas les autorisations pour les éditer.",
@@ -6307,8 +6403,20 @@
   "personalItemTransferWarningSingular": {
     "message": "1 élément sera transféré définitivement à l'organisation sélectionnée. Vous ne serez plus le propriétaire de cet élément."
   },
+  "personalItemVaultTransferWarningSingular": {
+    "message": "1 élément sera transféré de façon permanente vers le coffre sélectionné. Vous ne posséderez plus cet élément."
+  },
   "personalItemsTransferWarningPlural": {
     "message": "Les éléments $PERSONAL_ITEMS_COUNT$ seront transférés de façon permanente à l'organisation sélectionnée. Vous ne serez plus le propriétaire de ces éléments.",
+    "placeholders": {
+      "personal_items_count": {
+        "content": "$1",
+        "example": "2"
+      }
+    }
+  },
+  "personalItemsVaultTransferWarningPlural": {
+    "message": "$PERSONAL_ITEMS_COUNT$ éléments seront transférés de façon permanente vers le coffre sélectionné. Vous ne posséderez plus ces éléments.",
     "placeholders": {
       "personal_items_count": {
         "content": "$1",
@@ -6341,17 +6449,32 @@
   "successfullyAssignedCollections": {
     "message": "Collections assignées avec succès"
   },
+  "successfullyAddedSharedFolders": {
+    "message": "Dossiers partagés ajoutés avec succès"
+  },
   "itemMovedToCollection": {
     "message": "Élément déplacé vers la collection"
+  },
+  "itemAddedToSharedFolder": {
+    "message": "Élément ajouté au dossier partagé"
   },
   "itemMovedToCollections": {
     "message": "Élément déplacé vers les collections"
   },
+  "itemAddedToSharedFolders": {
+    "message": "Élément ajouté aux dossiers partagés"
+  },
   "itemsMovedToCollection": {
     "message": "Éléments déplacés vers la collection"
   },
+  "itemsAddedToSharedFolder": {
+    "message": "Éléments ajoutés au dossier partagé"
+  },
   "itemsMovedToCollections": {
     "message": "Éléments déplacés vers les collections"
+  },
+  "itemsAddedToSharedFolders": {
+    "message": "Éléments ajoutés aux dossiers partagés"
   },
   "itemAssignedToCollections": {
     "message": "Élément assigné aux collections"
@@ -6401,10 +6524,16 @@
     "message": "Emplacement de l'élément"
   },
   "fileSends": {
-    "message": "Sends de fichier"
+    "message": "Sends de fichier",
+    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
   },
   "textSends": {
-    "message": "Sends de texte"
+    "message": "Sends de texte",
+    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+  },
+  "itemSends": {
+    "message": "Élément Sends",
+    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
   },
   "accountActions": {
     "message": "Actions du compte"
@@ -6424,7 +6553,7 @@
       }
     }
   },
-  "showQuickCopyActions": {
+  "showQuickCopyActionsInVault": {
     "message": "Afficher les actions de copie rapide dans le coffre"
   },
   "systemDefault": {
@@ -6739,6 +6868,15 @@
       }
     }
   },
+  "cannotRemoveViewOnlySharedFolders": {
+    "message": "Vous ne pouvez pas supprimer les dossiers partagés avec les autorisations de visualisation uniquement : $SHAREDFOLDERS$",
+    "placeholders": {
+      "sharedfolders": {
+        "content": "$1",
+        "example": "Work, Personal"
+      }
+    }
+  },
   "updateDesktopAppOrDisableFingerprintDialogTitle": {
     "message": "Veuillez mettre à jour votre application de bureau"
   },
@@ -6920,6 +7058,9 @@
   },
   "permitCipherDetailsDescription": {
     "message": "Bitwarden utilisera les URI de connexion enregistrées pour identifier quelle icône ou URL de changement de mot de passe doit être utilisée pour améliorer votre expérience. Aucune information n'est recueillie ou enregistrée lorsque vous utilisez ce service."
+  },
+  "showQuickCopyActionsDetailsDescription": {
+    "message": "Ajoutez 3 boutons de copie rapide à côté des éléments pour copier votre nom d'utilisateur, votre mot de passe ou votre code de vérification dans le presse-papiers."
   },
   "noPermissionsViewPage": {
     "message": "Vous n'avez pas les autorisations pour consulter cette page. Essayez de vous connecter avec un autre compte."
@@ -7431,5 +7572,172 @@
   },
   "health": {
     "message": "Santé"
+  },
+  "scanMyVault": {
+    "message": "Scanner mon coffre"
+  },
+  "introducingHealth": {
+    "message": "Introduction de Santé"
+  },
+  "healthIntroDescription": {
+    "message": "Surveillez et améliorez la santé de votre coffre en corrigeant les mots de passes exposé, faibles ou réutilisés."
+  },
+  "yourVaultIsHealthy": {
+    "message": "Votre coffre-fort est sain",
+    "description": "Heading shown when none of the user's passwords are at risk."
+  },
+  "yourVaultRiskIsHigh": {
+    "message": "Le risque de votre coffre est élevé",
+    "description": "Heading shown when at least one of the user's passwords is at risk."
+  },
+  "passwordsNeedFixing": {
+    "message": "$AT_RISK$ de $TOTAL$ mots de passe doivent être corrigés",
+    "description": "Count of the user's passwords that are at risk, out of the total number scanned.",
+    "placeholders": {
+      "at_risk": {
+        "content": "$1",
+        "example": "63"
+      },
+      "total": {
+        "content": "$2",
+        "example": "200"
+      }
+    }
+  },
+  "exposedPasswordsNone": {
+    "message": "Aucun mot de passe exposé",
+    "description": "Title of the exposed risk category row when no passwords are exposed."
+  },
+  "exposedPassword": {
+    "message": "1 mot de passe exposé",
+    "description": "Title of the exposed risk category row when exactly one password is exposed."
+  },
+  "exposedPasswordsPlural": {
+    "message": "$COUNT$ mots de passe exposés",
+    "description": "Title of the exposed risk category row, including the count. Used for counts of two or more.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "6"
+      }
+    }
+  },
+  "exposedPasswordsDesc": {
+    "message": "Exposé dans des fuites de données",
+    "description": "Explains what makes a password count as exposed."
+  },
+  "exposedPasswordsNoneDesc": {
+    "message": "Aucun de vos mots de passe n'a été trouvé dans des fuites de données",
+    "description": "Description of the exposed risk category row when no passwords are exposed."
+  },
+  "weakPasswordsNone": {
+    "message": "Aucun mot de passe faible",
+    "description": "Title of the weak risk category row when no passwords are weak."
+  },
+  "weakPassword": {
+    "message": "1 mot de passe faible",
+    "description": "Title of the weak risk category row when exactly one password is weak."
+  },
+  "weakPasswordsPlural": {
+    "message": "$COUNT$ mots de passe faibles",
+    "description": "Title of the weak risk category row, including the count. Used for counts of two or more.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "22"
+      }
+    }
+  },
+  "weakPasswordsDesc": {
+    "message": "Trop court ou simple",
+    "description": "Explains what makes a password count as weak."
+  },
+  "weakPasswordsNoneDesc": {
+    "message": "Tous vos mots de passe sont forts",
+    "description": "Description of the weak risk category row when no passwords are weak."
+  },
+  "reusedPasswordsNone": {
+    "message": "Aucun mot de passe réutilisé",
+    "description": "Title of the reused risk category row when no passwords are reused."
+  },
+  "reusedPassword": {
+    "message": "1 mot de passe réutilisé",
+    "description": "Title of the reused risk category row when exactly one password is reused."
+  },
+  "reusedPasswordsPlural": {
+    "message": "$COUNT$ mots de passe réutilisés",
+    "description": "Title of the reused risk category row, including the count. Used for counts of two or more.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "35"
+      }
+    }
+  },
+  "reusedPasswordsDesc": {
+    "message": "Réutilisé dans plusieurs identifiants",
+    "description": "Explains what makes a password count as reused."
+  },
+  "reusedPasswordsNoneDesc": {
+    "message": "Tous vos mots de passe sont uniques",
+    "description": "Description of the reused risk category row when no passwords are reused."
+  },
+  "risksIdentified": {
+    "message": "Risques identifiés",
+    "description": "Section heading above the list of risk categories on the Health Overview."
+  },
+  "categoryHealthy": {
+    "message": "Aucun élément ne nécessite d'attetion",
+    "description": "Accessible label for the checkmark shown on a risk category with a count of zero."
+  },
+  "exposedPasswordsTitle": {
+    "message": "Mots de passe exposés"
+  },
+  "exposedPasswordsDescription": {
+    "message": "Les mots de passe pour ces identifiants ont été exposés dans des fuites de données. Changez-les immédiatement pour protéger vos comptes."
+  },
+  "weakPasswordsTitle": {
+    "message": "Mots de passe faibles"
+  },
+  "weakPasswordsDescription": {
+    "message": "Ces mots de passe peuvent être facilement devinés car ils sont trop courts ou simples. Renforcez-les en les rendant plus complexes."
+  },
+  "reusedPasswordsTitle": {
+    "message": "Mots de passe réutilisés"
+  },
+  "reusedPasswordsDescription": {
+    "message": "Ces identifiants ont un mot de passe réutilisé. Créez un mot de passe unique pour chaque compte pour empêcher quelqu'un d'accéder à plusieurs comptes avec un seul mot de passe."
+  },
+  "deleteAtRiskItemDescription": {
+    "message": "Supprimer cet identifiant le supprime de votre coffre mais ne corrige pas le risque. Pour protéger votre compte, changez d'abord votre mot de passe."
+  },
+  "passwordHasAdditionalRisks": {
+    "message": "Ce mot de passe comporte des risques supplémentaires :"
+  },
+  "reused": {
+    "message": "Réutilisé",
+    "description": "ex. A password that is reused across multiple logins."
+  },
+  "xTimes": {
+    "message": "$COUNT$ fois",
+    "description": "The number of times a password is reused. ex. 6 times",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "6"
+      }
+    }
+  },
+  "exposedPasswordsEmpty": {
+    "message": "Aucun de vos mots de passe n'a été trouvé dans des fuites de données."
+  },
+  "weakPasswordEmpty": {
+    "message": "All your passwords are strong."
+  },
+  "reusedPasswordEmpty": {
+    "message": "All your passwords are unique."
+  },
+  "youreAllSet": {
+    "message": "Vous êtes prêt !"
   }
 }

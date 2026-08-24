@@ -36,7 +36,6 @@ import {
   DefaultAuthRequestApiService,
   DefaultLogoutService,
   InternalUserDecryptionOptionsServiceAbstraction,
-  LockService,
   LoginEmailServiceAbstraction,
   DefaultLoginStrategyCacheService,
   DefaultLoginStrategySessionTimeoutService,
@@ -115,14 +114,6 @@ import { FeatureFlag } from "@bitwarden/common/enums/feature-flag.enum";
 import { ProcessReloadServiceAbstraction } from "@bitwarden/common/key-management/abstractions/process-reload.service";
 import { AccountCryptographicStateService } from "@bitwarden/common/key-management/account-cryptography/account-cryptographic-state.service";
 import { DefaultAccountCryptographicStateService } from "@bitwarden/common/key-management/account-cryptography/default-account-cryptographic-state.service";
-import {
-  DefaultKeyGenerationService,
-  KeyGenerationService,
-} from "@bitwarden/common/key-management/crypto";
-import { CryptoFunctionService as CryptoFunctionServiceAbstraction } from "@bitwarden/common/key-management/crypto/abstractions/crypto-function.service";
-import { EncryptService } from "@bitwarden/common/key-management/crypto/abstractions/encrypt.service";
-import { EncryptServiceImplementation } from "@bitwarden/common/key-management/crypto/services/encrypt.service.implementation";
-import { WebCryptoFunctionService } from "@bitwarden/common/key-management/crypto/services/web-crypto-function.service";
 import { DeviceTrustServiceAbstraction } from "@bitwarden/common/key-management/device-trust/abstractions/device-trust.service.abstraction";
 import { DeviceTrustService } from "@bitwarden/common/key-management/device-trust/services/device-trust.service.implementation";
 import { KeyConnectorService as KeyConnectorServiceAbstraction } from "@bitwarden/common/key-management/key-connector/abstractions/key-connector.service";
@@ -133,8 +124,6 @@ import { DefaultMasterPasswordUnlockService } from "@bitwarden/common/key-manage
 import { MasterPasswordService } from "@bitwarden/common/key-management/master-password/services/master-password.service";
 import { PinServiceAbstraction } from "@bitwarden/common/key-management/pin/pin.service.abstraction";
 import { PinService } from "@bitwarden/common/key-management/pin/pin.service.implementation";
-import { SecurityStateService } from "@bitwarden/common/key-management/security-state/abstractions/security-state.service";
-import { DefaultSecurityStateService } from "@bitwarden/common/key-management/security-state/services/security-state.service";
 import { DefaultProcessReloadService } from "@bitwarden/common/key-management/services/default-process-reload.service";
 import {
   SharedUnlockLeaderService,
@@ -210,7 +199,6 @@ import { DefaultSdkService } from "@bitwarden/common/platform/services/sdk/defau
 import { NoopSdkClientFactory } from "@bitwarden/common/platform/services/sdk/noop-sdk-client-factory";
 import { DefaultRegisterSdkService } from "@bitwarden/common/platform/services/sdk/register-sdk.service";
 import { SystemService } from "@bitwarden/common/platform/services/system.service";
-import { UserAutoUnlockKeyService } from "@bitwarden/common/platform/services/user-auto-unlock-key.service";
 import { PrimarySecondaryStorageService } from "@bitwarden/common/platform/storage/primary-secondary-storage.service";
 import { WindowStorageService } from "@bitwarden/common/platform/storage/window-storage.service";
 import { SyncService } from "@bitwarden/common/platform/sync";
@@ -301,6 +289,17 @@ import {
   KdfConfigService,
   KeyService as KeyServiceAbstraction,
 } from "@bitwarden/key-management";
+// eslint-disable-next-line no-restricted-imports
+import {
+  CryptoFunctionService as CryptoFunctionServiceAbstraction,
+  DefaultKeyGenerationService,
+  DefaultLegacyCompatKeyService,
+  EncryptService,
+  EncryptServiceImplementation,
+  KeyGenerationService,
+  LegacyCompatKeyService as LegacyCompatKeyServiceAbstraction,
+  WebCryptoFunctionService,
+} from "@bitwarden/legacy-crypto";
 import { BackgroundSyncService } from "@bitwarden/platform/background-sync";
 import {
   ActiveUserStateProvider,
@@ -320,7 +319,7 @@ import {
   DefaultStateService,
   InlineDerivedStateProvider,
 } from "@bitwarden/state-internal";
-import { DefaultUnlockService, UnlockService } from "@bitwarden/unlock";
+import { DefaultUnlockService, LockService, UnlockService } from "@bitwarden/unlock";
 import {
   IndividualVaultExportService,
   IndividualVaultExportServiceAbstraction,
@@ -368,6 +367,7 @@ import AutofillService from "../autofill/services/autofill.service";
 import { ClipboardNotificationBadgeUpdaterService } from "../autofill/services/clipboard-notification-badge-updater.service";
 import { InlineMenuFieldQualificationService } from "../autofill/services/inline-menu-field-qualification.service";
 import { TargetingRulesDataService } from "../autofill/services/targeting-rules-data.service";
+import { WebmapperDraftService } from "../autofill/services/webmapper-draft.service";
 import { trackGeneratedCredential } from "../autofill/utils/credential-history-utils";
 import { SafariApp } from "../browser/safariApp";
 import { PhishingDataService } from "../dirt/phishing-detection/services/phishing-data.service";
@@ -431,6 +431,7 @@ export default class MainBackground {
   logService: LogServiceAbstraction;
   keyGenerationService: KeyGenerationService;
   keyService: KeyServiceAbstraction;
+  legacyCompatKeyService: LegacyCompatKeyServiceAbstraction;
   cryptoFunctionService: CryptoFunctionServiceAbstraction;
   masterPasswordService: InternalMasterPasswordServiceAbstraction;
   masterPasswordUnlockService: MasterPasswordUnlockService;
@@ -532,7 +533,6 @@ export default class MainBackground {
   billingAccountProfileStateService: BillingAccountProfileStateService;
   // eslint-disable-next-line rxjs/no-exposed-subjects -- Needed to give access to services module
   intraprocessMessagingSubject: Subject<Message<Record<string, unknown>>>;
-  userAutoUnlockKeyService: UserAutoUnlockKeyService;
   scriptInjectorService: BrowserScriptInjectorService;
   kdfConfigService: KdfConfigService;
   offscreenDocumentService: OffscreenDocumentService;
@@ -558,7 +558,6 @@ export default class MainBackground {
   cipherEncryptionService: CipherEncryptionService;
   collectionEncryptionService: CollectionEncryptionService;
   private restrictedItemTypesService: RestrictedItemTypesService;
-  private securityStateService: SecurityStateService;
 
   ipcContentScriptManagerService: IpcContentScriptManagerService;
   ipcService: IpcService;
@@ -764,10 +763,6 @@ export default class MainBackground {
       logoutCallback,
     );
 
-    this.securityStateService = new DefaultSecurityStateService(
-      this.accountCryptographicStateService,
-    );
-
     this.popupViewCacheBackgroundService = new PopupViewCacheBackgroundService(
       messageListener,
       this.globalStateProvider,
@@ -803,22 +798,29 @@ export default class MainBackground {
     this.kdfConfigService = new DefaultKdfConfigService(this.stateProvider);
 
     this.keyService = new DefaultKeyService(
-      this.masterPasswordService,
-      this.keyGenerationService,
       this.cryptoFunctionService,
       this.encryptService,
       this.platformUtilsService,
       this.logService,
       this.stateService,
-      this.accountService,
       this.stateProvider,
-      this.kdfConfigService,
       this.accountCryptographicStateService,
+    );
+
+    this.legacyCompatKeyService = new DefaultLegacyCompatKeyService(
+      this.masterPasswordService,
+      this.keyGenerationService,
+      this.cryptoFunctionService,
+      this.encryptService,
+      this.logService,
+      this.accountService,
+      this.kdfConfigService,
+      this.keyService,
     );
 
     this.masterPasswordUnlockService = new DefaultMasterPasswordUnlockService(
       this.masterPasswordService,
-      this.keyService,
+      this.legacyCompatKeyService,
       this.logService,
     );
 
@@ -972,23 +974,6 @@ export default class MainBackground {
       this.collectionEncryptionService,
     );
 
-    this.keyConnectorService = new KeyConnectorService(
-      this.accountService,
-      this.masterPasswordService,
-      this.keyService,
-      this.apiService,
-      this.tokenService,
-      this.logService,
-      this.organizationService,
-      logoutCallback,
-      this.stateProvider,
-      this.configService,
-      this.registerSdkService,
-      this.accountCryptographicStateService,
-      this.sdkService,
-      this.userDecryptionOptionsService,
-    );
-
     this.pinService = new PinService(this.sdkService);
 
     this.ipcContentScriptManagerService = new IpcContentScriptManagerService(this.configService);
@@ -1019,8 +1004,28 @@ export default class MainBackground {
       this.stateService,
       this.biometricStateService,
       this.v2UpgradeTokenStateService,
+      this.keyService,
     );
     void browserBiometricsService.setUnlockService(this.unlockService);
+
+    // Constructed after the unlock service, which it depends on.
+    this.keyConnectorService = new KeyConnectorService(
+      this.accountService,
+      this.masterPasswordService,
+      this.legacyCompatKeyService,
+      this.apiService,
+      this.tokenService,
+      this.logService,
+      this.organizationService,
+      logoutCallback,
+      this.stateProvider,
+      this.configService,
+      this.registerSdkService,
+      this.accountCryptographicStateService,
+      this.sdkService,
+      this.userDecryptionOptionsService,
+      this.unlockService,
+    );
 
     this.passwordStrengthService = new PasswordStrengthService();
 
@@ -1060,11 +1065,13 @@ export default class MainBackground {
       this.appIdService,
       this.masterPasswordService,
       this.keyService,
+      this.legacyCompatKeyService,
       this.encryptService,
       this.apiService,
       this.stateProvider,
       this.authRequestApiService,
       this.accountService,
+      this.unlockService,
     );
 
     // Instantiated for its constructor side-effect: registers the login session timeout
@@ -1140,6 +1147,7 @@ export default class MainBackground {
 
     this.cipherService = new CipherService(
       this.keyService,
+      this.legacyCompatKeyService,
       this.domainSettingsService,
       this.apiService,
       this.i18nService,
@@ -1181,7 +1189,11 @@ export default class MainBackground {
       this.restrictedItemTypesService,
     );
 
-    this.containerService = new ContainerService(this.keyService, this.encryptService);
+    this.containerService = new ContainerService(
+      this.keyService,
+      this.encryptService,
+      this.legacyCompatKeyService,
+    );
 
     this.sendStateProvider = new SendStateProvider(this.stateProvider);
     this.sendService = new SendService(
@@ -1240,11 +1252,8 @@ export default class MainBackground {
       this.tokenService,
       this.authService,
       this.stateProvider,
-      this.securityStateService,
-      this.kdfConfigService,
-      this.accountCryptographicStateService,
-      this.v2UpgradeTokenStateService,
       this.configService,
+      this.sdkService,
     );
 
     this.syncServiceListener = new SyncServiceListener(
@@ -1513,9 +1522,7 @@ export default class MainBackground {
       this.vaultTimeoutSettingsService,
       logoutService,
       this.messagingService,
-      this.searchService,
       this.folderService,
-      this.masterPasswordService,
       this.stateEventRunnerService,
       this.cipherService,
       this.authService,
@@ -1558,6 +1565,7 @@ export default class MainBackground {
     );
     this.nativeMessagingBackground = new NativeMessagingBackground(
       this.keyService,
+      this.legacyCompatKeyService,
       this.encryptService,
       this.cryptoFunctionService,
       this.messagingService,
@@ -1658,6 +1666,7 @@ export default class MainBackground {
       this.userVerificationService,
       this.accountService,
       this.autofillTriageService,
+      new WebmapperDraftService(this.stateProvider),
     );
 
     this.contextMenusBackground = new ContextMenusBackground(contextMenuClickedHandler);
@@ -1708,8 +1717,6 @@ export default class MainBackground {
         chrome.webRequest,
       );
     }
-
-    this.userAutoUnlockKeyService = new UserAutoUnlockKeyService(this.keyService);
 
     this.cipherAuthorizationService = new DefaultCipherAuthorizationService(
       this.collectionService,
@@ -1810,16 +1817,13 @@ export default class MainBackground {
     const userIds = Object.keys(accounts) as UserId[];
     await this.tokenService.cleanupTokenStorage(userIds);
 
-    const setUserKeyInMemoryPromises = [];
     for (const userId of userIds) {
-      // For each acct, we must await the process of setting the user key in memory
-      // if the auto user key is set to avoid race conditions of any code trying to access
-      // the user key from mem.
-      setUserKeyInMemoryPromises.push(
-        this.userAutoUnlockKeyService.setUserKeyInMemoryIfAutoUserKeySet(userId),
-      );
+      try {
+        await this.unlockService.unlockWithAutoUnlockKey(userId);
+      } catch (e) {
+        this.logService.error("Failed to auto-unlock user on bootstrap", e);
+      }
     }
-    await Promise.all(setUserKeyInMemoryPromises);
 
     await (this.i18nService as I18nService).init();
     (this.eventUploadService as EventUploadService).init(true);
@@ -2307,6 +2311,7 @@ export default class MainBackground {
       this.accountService,
       this.generatorHistoryService,
       this.credentialGeneratorService,
+      this.configService,
     );
 
     this.autofillBadgeUpdaterService = new AutofillBadgeUpdaterService(

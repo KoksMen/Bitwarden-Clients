@@ -119,6 +119,9 @@
   "vault": {
     "message": "Kluis"
   },
+  "vaults": {
+    "message": "Kluizen"
+  },
   "myVault": {
     "message": "Mijn kluis"
   },
@@ -505,6 +508,45 @@
   "options": {
     "message": "Opties"
   },
+  "optionsForItem": {
+    "message": "Options for $NAME$",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Google Login"
+      }
+    }
+  },
+  "noSharedFolder": {
+    "message": "No shared folder"
+  },
+  "filterByName": {
+    "message": "Filter by $NAME$",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Engineering"
+      }
+    }
+  },
+  "favoritesFilterTooltip": {
+    "message": "Mark items as favorites to filter them here."
+  },
+  "foldersFilterTooltip": {
+    "message": "Add folders to items to filter them here."
+  },
+  "editItemWithName": {
+    "message": "Edit item - $NAME$",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Google Login"
+      }
+    }
+  },
+  "noItemsInVault": {
+    "message": "No items in the vault"
+  },
   "length": {
     "message": "Lengte"
   },
@@ -708,15 +750,6 @@
   },
   "launchWebsite": {
     "message": "Website openen"
-  },
-  "launchWebsiteName": {
-    "message": "Start website $ITEMNAME$",
-    "placeholders": {
-      "itemname": {
-        "content": "$1",
-        "example": "Secret item"
-      }
-    }
   },
   "website": {
     "message": "Website"
@@ -1557,6 +1590,21 @@
   "copyVerificationCode": {
     "message": "Verificatiecode kopiëren"
   },
+  "noUsername": {
+    "message": "Geen gebruikersnaam"
+  },
+  "noPassword": {
+    "message": "Geen wachtwoord"
+  },
+  "noVerificationCode": {
+    "message": "Geen verificatiecode"
+  },
+  "noNumber": {
+    "message": "Geen nummer"
+  },
+  "noSecurityCode": {
+    "message": "Geen beveiligingscode"
+  },
   "attachments": {
     "message": "Bijlagen"
   },
@@ -1626,12 +1674,6 @@
   "premiumRefresh": {
     "message": "Abonnement vernieuwen"
   },
-  "premiumNotCurrentMember": {
-    "message": "Je bent momenteel geen Premium-lid."
-  },
-  "premiumSignUpAndGet": {
-    "message": "Meld je aan voor een Premium-abonnement en krijg:"
-  },
   "premiumSignUpStorage": {
     "message": "1 GB versleutelde opslag voor bijlagen."
   },
@@ -1676,12 +1718,6 @@
   },
   "premiumPurchaseAlertV2": {
     "message": "Je kunt Premium via je accountinstellingen in de Bitwarden webapp kopen."
-  },
-  "premiumCurrentMember": {
-    "message": "Je bent Premium-lid!"
-  },
-  "premiumCurrentMemberThanks": {
-    "message": "Bedankt voor het ondersteunen van Bitwarden."
   },
   "premiumFeatures": {
     "message": "Upgrade naar premium en ontvang:"
@@ -1950,6 +1986,9 @@
   "showInlineMenuCardsLabel": {
     "message": "Kaarten als suggesties weergeven"
   },
+  "showInlineMenuSSHKeysLabel": {
+    "message": "SSH-sleutels als suggesties weergeven"
+  },
   "showInlineMenuOnIconSelectionLabel": {
     "message": "Suggesties weergeven wanneer pictogram is geselecteerd"
   },
@@ -2152,9 +2191,6 @@
   },
   "securityCode": {
     "message": "Beveiligingscode"
-  },
-  "cardNumber": {
-    "message": "kaartnummer"
   },
   "ex": {
     "message": "bijv."
@@ -2565,6 +2601,15 @@
   },
   "nCollections": {
     "message": "$COUNT$ collecties",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "2"
+      }
+    }
+  },
+  "nSharedFolders": {
+    "message": "$COUNT$ gedeelde mappen",
     "placeholders": {
       "count": {
         "content": "$1",
@@ -4576,7 +4621,7 @@
     "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
   },
   "sendsBodyNoItems": {
-    "message": "Deel bestanden en gegevens veilig met iedereen, op elk platform. Je informatie blijft end-to-end versleuteld terwijl en blootstelling beperkt.",
+    "message": "Bestanden en gegevens veilig met anderen delen, op elk platform. Je informatie blijft end-to-end versleuteld en lekken beperkt.",
     "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
   },
   "inputRequired": {
@@ -5001,6 +5046,79 @@
   },
   "noFileChosen": {
     "message": "Geen bestand gekozen"
+  },
+  "noFileSelected": {
+    "message": "Geen bestand gekozen"
+  },
+  "fileChosen": {
+    "message": "Bestand gekozen: $FILE_NAME$",
+    "placeholders": {
+      "file_name": {
+        "content": "$1",
+        "example": "image.png"
+      }
+    }
+  },
+  "fileAdded": {
+    "message": "Bestand toegevoegd: $FILE_NAME$",
+    "placeholders": {
+      "file_name": {
+        "content": "$1",
+        "example": "image.png"
+      }
+    }
+  },
+  "filesAdded": {
+    "message": "$COUNT$ bestanden toegevoegd: $FILE_NAMES$",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "3"
+      },
+      "file_names": {
+        "content": "$2",
+        "example": "a.txt, b.txt, c.txt"
+      }
+    }
+  },
+  "fileRemoved": {
+    "message": "Bestand verwijderd: $FILE_NAME$",
+    "placeholders": {
+      "file_name": {
+        "content": "$1",
+        "example": "image.png"
+      }
+    }
+  },
+  "oneFileUploaded": {
+    "message": "1 bestand geüpload"
+  },
+  "filesUploaded": {
+    "message": "$COUNT$ bestanden geüpload",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "3"
+      }
+    }
+  },
+  "uploadedFiles": {
+    "message": "Geüploade bestanden"
+  },
+  "clickToUploadOrDragAndDrop": {
+    "message": "Klik om te uploaden of sleep en zet neer"
+  },
+  "chooseFiles": {
+    "message": "Bestanden kiezen"
+  },
+  "maxFileSizeParam": {
+    "message": "Max. bestandsgrootte: $SIZE$ MB",
+    "placeholders": {
+      "size": {
+        "content": "$1",
+        "example": "500"
+      }
+    }
   },
   "orCopyPasteFileContents": {
     "message": "of kopieer en plak de inhoud van het importbestand"
@@ -5457,11 +5575,11 @@
     "description": "Explains to the user that URI match detection determines how Bitwarden suggests autofill options, and clarifies that this default strategy applies when no specific match detection is set for a login item."
   },
   "regExAdvancedOptionWarning": {
-    "message": "\"Reguliere expressie\" is een geavanceerde optie met een verhoogd risico op het blootstellen van inloggegevens.",
+    "message": "\"Reguliere expressie\" is een geavanceerde optie met een verhoogd risico op het lekken van inloggegevens.",
     "description": "Content for dialog which warns a user when selecting 'regular expression' matching strategy as a cipher match strategy"
   },
   "startsWithAdvancedOptionWarning": {
-    "message": "\"Begint met\" is een geavanceerde optie met een verhoogd risico op het blootstellen van inloggegevens.",
+    "message": "\"Begint met\" is een geavanceerde optie met een verhoogd risico op het lekken van inloggegevens.",
     "description": "Content for dialog which warns a user when selecting 'starts with' matching strategy as a cipher match strategy"
   },
   "uriMatchWarningDialogLink": {
@@ -5618,26 +5736,6 @@
   "clearFiltersOrTryAnother": {
     "message": "Wis filters of probeer een andere zoekterm"
   },
-  "copyInfoTitle": {
-    "message": "Info kopiëren - $ITEMNAME$",
-    "description": "Title for a button that opens a menu with options to copy information from an item.",
-    "placeholders": {
-      "itemname": {
-        "content": "$1",
-        "example": "Secret Item"
-      }
-    }
-  },
-  "copyNoteTitle": {
-    "message": "Notitie kopiëren - $ITEMNAME$",
-    "description": "Title for a button copies a note to the clipboard.",
-    "placeholders": {
-      "itemname": {
-        "content": "$1",
-        "example": "Secret Note Item"
-      }
-    }
-  },
   "moreOptionsLabel": {
     "message": "Meer opties, $ITEMNAME$",
     "description": "Aria label for a button that opens a menu with more options for an item.",
@@ -5709,29 +5807,21 @@
       }
     }
   },
-  "copyFieldCipherName": {
-    "message": "$FIELD$, $CIPHERNAME$ kopiëren",
-    "description": "Title for a button that copies a field value to the clipboard.",
-    "placeholders": {
-      "field": {
-        "content": "$1",
-        "example": "Username"
-      },
-      "ciphername": {
-        "content": "$2",
-        "example": "Login Item"
-      }
-    }
-  },
   "noValueEntered": {
     "message": "Geen waarde ingevoerd",
     "description": "Screen reader announcement appended to a custom field's name when the field has no value entered."
   },
-  "noValuesToCopy": {
-    "message": "Geen waarden om te kopiëren"
+  "noDetailsToCopy": {
+    "message": "Geen details om te kopiëren"
   },
   "assignToCollections": {
     "message": "Aan collecties toewijzen"
+  },
+  "addToSharedFolder": {
+    "message": "Aan gedeelde map toevoegen"
+  },
+  "transferAndAdd": {
+    "message": "Overdragen en toevoegen"
   },
   "copyEmail": {
     "message": "E-mail kopiëren"
@@ -6200,8 +6290,14 @@
   "bulkCollectionAssignmentDialogDescriptionSingular": {
     "message": "Alleen organisatieleden met toegang tot deze collecties kunnen de items zien."
   },
+  "bulkVaultSharedFolderAssignmentDialogDescriptionSingular": {
+    "message": "Alleen kluisleden met toegang tot deze gedeelde mappen kunnen het item zien."
+  },
   "bulkCollectionAssignmentDialogDescriptionPlural": {
     "message": "Alleen organisatieleden met toegang tot deze collecties kunnen de items zien."
+  },
+  "bulkVaultSharedFolderAssignmentDialogDescriptionPlural": {
+    "message": "Alleen kluisleden met toegang tot deze gedeelde mappen kunnen de items zien."
   },
   "bulkCollectionAssignmentWarning": {
     "message": "Je hebt $TOTAL_COUNT$ items geselecteerd. Je kunt $READONLY_COUNT$ items niet bijwerken omdat je geen bewerkrechten hebt.",
@@ -6307,8 +6403,20 @@
   "personalItemTransferWarningSingular": {
     "message": "1 item wordt permanent overgedragen aan de geselecteerde organisatie. Je bent niet langer de eigenaar van dit item."
   },
+  "personalItemVaultTransferWarningSingular": {
+    "message": "1 item wordt permanent overgedragen aan de geselecteerde kluis. Je bent niet langer de eigenaar van dit item."
+  },
   "personalItemsTransferWarningPlural": {
     "message": "$PERSONAL_ITEMS_COUNT$ items worden permanent overgedragen aan de geselecteerde organisatie. Je bent niet langer de eigenaar van deze items.",
+    "placeholders": {
+      "personal_items_count": {
+        "content": "$1",
+        "example": "2"
+      }
+    }
+  },
+  "personalItemsVaultTransferWarningPlural": {
+    "message": "$PERSONAL_ITEMS_COUNT$ items worden permanent overgedragen aan de geselecteerde kluis. Je bent niet langer de eigenaar van deze items.",
     "placeholders": {
       "personal_items_count": {
         "content": "$1",
@@ -6341,17 +6449,32 @@
   "successfullyAssignedCollections": {
     "message": "Succesvol toegewezen collecties"
   },
+  "successfullyAddedSharedFolders": {
+    "message": "Succesvol gedeelde mappen toegevoegd"
+  },
   "itemMovedToCollection": {
     "message": "Item naar collectie verplaatst"
+  },
+  "itemAddedToSharedFolder": {
+    "message": "Item aan gedeelde map toegevoegd"
   },
   "itemMovedToCollections": {
     "message": "Item naar collecties verplaatst"
   },
+  "itemAddedToSharedFolders": {
+    "message": "Item aan gedeelde mappen toegevoegd"
+  },
   "itemsMovedToCollection": {
     "message": "Items naar collectie verplaatst"
   },
+  "itemsAddedToSharedFolder": {
+    "message": "Items aan gedeelde map toegevoegd"
+  },
   "itemsMovedToCollections": {
     "message": "Items naar collecties verplaatst"
+  },
+  "itemsAddedToSharedFolders": {
+    "message": "Items aan gedeelde mappen toegevoegd"
   },
   "itemAssignedToCollections": {
     "message": "Item aan collecties toegewezen"
@@ -6401,10 +6524,16 @@
     "message": "Itemlocatie"
   },
   "fileSends": {
-    "message": "Bestanden verzenden"
+    "message": "Bestanden verzenden",
+    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
   },
   "textSends": {
-    "message": "Tekst-Sends"
+    "message": "Tekst-Sends",
+    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+  },
+  "itemSends": {
+    "message": "Item-Sends",
+    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
   },
   "accountActions": {
     "message": "Accountacties"
@@ -6424,8 +6553,8 @@
       }
     }
   },
-  "showQuickCopyActions": {
-    "message": "Toon snelle kopieeracties in de kluis"
+  "showQuickCopyActionsInVault": {
+    "message": "Toon snelle kopieeracties in kluis"
   },
   "systemDefault": {
     "message": "Systeemstandaard"
@@ -6739,6 +6868,15 @@
       }
     }
   },
+  "cannotRemoveViewOnlySharedFolders": {
+    "message": "Je kunt gedeelde mappen niet verwijderen met alleen rechten voor weergeven: $SHAREDFOLDERS$",
+    "placeholders": {
+      "sharedfolders": {
+        "content": "$1",
+        "example": "Work, Personal"
+      }
+    }
+  },
   "updateDesktopAppOrDisableFingerprintDialogTitle": {
     "message": "Werk je desktopapplicatie bij"
   },
@@ -6920,6 +7058,9 @@
   },
   "permitCipherDetailsDescription": {
     "message": "Bitwarden gebruikt opgeslagen login-URI's om te bepalen welk pictogram of URL voor het wijzigen van het wachtwoord moet worden gebruikt om je ervaring te verbeteren. Er wordt geen informatie verzameld of opgeslagen wanneer je deze service gebruikt."
+  },
+  "showQuickCopyActionsDetailsDescription": {
+    "message": "3 sneltoetsen toevoegen naast items om je gebruikersnaam, wachtwoord of verificatiecode naar het klembord te kopiëren."
   },
   "noPermissionsViewPage": {
     "message": "Je hebt geen rechten om deze pagina te bekijken. Probeer in te loggen met een ander account."
@@ -7431,5 +7572,172 @@
   },
   "health": {
     "message": "Gezondheid"
+  },
+  "scanMyVault": {
+    "message": "Mijn kluis doorzoeken"
+  },
+  "introducingHealth": {
+    "message": "Introductie van gezondheid"
+  },
+  "healthIntroDescription": {
+    "message": "Controleer en verbeter de gezondheid van je kluis door het aanpassen van gelekte, zwakke en hergebruikte wachtwoorden."
+  },
+  "yourVaultIsHealthy": {
+    "message": "Je kluis is gezond",
+    "description": "Heading shown when none of the user's passwords are at risk."
+  },
+  "yourVaultRiskIsHigh": {
+    "message": "Je kluisrisico is hoog",
+    "description": "Heading shown when at least one of the user's passwords is at risk."
+  },
+  "passwordsNeedFixing": {
+    "message": "$AT_RISK$ van $TOTAL$ wachtwoorden moeten worden aangepast",
+    "description": "Count of the user's passwords that are at risk, out of the total number scanned.",
+    "placeholders": {
+      "at_risk": {
+        "content": "$1",
+        "example": "63"
+      },
+      "total": {
+        "content": "$2",
+        "example": "200"
+      }
+    }
+  },
+  "exposedPasswordsNone": {
+    "message": "Geen gelekte wachtwoorden",
+    "description": "Title of the exposed risk category row when no passwords are exposed."
+  },
+  "exposedPassword": {
+    "message": "1 gelekt wachtwoord",
+    "description": "Title of the exposed risk category row when exactly one password is exposed."
+  },
+  "exposedPasswordsPlural": {
+    "message": "$COUNT$ gelekte wachtwoorden",
+    "description": "Title of the exposed risk category row, including the count. Used for counts of two or more.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "6"
+      }
+    }
+  },
+  "exposedPasswordsDesc": {
+    "message": "Gelekt in datalekken",
+    "description": "Explains what makes a password count as exposed."
+  },
+  "exposedPasswordsNoneDesc": {
+    "message": "Geen van je wachtwoorden zijn gevonden in datalekken",
+    "description": "Description of the exposed risk category row when no passwords are exposed."
+  },
+  "weakPasswordsNone": {
+    "message": "Geen zwakke wachtwoorden",
+    "description": "Title of the weak risk category row when no passwords are weak."
+  },
+  "weakPassword": {
+    "message": "1 zwak wachtwoord",
+    "description": "Title of the weak risk category row when exactly one password is weak."
+  },
+  "weakPasswordsPlural": {
+    "message": "$COUNT$ zwakke wachtwoorden",
+    "description": "Title of the weak risk category row, including the count. Used for counts of two or more.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "22"
+      }
+    }
+  },
+  "weakPasswordsDesc": {
+    "message": "Te kort of eenvoudig",
+    "description": "Explains what makes a password count as weak."
+  },
+  "weakPasswordsNoneDesc": {
+    "message": "Al je wachtwoorden zijn sterk",
+    "description": "Description of the weak risk category row when no passwords are weak."
+  },
+  "reusedPasswordsNone": {
+    "message": "Geen hergebruikte wachtwoorden",
+    "description": "Title of the reused risk category row when no passwords are reused."
+  },
+  "reusedPassword": {
+    "message": "1 hergebruikt wachtwoord",
+    "description": "Title of the reused risk category row when exactly one password is reused."
+  },
+  "reusedPasswordsPlural": {
+    "message": "$COUNT$ hergebruikte wachtwoorden",
+    "description": "Title of the reused risk category row, including the count. Used for counts of two or more.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "35"
+      }
+    }
+  },
+  "reusedPasswordsDesc": {
+    "message": "Hergebruikt voor verschillende logins",
+    "description": "Explains what makes a password count as reused."
+  },
+  "reusedPasswordsNoneDesc": {
+    "message": "Al je wachtwoorden zijn uniek",
+    "description": "Description of the reused risk category row when no passwords are reused."
+  },
+  "risksIdentified": {
+    "message": "Risico's geïdentificeerd",
+    "description": "Section heading above the list of risk categories on the Health Overview."
+  },
+  "categoryHealthy": {
+    "message": "Geen items die aandacht nodig hebben",
+    "description": "Accessible label for the checkmark shown on a risk category with a count of zero."
+  },
+  "exposedPasswordsTitle": {
+    "message": "Gelekte wachtwoorden"
+  },
+  "exposedPasswordsDescription": {
+    "message": "Wachtwoorden voor deze logins waren zijn gelekt in datalekken. Wijzig ze meteen om je accounts te beschermen."
+  },
+  "weakPasswordsTitle": {
+    "message": "Zwakke wachtwoorden"
+  },
+  "weakPasswordsDescription": {
+    "message": "Deze wachtwoorden kunnen gemakkelijk worden geraden omdat ze te kort of eenvoudig zijn. Versterk ze door ze complexer te maken."
+  },
+  "reusedPasswordsTitle": {
+    "message": "Hergebruikte wachtwoorden"
+  },
+  "reusedPasswordsDescription": {
+    "message": "Deze logins hebben een hergebruikt wachtwoord. Maak een uniek wachtwoord aan voor elk account om te voorkomen dat iemand meerdere accounts met één wachtwoord bezoekt."
+  },
+  "deleteAtRiskItemDescription": {
+    "message": "Het verwijderen van deze login verwijdert deze uit je kluis maar lost het risico niet op. Om je account te beschermen, wijzig je eerst je wachtwoord."
+  },
+  "passwordHasAdditionalRisks": {
+    "message": "Dit wachtwoord heeft extra risico's:"
+  },
+  "reused": {
+    "message": "Hergebruikt",
+    "description": "ex. A password that is reused across multiple logins."
+  },
+  "xTimes": {
+    "message": "$COUNT$ items",
+    "description": "The number of times a password is reused. ex. 6 times",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "6"
+      }
+    }
+  },
+  "exposedPasswordsEmpty": {
+    "message": "Geen van je wachtwoorden zijn gevonden in datalekken"
+  },
+  "weakPasswordEmpty": {
+    "message": "All your passwords are strong."
+  },
+  "reusedPasswordEmpty": {
+    "message": "All your passwords are unique."
+  },
+  "youreAllSet": {
+    "message": "Je bent helemaal klaar!"
   }
 }
