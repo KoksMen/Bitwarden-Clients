@@ -156,54 +156,46 @@ tr[appVaultCollectionRow] {
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    width: 36px !important;
-    min-width: 36px !important;
+    width: 40px !important;
+    min-width: 40px !important;
     padding: 0 !important;
     cursor: pointer !important;
   }
 
-  input[type="checkbox"] {
-    width: 18px !important;
-    height: 18px !important;
-    border-radius: 5px !important;
+  /* Reset outer input to prevent double border or offset box */
+  input[type="checkbox"][bitCheckbox] {
+    border: none !important;
+    outline: none !important;
+    background: transparent !important;
     cursor: pointer !important;
     margin: 0 !important;
-    transition: all 0.15s ease !important;
+    box-shadow: none !important;
   }
 }
 
-html.theme_light tr[appVaultCipherRow],
-html.theme_light tr[appVaultCollectionRow] {
-  input[type="checkbox"] {
-    border: 1.5px solid #94a3b8 !important;
-    accent-color: #2563eb !important;
-
-    &:hover {
-      border-color: #2563eb !important;
-      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15) !important;
-    }
+/* Active card state: make checkbox border crisp white on the vivid blue background */
+html.theme_light tr[appVaultCipherRow][data-active="true"] input[bitCheckbox],
+html.theme_dark tr[appVaultCipherRow][data-active="true"] input[bitCheckbox],
+html.theme_light tr[appVaultCollectionRow][data-active="true"] input[bitCheckbox],
+html.theme_dark tr[appVaultCollectionRow][data-active="true"] input[bitCheckbox] {
+  &:before {
+    border-color: rgba(255, 255, 255, 0.9) !important;
+    background-color: rgba(255, 255, 255, 0.2) !important;
   }
-}
 
-html.theme_dark tr[appVaultCipherRow],
-html.theme_dark tr[appVaultCollectionRow] {
-  input[type="checkbox"] {
-    border: 1.5px solid #64748b !important;
-    accent-color: #3b82f6 !important;
-
-    &:hover {
-      border-color: #60a5fa !important;
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25) !important;
-    }
+  &:hover:before {
+    border-color: #ffffff !important;
+    background-color: rgba(255, 255, 255, 0.35) !important;
   }
-}
 
-html.theme_light tr[appVaultCipherRow][data-active="true"] input[type="checkbox"],
-html.theme_dark tr[appVaultCipherRow][data-active="true"] input[type="checkbox"],
-html.theme_light tr[appVaultCollectionRow][data-active="true"] input[type="checkbox"],
-html.theme_dark tr[appVaultCollectionRow][data-active="true"] input[type="checkbox"] {
-  border-color: #ffffff !important;
-  accent-color: #ffffff !important;
+  &:checked:before {
+    background-color: #ffffff !important;
+    border-color: #ffffff !important;
+  }
+
+  &:checked:after {
+    background-color: #2563eb !important;
+  }
 }
 
 /* 4. Sidebar Navigation Items Clean Card Styling */
