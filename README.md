@@ -25,6 +25,9 @@
 
 <p align="center">
   <a href="https://github.com/KoksMen/Bitwarden-Clients/releases/latest">
+    <img src="https://img.shields.io/badge/Download-Installer%20(.exe)-0078D6?style=for-the-badge&logo=windows&logoColor=white" alt="Download Installer" />
+  </a>
+  <a href="https://github.com/KoksMen/Bitwarden-Clients/releases/latest">
     <img src="https://img.shields.io/badge/Download-Portable%20(.exe)-2563eb?style=for-the-badge&logo=windows&logoColor=white" alt="Download Portable" />
   </a>
   <a href="https://github.com/KoksMen/Bitwarden-Clients">
@@ -107,8 +110,10 @@
 
 ## 🚀 Быстрый запуск
 
-1. Скачайте портативную версию [Bitwarden-Fork-Portable-2026.10.0.exe](https://github.com/KoksMen/Bitwarden-Clients/releases/latest).
-2. Запустите файл — установка не требуется, приложение готово к работе!
+Вы можете выбрать удобный для вас вариант сборки:
+
+1. **📦 Установочник (Installer):** Скачайте [`Bitwarden-Fork-Installer-2026.10.0.exe`](https://github.com/KoksMen/Bitwarden-Clients/releases/latest). Запустите инсталлятор для стандартной установки в систему Windows, создания ярлыков и интеграции в систему.
+2. **🚀 Портативная версия (Portable):** Скачайте [`Bitwarden-Fork-Portable-2026.10.0.exe`](https://github.com/KoksMen/Bitwarden-Clients/releases/latest). Запустите файл напрямую из любой папки или со съемного накопителя — установка не требуется!
 3. Войдите в свою учетную запись Bitwarden или укажите адрес собственного сервера Vaultwarden.
 
 ---
@@ -133,13 +138,32 @@ The fork is fully synced with upstream [bitwarden/clients](https://github.com/bi
 - ↔️ **Floating Drawer Resizer:** Freely adjustable sidebar width with smooth dragging support.
 - 🛡️ **Native Passkeys & Windows Hello:** System-wide WebAuthn Credential Provider for Windows 10/11 without requiring a browser extension.
 - 🚫 **Upstream Update Blocker:** Prevents automatic overwriting of custom fork builds by upstream binaries.
-- 📦 **Portable Release:** Standalone Windows x64 binary requiring zero installation.
+- 📦 **Dual Release Options:** Available both as a standard Windows Installer (`.exe`) and as a standalone Portable executable (`.exe`).
+
+---
+
+## 🚀 Quick Start
+
+Choose your preferred distribution format:
+
+1. **📦 Installer (Setup):** Download [`Bitwarden-Fork-Installer-2026.10.0.exe`](https://github.com/KoksMen/Bitwarden-Clients/releases/latest) for standard Windows installation with Start Menu shortcuts and system integration.
+2. **🚀 Portable Edition:** Download [`Bitwarden-Fork-Portable-2026.10.0.exe`](https://github.com/KoksMen/Bitwarden-Clients/releases/latest) for a standalone, single-file executable that runs without installation.
+3. Log in with your standard Bitwarden account or configure a self-hosted Vaultwarden server.
 
 ---
 
 ## 📦 Хеш-суммы и цифровая подпись (Checksums)
 
 ```text
+=== Windows Installer (Установочник) ===
+File: Bitwarden-Fork-Installer-2026.10.0.exe
+Size: 119,285,640 bytes (113.76 MB)
+SHA256: 428A0CB1F8D3E009A81CA87BB8DB15F17A76D7AECB6CB14A75DE97E019FAA3AF
+Signer: CN=xXKoksMenXx, O=xXTeam, C=RU
+Thumbprint: C6C4A602CD20A275BC0B4E07AC0F73CAC7D414F7
+TSA: Sectigo RFC 3161 SHA-256 Timestamp
+
+=== Windows Portable (Портативная версия) ===
 File: Bitwarden-Fork-Portable-2026.10.0.exe
 Size: 119,050,976 bytes (113.54 MB)
 SHA256: 39AB4B73DB0EA836BDB12C77879E652F54BF300660B2B5D0056F239527D012FE
