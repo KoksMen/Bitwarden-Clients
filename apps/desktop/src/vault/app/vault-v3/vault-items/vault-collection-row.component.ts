@@ -59,7 +59,6 @@ export class VaultCollectionRowComponent {
   protected readonly collection = input<CollectionView>();
   protected readonly showOwner = input<boolean>();
   protected readonly organizations = input<Organization[]>();
-  protected readonly showBatchBar = input<boolean>(false);
   protected readonly selected = input<boolean>(false);
   protected readonly checkboxChange = output<void>();
 }

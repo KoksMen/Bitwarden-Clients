@@ -2,9 +2,24 @@
   class="vault tw-flex tw-flex-col tw-h-full tw-overflow-x-hidden"
   attr.aria-hidden="{{ showingModal }}"
 >
+  <vault-organization-user-notifications
+    class="tw-shrink-0"
+  ></vault-organization-user-notifications>
   <div class="tw-pt-6 tw-px-6">
-    <vault-organization-user-notifications></vault-organization-user-notifications>
-    <app-header>
+    <app-header [title]="title()">
+      @if (showBreadcrumbs()) {
+        <vault-breadcrumbs slot="breadcrumbs" [scope]="vaultScope()" />
+      } @else if (headerTile(); as tile) {
+        <bit-icon-tile
+          slot="title-prefix"
+          [icon]="tile.icon"
+          [variant]="tile.variant ?? 'primary'"
+          [color]="tile.color"
+          [emphasis]="tile.emphasis ?? 'subtle'"
+          size="sm"
+          aria-hidden="true"
+        />
+      }
       <vault-new-cipher-menu
         [canCreateCipher]="(canCreateCipher$ | async) ?? true"
         [canCreateFolder]="true"
@@ -45,7 +60,5 @@
     (onAddFolder)="addFolder()"
     (onAddItemDialog)="openAddItemDialog()"
   />
-  @if (vaultBatchBarFeatureFlag()) {
-    <bit-vault-batch-action />
-  }
+  <bit-vault-batch-action />
 </div>

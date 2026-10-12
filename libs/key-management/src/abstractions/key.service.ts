@@ -3,7 +3,6 @@ import { Observable } from "rxjs";
 import { ProfileOrganizationResponse } from "@bitwarden/common/admin-console/models/response/profile-organization.response";
 import { ProfileProviderOrganizationResponse } from "@bitwarden/common/admin-console/models/response/profile-provider-organization.response";
 import { ProfileProviderResponse } from "@bitwarden/common/admin-console/models/response/profile-provider.response";
-import { KeySuffixOptions } from "@bitwarden/common/platform/enums";
 import { OrganizationId, ProviderId, UserId } from "@bitwarden/common/types/guid";
 import {
   UserKey,
@@ -13,12 +12,7 @@ import {
   UserPublicKey,
 } from "@bitwarden/common/types/key";
 // eslint-disable-next-line no-restricted-imports
-import {
-  EncryptedString,
-  EncString,
-  SignedPublicKey,
-  WrappedSigningKey,
-} from "@bitwarden/legacy-crypto";
+import { EncryptedString, EncString } from "@bitwarden/legacy-crypto";
 
 export class UserPrivateKeyDecryptionFailedError extends Error {
   constructor() {
@@ -48,25 +42,6 @@ export abstract class KeyService {
    * @param userId The user id of the user to get the {@see UserKey} for.
    */
   abstract userKey$(userId: UserId): Observable<UserKey | null>;
-  /**
-   * Sets the provided user key and stores
-   * any other necessary versions (such as auto, biometrics,
-   * or pin)
-   *
-   * @throws Error when key or userId is null. Lock the account to clear a key.
-   * @param key The user key to set
-   * @param userId The desired user
-   */
-  abstract setUserKey(key: UserKey, userId: UserId): Promise<void>;
-  /**
-   * Gets the user key from memory and sets it again,
-   * kicking off a refresh of any additional keys
-   * (such as auto, biometrics, or pin)
-   * @param userId The target user to refresh keys for.
-   * @throws Error when userId is null or undefined.
-   * @throws When userKey doesn't exist in memory for the target user.
-   */
-  abstract refreshAdditionalKeys(userId: UserId): Promise<void>;
 
   /**
    * Observable value that returns whether or not the user has ever had a userKey,
@@ -75,25 +50,11 @@ export abstract class KeyService {
   abstract everHadUserKey$(userId: UserId): Observable<boolean>;
 
   /**
-   * Retrieves the user key
+   * Clears every stored copy of the user's key, including platform-specific copies
+   * such as the desktop biometric unlock key.
    * @param userId The desired user
-   * @returns The user key
-   *
-   * @deprecated Use {@link userKey$} with a required {@link UserId} instead.
    */
-  abstract getUserKey(userId?: string): Promise<UserKey | null>;
-
-  /**
-   * Retrieves the user key from storage
-   * @param keySuffix The desired version of the user's key to retrieve
-   * @param userId The desired user
-   * @returns The user key
-   * @throws Error when userId is null or undefined.
-   */
-  abstract getUserKeyFromStorage(
-    keySuffix: KeySuffixOptions,
-    userId: string,
-  ): Promise<UserKey | null>;
+  abstract clearAllStoredUserKeys(userId: UserId): Promise<void>;
 
   /**
    * Determines whether the user key is available for the given user in memory.
@@ -240,17 +201,9 @@ export abstract class KeyService {
   abstract userPublicKey$(userId: UserId): Observable<Uint8Array | null>;
 
   /**
-   * Gets a users signing keys from local state.
-   * The observable will emit null, exactly if the local state returns null.
-   */
-  abstract userSigningKey$(userId: UserId): Observable<WrappedSigningKey | null>;
-
-  /**
    * Validates that a userkey is correct for a given user
    * @param key The key to validate
    * @param userId The user id for the key
    */
   abstract validateUserKey(key: UserKey, userId: UserId): Promise<boolean>;
-
-  abstract userSignedPublicKey$(userId: UserId): Observable<SignedPublicKey | null>;
 }

@@ -5,6 +5,8 @@ import * as path from "path";
 
 import { app } from "electron";
 
+import { DEV_ICON_FILE, isDev } from "./utils";
+
 app.setName("Bitwarden");
 if (process.platform === "win32") {
   // Set this before the first BrowserWindow is created so Windows uses the
@@ -46,6 +48,14 @@ if (
     process.exit(1);
   });
 } else {
+  // macOS draws no window icon, so the dock is the only place a dev client can be told apart
+  // from an installed one. __dirname is the build output directory at runtime.
+  if (isDev() && process.platform === "darwin") {
+    const devIcon = path.join(__dirname, "images", DEV_ICON_FILE);
+
+    void app.whenReady().then(() => app.dock.setIcon(devIcon));
+  }
+
   // eslint-disable-next-line
   const Main = require("./main").Main;
 
