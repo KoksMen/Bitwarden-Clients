@@ -75,14 +75,14 @@ export class VaultCipherRowComponent<C extends CipherViewLike> {
   protected get hostClasses(): string {
     const base =
       "tw-block tw-w-full tw-rounded-xl tw-border tw-py-2.5 tw-px-3.5 tw-transition-all tw-duration-150 tw-cursor-pointer tw-shadow-xs";
-    return this.selected()
+    return this.selected() || this.active()
       ? `${base} tw-border-blue-600 dark:tw-border-blue-400 tw-ring-2 tw-ring-blue-500/40 tw-bg-blue-100 dark:tw-bg-blue-900/60 tw-shadow-md`
       : `${base} tw-border-gray-200 dark:tw-border-gray-700 tw-bg-surface-alt hover:tw-border-blue-400 hover:tw-bg-blue-50 dark:hover:tw-bg-blue-950/70 hover:tw-shadow-sm`;
   }
 
   @HostBinding("attr.data-active")
   protected get activeState(): string | null {
-    return this.selected() ? "true" : null;
+    return this.selected() || this.active() ? "true" : null;
   }
 
   protected readonly menuTrigger = viewChild<MenuTriggerForDirective>("optionsMenuTrigger");
@@ -114,6 +114,7 @@ export class VaultCipherRowComponent<C extends CipherViewLike> {
    * Enforce Org Data Ownership Policy Status
    */
   protected readonly enforceOrgDataOwnershipPolicy = input<boolean>();
+  readonly active = input<boolean>(false);
   protected readonly selected = input<boolean>(false);
   protected readonly checkboxChange = output<void>();
   protected readonly onEvent = output<VaultItemEvent<C>>();

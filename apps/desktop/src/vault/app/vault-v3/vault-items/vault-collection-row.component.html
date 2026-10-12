@@ -1,8 +1,14 @@
-<td bitCell [ngClass]="RowHeightClass" class="tw-w-10">
+<td
+  bitCell
+  class="tw-flex tw-w-10 tw-h-full tw-items-center tw-justify-center tw-shrink-0 tw-cursor-pointer"
+  (click)="$event.stopPropagation(); checkboxChange.emit()"
+>
   <input
     type="checkbox"
     bitCheckbox
+    class="tw-cursor-pointer"
     [checked]="selected()"
+    (click)="$event.stopPropagation()"
     (change)="checkboxChange.emit()"
     [attr.aria-label]="collection().name"
   />

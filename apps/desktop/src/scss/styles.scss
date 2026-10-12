@@ -149,6 +149,63 @@ html.theme_dark tr[appVaultCollectionRow][data-active="true"] {
   }
 }
 
+/* --- Checkbox Selector Ergonomics & Alignment --- */
+tr[appVaultCipherRow],
+tr[appVaultCollectionRow] {
+  td:first-child {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 36px !important;
+    min-width: 36px !important;
+    padding: 0 !important;
+    cursor: pointer !important;
+  }
+
+  input[type="checkbox"] {
+    width: 18px !important;
+    height: 18px !important;
+    border-radius: 5px !important;
+    cursor: pointer !important;
+    margin: 0 !important;
+    transition: all 0.15s ease !important;
+  }
+}
+
+html.theme_light tr[appVaultCipherRow],
+html.theme_light tr[appVaultCollectionRow] {
+  input[type="checkbox"] {
+    border: 1.5px solid #94a3b8 !important;
+    accent-color: #2563eb !important;
+
+    &:hover {
+      border-color: #2563eb !important;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15) !important;
+    }
+  }
+}
+
+html.theme_dark tr[appVaultCipherRow],
+html.theme_dark tr[appVaultCollectionRow] {
+  input[type="checkbox"] {
+    border: 1.5px solid #64748b !important;
+    accent-color: #3b82f6 !important;
+
+    &:hover {
+      border-color: #60a5fa !important;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25) !important;
+    }
+  }
+}
+
+html.theme_light tr[appVaultCipherRow][data-active="true"] input[type="checkbox"],
+html.theme_dark tr[appVaultCipherRow][data-active="true"] input[type="checkbox"],
+html.theme_light tr[appVaultCollectionRow][data-active="true"] input[type="checkbox"],
+html.theme_dark tr[appVaultCollectionRow][data-active="true"] input[type="checkbox"] {
+  border-color: #ffffff !important;
+  accent-color: #ffffff !important;
+}
+
 /* 4. Sidebar Navigation Items Clean Card Styling */
 bit-nav-item [data-spotlight-target],
 app-folder-filter [data-spotlight-target],

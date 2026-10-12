@@ -1,9 +1,18 @@
 // FIXME: Update this file to be type safe and remove this and next line
 // @ts-strict-ignore
 import { SelectionModel } from "@angular/cdk/collections";
-import { ScrollingModule } from "@angular/cdk/scrolling";
+import { CdkVirtualScrollViewport, ScrollingModule } from "@angular/cdk/scrolling";
 import { AsyncPipe, NgClass } from "@angular/common";
-import { Component, input, output, effect, inject, computed } from "@angular/core";
+import {
+  Component,
+  input,
+  output,
+  effect,
+  inject,
+  computed,
+  signal,
+  viewChild,
+} from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { Observable, of, switchMap } from "rxjs";
 
@@ -98,6 +107,9 @@ export class VaultListComponent<C extends CipherViewLike> {
   protected onEvent = output<VaultItemEvent<C>>();
   readonly pinnedCipher = input<C | null>(null);
 
+  readonly viewport = viewChild(CdkVirtualScrollViewport);
+  readonly isPinnedVisibleInList = signal<boolean>(false);
+
   protected onAddCipher = output<CipherType>();
   protected onAddFolder = output<void>();
   protected onAddItemDialog = output<void>();
@@ -142,6 +154,56 @@ export class VaultListComponent<C extends CipherViewLike> {
       this.ciphers();
       this.refreshItems();
     });
+
+    effect(() => {
+      this.pinnedCipher();
+      this.ciphers();
+      setTimeout(() => this.updatePinnedVisibility(), 0);
+    });
+  }
+
+  protected updatePinnedVisibility() {
+    const pinned = this.pinnedCipher();
+    const vp = this.viewport();
+    if (!pinned || !vp) {
+      this.isPinnedVisibleInList.set(false);
+      return;
+    }
+    const items = this.dataSource.data;
+    if (!items || items.length === 0) {
+      this.isPinnedVisibleInList.set(false);
+      return;
+    }
+    const index = items.findIndex((it) => it.cipher?.id === pinned.id);
+    if (index === -1) {
+      this.isPinnedVisibleInList.set(false);
+      return;
+    }
+
+    try {
+      const scrollOffset = vp.measureScrollOffset();
+      const viewportHeight = vp.getViewportSize() || vp.elementRef.nativeElement.clientHeight || 0;
+      if (viewportHeight <= 0) {
+        this.isPinnedVisibleInList.set(false);
+        return;
+      }
+      const itemTop = index * this.RowHeight;
+      const itemBottom = itemTop + this.RowHeight;
+      const isVisible = itemBottom > scrollOffset && itemTop < scrollOffset + viewportHeight;
+      this.isPinnedVisibleInList.set(isVisible);
+    } catch {
+      this.isPinnedVisibleInList.set(false);
+    }
+  }
+
+  protected scrollToPinned() {
+    const pinned = this.pinnedCipher();
+    const vp = this.viewport();
+    if (!pinned || !vp) {return;}
+    const index = this.dataSource.data.findIndex((it) => it.cipher?.id === pinned.id);
+    if (index !== -1) {
+      vp.scrollToIndex(index, "smooth");
+    }
   }
 
   protected readonly showExtraColumn = computed(() => this.showOwner());
