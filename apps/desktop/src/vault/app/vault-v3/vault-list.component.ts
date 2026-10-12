@@ -4,7 +4,7 @@ import { SelectionModel } from "@angular/cdk/collections";
 import { ScrollingModule } from "@angular/cdk/scrolling";
 import { AsyncPipe, NgClass } from "@angular/common";
 import { Component, input, output, effect, inject, computed } from "@angular/core";
-import { takeUntilDestroyed, toSignal } from "@angular/core/rxjs-interop";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { Observable, of, switchMap } from "rxjs";
 
 import { BitSvg } from "@bitwarden/assets/svg";
@@ -106,22 +106,6 @@ export class VaultListComponent<C extends CipherViewLike> {
   protected restrictedItemTypesService = inject(RestrictedItemTypesService);
   private premiumUpgradePromptService = inject(PremiumUpgradePromptService);
   private batchBarService = inject<VaultBatchBarService<C>>(VaultBatchBarService);
-  private vaultCopyButtonsService = inject(VaultCopyButtonsService);
-
-  /**
-   * Whether copy actions render as an icon per copyable field rather than a single combined menu.
-   * Mirrors {@link VaultCipherRowComponent}'s own check, so the column reserves what the rows draw.
-   */
-  private readonly showQuickCopyActions = toSignal(
-    this.vaultCopyButtonsService.showQuickCopyActions$,
-    { initialValue: false },
-  );
-
-  protected readonly optionsColumnWidthClass = computed(() =>
-    optionsColumnWidthClass(this.showQuickCopyActions()),
-  );
-
-  protected readonly ownerColumnWidthClass = OWNER_COLUMN_WIDTH_CLASS;
 
   protected readonly barVisible = computed(() => this.batchBarService.selectedCount() > 0);
 

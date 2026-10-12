@@ -7,7 +7,6 @@ import { RouterModule } from "@angular/router";
 import { BehaviorSubject, EMPTY, firstValueFrom, from, fromEvent } from "rxjs";
 import { catchError, concatMap, map, switchMap, timeout } from "rxjs/operators";
 
-import { PremiumBadgeComponent } from "@bitwarden/angular/billing/components/premium-badge";
 import { AutotypeShortcutComponent } from "@bitwarden/angular/desktop-native/components/autotype-shortcut.component";
 import { PolicyService } from "@bitwarden/common/admin-console/abstractions/policy/policy.service.abstraction";
 import { PolicyType } from "@bitwarden/common/admin-console/enums";
@@ -112,7 +111,6 @@ import { NativeMessagingManifestService } from "../services/native-messaging-man
     TypographyModule,
     SessionTimeoutSettingsComponent,
     PermitCipherDetailsPopoverComponent,
-    PremiumBadgeComponent,
     ShowQuickCopyActionsDetailsPopoverComponent,
   ],
 })

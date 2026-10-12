@@ -42,7 +42,6 @@
           [canRestoreCipher]="cipherAuthorizationService.canRestoreCipher$(pinned) | async"
           [userCanArchive]="userCanArchive()"
           [enforceOrgDataOwnershipPolicy]="enforceOrgDataOwnershipPolicy()"
-          [showBatchBar]="false"
           [selected]="true"
           (onEvent)="event($event)"
         ></tr>

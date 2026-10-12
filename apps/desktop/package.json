@@ -96,6 +96,7 @@
     "dist:mac:masdev": "npm run build && npm run pack:mac:masdev",
     "dist:win": "npm run build && npm run pack:win",
     "dist:win:fork": "npm run build-native -- --release && npm run build && npm run clean:dist && electron-builder --config electron-builder.fork.json --win --x64 -p never",
+    "dist:win:portable": "npm run build-native -- --release && npm run build && npm run clean:dist && electron-builder --config electron-builder.portable.json --win --x64 -p never",
     "dist:win:ci": "npm run build && npm run pack:win:ci",
     "test": "npm run test:oss",
     "test:watch": "npm run test:oss:watch",

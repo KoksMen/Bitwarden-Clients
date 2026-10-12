@@ -1,0 +1,9 @@
+{
+  "extends": "./electron-builder.json",
+  "win": {
+    "target": ["portable"]
+  },
+  "portable": {
+    "artifactName": "${productName}-Fork-Portable-${version}.${ext}"
+  }
+}
