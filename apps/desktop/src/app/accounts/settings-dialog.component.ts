@@ -210,12 +210,12 @@ export class SettingsDialogComponent implements OnInit {
     enableDuckDuckGoBrowserIntegration: false,
     enableAutotype: this.formBuilder.control<boolean>({
       value: false,
-      disabled: true,
+      disabled: false,
     }),
     autotypeShortcut: [null as string | null],
     enableAutotypeGa: this.formBuilder.control<boolean>({
       value: false,
-      disabled: true,
+      disabled: false,
     }),
     autotypeGaShortcut: [null as string | null],
     theme: [null as Theme | null],
@@ -340,15 +340,8 @@ export class SettingsDialogComponent implements OnInit {
     this.form.setValue(initialValues, { emitEvent: false });
 
     if (this.isWindows) {
-      this.billingAccountProfileStateService
-        .hasPremiumFromAnySource$(this.currentUserId())
-        .pipe(takeUntilDestroyed(this.destroyRef))
-        .subscribe((hasPremium) => {
-          if (hasPremium) {
-            this.form.controls.enableAutotype.enable(); // MVP, delete with PM-41067
-            this.form.controls.enableAutotypeGa.enable();
-          }
-        });
+      this.form.controls.enableAutotype.enable(); // MVP, delete with PM-41067
+      this.form.controls.enableAutotypeGa.enable();
     }
 
     // Form events

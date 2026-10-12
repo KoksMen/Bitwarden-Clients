@@ -182,15 +182,12 @@ export class DesktopAutotypeMvpService implements OnDestroy {
       ),
       // if there is an active account with an unlocked vault
       this.authService.activeAccountStatus$,
-      // if the active user's account is Premium
-      this.isPremiumAccount$,
     ]).pipe(
       map(
-        ([settingsEnabled, ffEnabled, authStatus, isPremiumAcct]) =>
+        ([settingsEnabled, ffEnabled, authStatus]) =>
           settingsEnabled &&
           ffEnabled &&
-          authStatus === AuthenticationStatus.Unlocked &&
-          isPremiumAcct,
+          authStatus === AuthenticationStatus.Unlocked,
       ),
       distinctUntilChanged(), // Only emit when the boolean result changes
       takeUntil(this.destroy$),
@@ -220,20 +217,38 @@ export class DesktopAutotypeMvpService implements OnDestroy {
     );
 
     const possibleCiphers = ciphers.filter((c) => {
-      return (
-        c.login?.username &&
-        c.login?.password &&
-        c.deletedDate == null &&
-        c.login?.uris.some((u) => {
-          if (u.uri?.indexOf(URI_PREFIX) !== 0) {
-            return false;
-          }
+      if (!c.login?.username || !c.login?.password || c.deletedDate != null) {
+        return false;
+      }
 
-          const uri = u.uri.substring(URI_PREFIX.length).toLowerCase();
+      // 1. Explicit apptitle:// URI match
+      const uriMatch = c.login?.uris?.some((u) => {
+        if (u.uri?.indexOf(URI_PREFIX) === 0) {
+          const uri = u.uri.substring(URI_PREFIX.length).trim().toLowerCase();
+          return uri.length > 0 && windowTitle.indexOf(uri) > -1;
+        }
+        return false;
+      });
 
-          return windowTitle.indexOf(uri) > -1;
-        })
-      );
+      if (uriMatch) {
+        return true;
+      }
+
+      // 2. Name-based match
+      if (c.name) {
+        const name = c.name.trim().toLowerCase();
+        if (name.length >= 2 && windowTitle.indexOf(name) > -1) {
+          return true;
+        }
+
+        // Handle names like "Steam (main)" matching window "Steam"
+        const primaryName = name.split(/[\s(\-_:]+/)[0]?.trim();
+        if (primaryName && primaryName.length >= 3 && windowTitle.indexOf(primaryName) > -1) {
+          return true;
+        }
+      }
+
+      return false;
     });
 
     return possibleCiphers;

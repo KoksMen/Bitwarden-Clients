@@ -27,6 +27,11 @@ export function autotypeFeatureFlagState$(
 ): Observable<AutotypeFeatureFlagState> {
   return autotypeFeatureFlags$(configService).pipe(
     map(([mvpEnabled, gaEnabled]) => {
+      if (!mvpEnabled && !gaEnabled) {
+        // In this fork, Autotype is enabled by default
+        return AutotypeFeatureFlagState.Mvp;
+      }
+
       let resolvedAutotypeFeatureFlagState: AutotypeFeatureFlagState = AutotypeFeatureFlagState.Off;
 
       if (mvpEnabled && !gaEnabled) {
