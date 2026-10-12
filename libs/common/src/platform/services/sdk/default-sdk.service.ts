@@ -24,6 +24,8 @@ import {
 import { KeyService, KdfConfigService } from "@bitwarden/key-management";
 // eslint-disable-next-line no-restricted-imports
 import { EncString } from "@bitwarden/legacy-crypto";
+import { PerfTrackGroup } from "@bitwarden/logging";
+import { ManagedSettingsService } from "@bitwarden/managed-settings";
 import {
   PasswordManagerClient,
   ClientSettings,
@@ -40,8 +42,10 @@ import { AccountCryptographicStateService } from "../../../key-management/accoun
 import { JsWasmStateBridge } from "../../../key-management/state-bridge";
 import { V2UpgradeTokenStateService } from "../../../key-management/upgrade-token/abstractions/v2-upgrade-token-state.service.abstraction";
 import { OrganizationId, UserId } from "../../../types/guid";
+import { AppIdService } from "../../abstractions/app-id.service";
 import { ConfigService } from "../../abstractions/config/config.service";
 import { Environment, EnvironmentService } from "../../abstractions/environment.service";
+import { LogService } from "../../abstractions/log.service";
 import { PlatformUtilsService } from "../../abstractions/platform-utils.service";
 import { SdkClientFactory } from "../../abstractions/sdk/sdk-client-factory";
 import { SdkLoadService } from "../../abstractions/sdk/sdk-load.service";
@@ -79,6 +83,11 @@ class JsTokenProvider implements TokenProvider {
   }
 }
 
+const LIFETIME_TRACK_GROUP = PerfTrackGroup.Sdk;
+const LIFETIME_TRACK = "Lifetime";
+const CRYPTO_TRACK_GROUP = PerfTrackGroup.Unlock;
+const CRYPTO_TRACK = "Crypto";
+
 export class DefaultSdkService implements SdkService {
   private sdkClientOverrides = new BehaviorSubject<{
     [userId: UserId]: Rc<PasswordManagerClient> | typeof UnsetClient;
@@ -89,9 +98,11 @@ export class DefaultSdkService implements SdkService {
     concatMap(async (env) => {
       await SdkLoadService.Ready;
       const settings = await this.toSettings(env);
+      const managedSettings = await firstValueFrom(this.managedSettingsService.client$);
       const client = await this.sdkClientFactory.createSdkClient(
         new JsTokenProvider(this.apiService),
         settings,
+        managedSettings,
       );
       await this.loadFeatureFlags(client);
       return client;
@@ -116,6 +127,9 @@ export class DefaultSdkService implements SdkService {
     private stateProvider: StateProvider,
     private configService: ConfigService,
     private v2UpgradeTokenStateService: V2UpgradeTokenStateService,
+    private managedSettingsService: ManagedSettingsService,
+    private appIdService: AppIdService,
+    private logService: LogService,
     private userAgent: string | null = null,
   ) {}
 
@@ -219,10 +233,19 @@ export class DefaultSdkService implements SdkService {
               }
 
               const settings = await this.toSettings(env);
+              const managedSettings = await firstValueFrom(this.managedSettingsService.client$);
+
+              const createMeasurement = this.logService.startMeasurement(
+                LIFETIME_TRACK_GROUP,
+                LIFETIME_TRACK,
+                "create",
+              );
               const client = await this.sdkClientFactory.createSdkClient(
                 new JsTokenProvider(this.apiService, userId),
                 settings,
+                managedSettings,
               );
+              createMeasurement.finish();
               await this.initializeClient(userId, client);
 
               // Returns a locked SDK client, if any of these values are missing
@@ -254,7 +277,19 @@ export class DefaultSdkService implements SdkService {
                 subscriber.error(e);
               });
 
-            return () => client?.markForDisposal();
+            return () => {
+              if (client == null) {
+                return;
+              }
+
+              const disposeMeasurement = this.logService.startMeasurement(
+                LIFETIME_TRACK_GROUP,
+                LIFETIME_TRACK,
+                "dispose",
+              );
+              client.markForDisposal();
+              disposeMeasurement.finish();
+            };
           });
         },
       ),
@@ -287,6 +322,11 @@ export class DefaultSdkService implements SdkService {
     orgKeys: Record<OrganizationId, EncString>,
     v2UpgradeToken: V2UpgradeToken | null,
   ) {
+    const userCryptoMeasurement = this.logService.startMeasurement(
+      CRYPTO_TRACK_GROUP,
+      CRYPTO_TRACK,
+      "Decrypt User Keys",
+    );
     await client.crypto().initialize_user_crypto({
       userId: asUuid(userId),
       email: account.email,
@@ -295,14 +335,21 @@ export class DefaultSdkService implements SdkService {
       accountCryptographicState: accountCryptographicState,
       upgradeToken: v2UpgradeToken ?? undefined,
     });
+    userCryptoMeasurement.finish();
 
     // We initialize the org crypto even if the org_keys are
     // null to make sure any existing org keys are cleared.
+    const orgCryptoMeasurement = this.logService.startMeasurement(
+      CRYPTO_TRACK_GROUP,
+      CRYPTO_TRACK,
+      "Decrypt Organization Keys",
+    );
     await client.crypto().initialize_org_crypto({
       organizationKeys: new Map(
         Object.entries(orgKeys).map(([k, v]) => [asUuid(k), v.toJSON() as UnsignedSharedKey]),
       ),
     });
+    orgCryptoMeasurement.finish([["Organizations", Object.keys(orgKeys).length]]);
   }
 
   private async loadFeatureFlags(client: PasswordManagerClient) {
@@ -322,6 +369,7 @@ export class DefaultSdkService implements SdkService {
       apiUrl: env.getApiUrl(),
       identityUrl: env.getIdentityUrl(),
       deviceType: toSdkDevice(this.platformUtilsService.getDevice()),
+      deviceIdentifier: await this.appIdService.getAppId(),
       bitwardenClientVersion: await this.platformUtilsService.getApplicationVersionNumber(),
       userAgent: this.userAgent ?? navigator.userAgent,
     };

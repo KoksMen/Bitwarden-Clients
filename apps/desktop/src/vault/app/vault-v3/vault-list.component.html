@@ -13,46 +13,52 @@
   </div>
 }
 @if (pinnedCipher(); as pinned) {
-  <section
-    class="tw-mx-6 tw-mb-3 tw-shrink-0 tw-rounded-2xl tw-border tw-border-solid tw-border-primary-300 tw-bg-primary-100/60 tw-p-2 tw-shadow-md"
-    [attr.aria-label]="'viewItem' | i18n"
-  >
-    <div
-      class="tw-flex tw-items-center tw-gap-1.5 tw-px-2 tw-pb-1 tw-text-xs tw-font-semibold tw-uppercase tw-tracking-wide tw-text-primary-700"
+  @if (!isPinnedVisibleInList()) {
+    <section
+      class="tw-mx-6 tw-mb-3 tw-shrink-0 tw-rounded-2xl tw-border tw-border-solid tw-border-primary-300 tw-bg-primary-100/60 tw-p-2 tw-shadow-md"
+      [attr.aria-label]="'viewItem' | i18n"
     >
-      <bit-icon name="bwi-eye" />
-      {{ "viewItem" | i18n }}
-    </div>
-    <table class="tw-w-full tw-table-fixed tw-border-collapse">
-      <tbody>
-        <tr
-          bitRow
-          appVaultCipherRow
-          alignContent="middle"
-          [disabled]="disabled()"
-          [cipher]="pinned"
-          [showOwner]="showOwner()"
-          [showPremiumFeatures]="showPremiumFeatures()"
-          [cloneable]="canClone$({ cipher: pinned }) | async"
-          [organizations]="allOrganizations()"
-          [canEditCipher]="canEditCipher(pinned)"
-          [canAssignCollections]="canAssignCollections(pinned)"
-          [canManageCollection]="canManageCollection(pinned)"
-          [canDeleteCipher]="cipherAuthorizationService.canDeleteCipher$(pinned) | async"
-          [canRestoreCipher]="cipherAuthorizationService.canRestoreCipher$(pinned) | async"
-          [userCanArchive]="userCanArchive()"
-          [enforceOrgDataOwnershipPolicy]="enforceOrgDataOwnershipPolicy()"
-          [showBatchBar]="false"
-          [selected]="true"
-          (onEvent)="event($event)"
-        ></tr>
-      </tbody>
-    </table>
-  </section>
+      <div
+        class="tw-flex tw-items-center tw-justify-between tw-px-2 tw-pb-1 tw-text-xs tw-font-semibold tw-uppercase tw-tracking-wide tw-text-primary-700"
+      >
+        <div class="tw-flex tw-items-center tw-gap-1.5">
+          <bit-icon name="bwi-eye" />
+          {{ "viewItem" | i18n }}
+        </div>
+      </div>
+      <table class="tw-w-full tw-table-fixed tw-border-collapse">
+        <tbody>
+          <tr
+            bitRow
+            appVaultCipherRow
+            alignContent="middle"
+            [disabled]="disabled()"
+            [cipher]="pinned"
+            [showOwner]="showOwner()"
+            [showPremiumFeatures]="showPremiumFeatures()"
+            [cloneable]="canClone$({ cipher: pinned }) | async"
+            [organizations]="allOrganizations()"
+            [canEditCipher]="canEditCipher(pinned)"
+            [canAssignCollections]="canAssignCollections(pinned)"
+            [canManageCollection]="canManageCollection(pinned)"
+            [canDeleteCipher]="cipherAuthorizationService.canDeleteCipher$(pinned) | async"
+            [canRestoreCipher]="cipherAuthorizationService.canRestoreCipher$(pinned) | async"
+            [userCanArchive]="userCanArchive()"
+            [enforceOrgDataOwnershipPolicy]="enforceOrgDataOwnershipPolicy()"
+            [active]="true"
+            [selected]="false"
+            (onEvent)="event($event)"
+          ></tr>
+        </tbody>
+      </table>
+    </section>
+  }
 }
 <cdk-virtual-scroll-viewport
   [itemSize]="RowHeight"
   bitScrollLayout
+  (scroll)="updatePinnedVisibility()"
+  (scrolledIndexChange)="updatePinnedVisibility()"
   class="tw-min-h-0 tw-flex-1 tw-transition-[padding-bottom] tw-duration-300 tw-ease-in-out"
   [ngClass]="barVisible() ? 'tw-pb-[9rem]' : 'tw-pb-0'"
 >
@@ -73,7 +79,6 @@
               [collection]="item.collection"
               [showOwner]="showOwner()"
               [organizations]="allOrganizations()"
-              [showBatchBar]="showBatchBar()"
               [selected]="selection.isSelected(item)"
               (checkboxChange)="selection.toggle(item)"
             ></tr>
@@ -97,7 +102,7 @@
               (onEvent)="event($event)"
               [userCanArchive]="userCanArchive()"
               [enforceOrgDataOwnershipPolicy]="enforceOrgDataOwnershipPolicy()"
-              [showBatchBar]="showBatchBar()"
+              [active]="pinnedCipher()?.id === item.cipher?.id"
               [selected]="selection.isSelected(item)"
               (checkboxChange)="selection.toggle(item)"
             ></tr>
@@ -107,26 +112,27 @@
     </bit-table>
   </div>
   @if (isEmpty()) {
-    <bit-no-items [icon]="emptyStateItem()?.icon">
+    <bit-status-lockup>
+      <bit-svg slot="graphic" [content]="emptyStateItem()?.icon"></bit-svg>
       <div slot="title">
         {{ emptyStateItem()?.title | i18n }}
       </div>
-      <p slot="description" bitTypography="body2" class="tw-max-w-md tw-text-center">
+      <div slot="description">
         {{ emptyStateItem()?.description | i18n }}
-      </p>
+      </div>
       @if (showAddCipherBtn()) {
         <vault-new-cipher-menu
           [canCreateCipher]="true"
           [canCreateFolder]="true"
           [canCreateSshKey]="true"
-          [buttonType]="btnTextAddCreateFeatureFlag() ? 'secondary' : 'primary'"
-          [icon]="btnTextAddCreateFeatureFlag() ? undefined : 'bwi-plus'"
+          buttonType="secondary"
+          [icon]="undefined"
           (cipherAdded)="addCipher($event)"
           (folderAdded)="addFolder()"
           (onAddItemDialog)="onAddItemDialog.emit()"
           slot="button"
         />
       }
-    </bit-no-items>
+    </bit-status-lockup>
   }
 </cdk-virtual-scroll-viewport>

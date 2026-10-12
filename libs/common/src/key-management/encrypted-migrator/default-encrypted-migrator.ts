@@ -5,7 +5,7 @@ import {
   KdfConfigService,
   KeyService,
 } from "@bitwarden/key-management";
-import { LogService } from "@bitwarden/logging";
+import { LogService, measured, PerfTrackGroup } from "@bitwarden/logging";
 import { UserKeyRotationServiceAbstraction } from "@bitwarden/user-crypto-management";
 
 import { assertNonNullish } from "../../auth/utils";
@@ -13,6 +13,7 @@ import { ClientType } from "../../enums";
 import { ConfigService } from "../../platform/abstractions/config/config.service";
 import { PlatformUtilsService } from "../../platform/abstractions/platform-utils.service";
 import { SdkService } from "../../platform/abstractions/sdk/sdk.service";
+import { StateProvider } from "../../platform/state";
 import { SyncService } from "../../platform/sync";
 import { UserId } from "../../types/guid";
 import { CipherService } from "../../vault/abstractions/cipher.service";
@@ -24,6 +25,9 @@ import { EncryptedMigration, MigrationRequirement } from "./migrations/encrypted
 import { MinimumKdfMigration } from "./migrations/minimum-kdf-migration";
 import { UserKeyIdBackfillMigration } from "./migrations/user-key-id-backfill-migration";
 import { V2KeyRotationMigration } from "./migrations/v2-key-rotation-migration";
+
+const PERF_TRACK_GROUP = PerfTrackGroup.Migrations;
+const PERF_TRACK = "Encrypted Migrator";
 
 export class DefaultEncryptedMigrator implements EncryptedMigrator {
   private migrations: { name: string; migration: EncryptedMigration }[] = [];
@@ -42,12 +46,13 @@ export class DefaultEncryptedMigrator implements EncryptedMigrator {
     userKeyRotationService: UserKeyRotationServiceAbstraction,
     cipherService: CipherService,
     sdkService: SdkService,
+    stateProvider: StateProvider,
   ) {
     // Register migrations here
 
     this.migrations.push({
       name: "User Key Id Backfill Migration",
-      migration: new UserKeyIdBackfillMigration(sdkService, syncService, logService),
+      migration: new UserKeyIdBackfillMigration(sdkService, syncService, stateProvider, logService),
     });
 
     this.migrations.push({
@@ -56,7 +61,6 @@ export class DefaultEncryptedMigrator implements EncryptedMigrator {
         kdfConfigService,
         sdkService,
         logService,
-        configService,
         masterPasswordService,
         syncService,
       ),
@@ -92,6 +96,7 @@ export class DefaultEncryptedMigrator implements EncryptedMigrator {
     }
   }
 
+  @measured(PERF_TRACK_GROUP, PERF_TRACK)
   async runMigrations(userId: UserId, masterPassword: string | null): Promise<void> {
     assertNonNullish(userId, "userId");
 
@@ -123,9 +128,9 @@ export class DefaultEncryptedMigrator implements EncryptedMigrator {
       for (const { name, migration } of this.migrations) {
         if ((await migration.needsMigration(userId)) !== "noMigrationNeeded") {
           this.logService.info(`[Encrypted Migrator] Running migration: ${name}`);
-          const start = performance.now();
+          const measurement = this.logService.startMeasurement(PERF_TRACK_GROUP, PERF_TRACK, name);
           await migration.runMigrations(userId, masterPassword);
-          this.logService.measure(start, "[Encrypted Migrator]", name, "ExecutionTime");
+          measurement.finish();
           ranMigration = true;
         }
       }

@@ -149,6 +149,55 @@ html.theme_dark tr[appVaultCollectionRow][data-active="true"] {
   }
 }
 
+/* --- Checkbox Selector Ergonomics & Alignment --- */
+tr[appVaultCipherRow],
+tr[appVaultCollectionRow] {
+  td:first-child {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 40px !important;
+    min-width: 40px !important;
+    padding: 0 !important;
+    cursor: pointer !important;
+  }
+
+  /* Reset outer input to prevent double border or offset box */
+  input[type="checkbox"][bitCheckbox] {
+    border: none !important;
+    outline: none !important;
+    background: transparent !important;
+    cursor: pointer !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+  }
+}
+
+/* Active card state: make checkbox border crisp white on the vivid blue background */
+html.theme_light tr[appVaultCipherRow][data-active="true"] input[bitCheckbox],
+html.theme_dark tr[appVaultCipherRow][data-active="true"] input[bitCheckbox],
+html.theme_light tr[appVaultCollectionRow][data-active="true"] input[bitCheckbox],
+html.theme_dark tr[appVaultCollectionRow][data-active="true"] input[bitCheckbox] {
+  &:before {
+    border-color: rgba(255, 255, 255, 0.9) !important;
+    background-color: rgba(255, 255, 255, 0.2) !important;
+  }
+
+  &:hover:before {
+    border-color: #ffffff !important;
+    background-color: rgba(255, 255, 255, 0.35) !important;
+  }
+
+  &:checked:before {
+    background-color: #ffffff !important;
+    border-color: #ffffff !important;
+  }
+
+  &:checked:after {
+    background-color: #2563eb !important;
+  }
+}
+
 /* 4. Sidebar Navigation Items Clean Card Styling */
 bit-nav-item [data-spotlight-target],
 app-folder-filter [data-spotlight-target],

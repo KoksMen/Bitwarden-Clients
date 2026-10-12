@@ -52,7 +52,8 @@ import {
   BiometricsStatus,
   UserAsymmetricKeysRegenerationService,
 } from "@bitwarden/key-management";
-import { UnlockService } from "@bitwarden/unlock";
+import { measured, PerfTrackGroup } from "@bitwarden/logging";
+import { UnlockMethod, UnlockService } from "@bitwarden/unlock";
 
 import {
   UnlockOption,
@@ -81,6 +82,9 @@ type AfterUnlockActions = {
 /// The minimum amount of time to wait after a process reload for a biometrics auto prompt to be possible
 /// Fixes safari autoprompt behavior
 const AUTOPROMPT_BIOMETRICS_PROCESS_RELOAD_DELAY = 5000;
+
+const PERF_TRACK_GROUP = PerfTrackGroup.Unlock;
+const PERF_TRACK = "Lock Component";
 
 const BIOMETRIC_UNLOCK_TEMPORARY_UNAVAILABLE_STATUSES = [
   BiometricsStatus.HardwareUnavailable,
@@ -294,18 +298,27 @@ export class LockComponent implements OnInit, OnDestroy {
 
     await this.setDefaultActiveUnlockOption(this.unlockOptions);
 
+    // Every unlock of this user continues from here, except
+    // for master password, as a policy evaluation has to be run
+    this.unlockService.unlocked$
+      .pipe(
+        filter(
+          (unlock) =>
+            unlock.userId === activeAccount.id && unlock.method !== UnlockMethod.MasterPassword,
+        ),
+        take(1),
+        takeUntil(this.activeAccountChange$),
+        takeUntil(this.destroy$),
+      )
+      .subscribe(() => {
+        this.ngZone.run((): void => {
+          void this.continueAfterSettingUserKey();
+        });
+      });
+
     if (this.unlockOptions?.biometrics.enabled) {
       await this.handleBiometricsUnlockEnabled(activeAccount.id);
     }
-
-    this.lockComponentService
-      .getExternalUnlock$(activeAccount.id)
-      .pipe(take(1), takeUntil(this.activeAccountChange$), takeUntil(this.destroy$))
-      .subscribe(() => {
-        this.ngZone.run((): void => {
-          void this.doContinue({});
-        });
-      });
   }
 
   private resetDataOnActiveAccountChange() {
@@ -438,8 +451,6 @@ export class LockComponent implements OnInit, OnDestroy {
 
       // Throws if the user cancels the biometric prompt.
       await this.unlockService.unlockWithBiometrics(this.activeAccount.id);
-
-      await this.continueAfterSettingUserKey();
     } catch (e) {
       // Biometrics may fail if the user does not accept or if the desktop app is disconnected.
       this.logService.info("[LockComponent] Failed to unlock via biometrics.", e);
@@ -453,9 +464,11 @@ export class LockComponent implements OnInit, OnDestroy {
       throw new Error("No active user.");
     }
 
-    await this.unlockService.unlockWithDecryptedUserKey(this.activeAccount.id, userKey);
-
-    await this.continueAfterSettingUserKey();
+    await this.unlockService.unlockWithDecryptedUserKey(
+      this.activeAccount.id,
+      userKey,
+      UnlockMethod.Prf,
+    );
   }
 
   togglePassword() {
@@ -486,7 +499,6 @@ export class LockComponent implements OnInit, OnDestroy {
 
     try {
       await this.unlockService.unlockWithPin(this.activeAccount.id, pin);
-      await this.continueAfterSettingUserKey();
     } catch {
       // Failure state: invalid PIN or failed decryption
       this.invalidPinAttempts++;
@@ -528,9 +540,11 @@ export class LockComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Shared tail of the lock screen's unlock methods. Callers are responsible for setting the user
-   * key via the matching {@link UnlockService} method before calling this.
+   * Shared tail of every unlock, run once the user key is set. Reached through
+   * {@link UnlockService.unlocked$} rather than called by each unlock method, so that an unlock
+   * performed elsewhere continues the same way as one performed here.
    */
+  @measured(PERF_TRACK_GROUP, PERF_TRACK)
   protected async continueAfterSettingUserKey(
     afterUnlockActions: AfterUnlockActions = {},
   ): Promise<void> {
@@ -596,23 +610,15 @@ export class LockComponent implements OnInit, OnDestroy {
     }
 
     if (this.platformUtilsService.getClientType() == ClientType.Web) {
-      const startSync = performance.now();
-
       // Web does not cache vault data and would be in a unusable state when unlocked.
       await this.syncService.fullSync(true);
-
-      this.logService.measure(startSync, "KeyManagement", "LockComponent", "sync complete");
     } else {
       // On non-web clients, we start a sync in the background, but to not block by it
       void this.syncService.fullSync(false);
     }
 
-    const startRegeneration = new Date().getTime();
     // TODO: This should probably not be blocking
     await this.userAsymmetricKeysRegenerationService.regenerateIfNeeded(this.activeAccount.id);
-    this.logService.info(
-      `[LockComponent] Private key regeneration took ${new Date().getTime() - startRegeneration}ms`,
-    );
 
     if (this.clientType === "browser") {
       const previousUrl = this.lockComponentService.getPreviousUrl();

@@ -1,5 +1,14 @@
 [target.x86_64-pc-windows-msvc]
-rustflags = ["-Ctarget-feature=+crt-static"]
+linker = "rust-lld"
+rustflags = [
+  "-Ctarget-feature=+crt-static",
+  "-Lnative=C:/Users/rinsh/AppData/Local/cargo-xwin/xwin/crt/lib/x86_64",
+  "-Lnative=C:/Users/rinsh/AppData/Local/cargo-xwin/xwin/sdk/lib/um/x86_64",
+  "-Lnative=C:/Users/rinsh/AppData/Local/cargo-xwin/xwin/sdk/lib/ucrt/x86_64"
+]
+
+[target.x86_64-pc-windows-gnu]
+linker = "rust-lld"
 
 [target.i686-pc-windows-msvc]
 rustflags = ["-Ctarget-feature=+crt-static"]

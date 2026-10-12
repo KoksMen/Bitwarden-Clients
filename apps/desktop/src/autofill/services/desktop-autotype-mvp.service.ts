@@ -19,8 +19,9 @@ import { Account, AccountService } from "@bitwarden/common/auth/abstractions/acc
 import { AuthService } from "@bitwarden/common/auth/abstractions/auth.service";
 import { AuthenticationStatus } from "@bitwarden/common/auth/enums/authentication-status";
 import { BillingAccountProfileStateService } from "@bitwarden/common/billing/abstractions";
+import { AutotypeFeatureFlagState } from "@bitwarden/common/desktop-native/enums/autotype-feature-flag-state.enum";
+import { autotypeFeatureFlagState$ } from "@bitwarden/common/desktop-native/services/autotype-feature-flags";
 import { DeviceType } from "@bitwarden/common/enums";
-import { FeatureFlag } from "@bitwarden/common/enums/feature-flag.enum";
 import { ConfigService } from "@bitwarden/common/platform/abstractions/config/config.service";
 import { PlatformUtilsService } from "@bitwarden/common/platform/abstractions/platform-utils.service";
 import {
@@ -176,18 +177,17 @@ export class DesktopAutotypeMvpService implements OnDestroy {
       // if the user has enabled the setting
       this.autotypeEnabledUserSetting$,
       // if the feature flag is set
-      this.configService.getFeatureFlag$(FeatureFlag.WindowsDesktopAutotype),
+      autotypeFeatureFlagState$(this.configService).pipe(
+        map((state) => state === AutotypeFeatureFlagState.Mvp),
+      ),
       // if there is an active account with an unlocked vault
       this.authService.activeAccountStatus$,
-      // if the active user's account is Premium
-      this.isPremiumAccount$,
     ]).pipe(
       map(
-        ([settingsEnabled, ffEnabled, authStatus, isPremiumAcct]) =>
+        ([settingsEnabled, ffEnabled, authStatus]) =>
           settingsEnabled &&
           ffEnabled &&
-          authStatus === AuthenticationStatus.Unlocked &&
-          isPremiumAcct,
+          authStatus === AuthenticationStatus.Unlocked,
       ),
       distinctUntilChanged(), // Only emit when the boolean result changes
       takeUntil(this.destroy$),
@@ -217,20 +217,38 @@ export class DesktopAutotypeMvpService implements OnDestroy {
     );
 
     const possibleCiphers = ciphers.filter((c) => {
-      return (
-        c.login?.username &&
-        c.login?.password &&
-        c.deletedDate == null &&
-        c.login?.uris.some((u) => {
-          if (u.uri?.indexOf(URI_PREFIX) !== 0) {
-            return false;
-          }
+      if (!c.login?.username || !c.login?.password || c.deletedDate != null) {
+        return false;
+      }
 
-          const uri = u.uri.substring(URI_PREFIX.length).toLowerCase();
+      // 1. Explicit apptitle:// URI match
+      const uriMatch = c.login?.uris?.some((u) => {
+        if (u.uri?.indexOf(URI_PREFIX) === 0) {
+          const uri = u.uri.substring(URI_PREFIX.length).trim().toLowerCase();
+          return uri.length > 0 && windowTitle.indexOf(uri) > -1;
+        }
+        return false;
+      });
 
-          return windowTitle.indexOf(uri) > -1;
-        })
-      );
+      if (uriMatch) {
+        return true;
+      }
+
+      // 2. Name-based match
+      if (c.name) {
+        const name = c.name.trim().toLowerCase();
+        if (name.length >= 2 && windowTitle.indexOf(name) > -1) {
+          return true;
+        }
+
+        // Handle names like "Steam (main)" matching window "Steam"
+        const primaryName = name.split(/[\s(\-_:]+/)[0]?.trim();
+        if (primaryName && primaryName.length >= 3 && windowTitle.indexOf(primaryName) > -1) {
+          return true;
+        }
+      }
+
+      return false;
     });
 
     return possibleCiphers;
