@@ -1324,18 +1324,61 @@ export class VaultComponent<C extends CipherViewLike> implements OnInit, OnDestr
   }
 
   private getSingleSelectedOrActiveCipher(): CipherViewLike | null {
-    const selected = this.vaultBatchBarService?.selection?.selected ?? [];
-    if (selected.length === 1 && selected[0]?.cipher) {
-      return selected[0].cipher;
+    const selectedBatch =
+      (this.vaultBatchBarService?.selection?.selected?.length
+        ? this.vaultBatchBarService.selection.selected
+        : this.vaultBatchBarService?.selected?.()) ?? [];
+
+    const selectedCiphers: CipherViewLike[] = [];
+    for (const item of selectedBatch as any[]) {
+      if (item?.cipher) {
+        selectedCiphers.push(item.cipher);
+      } else if (item?.id && !item?.collection) {
+        selectedCiphers.push(item);
+      }
     }
-    if (selected.length === 0) {
-      return this.pinnedCipher ?? this.cipher();
+
+    if (selectedCiphers.length === 1) {
+      return selectedCiphers[0];
     }
-    return null;
+
+    if (selectedBatch.length > 1 || selectedCiphers.length > 1) {
+      return null;
+    }
+
+    return this.pinnedCipher ?? this.cipher();
   }
 
   @HostListener("window:keydown", ["$event"])
   protected async onWindowKeydown(event: KeyboardEvent) {
+    // 1. Handle Escape: Clear multi-selection and reset active item
+    if (event.key === "Escape" || event.code === "Escape") {
+      const selectedCount =
+        this.vaultBatchBarService?.selectedCount?.() ??
+        this.vaultBatchBarService?.selection?.selected?.length ??
+        0;
+
+      if (selectedCount > 0 || this.vaultBatchBarService?.selection?.hasValue?.()) {
+        event.preventDefault();
+        event.stopPropagation();
+        this.vaultBatchBarService.clearSelection();
+        this.changeDetectorRef.markForCheck();
+        return;
+      }
+
+      if (this.pinnedCipher || this.activeDrawerRef) {
+        event.preventDefault();
+        event.stopPropagation();
+        this.pinnedCipher = null;
+        this.cipher.set(null);
+        void this.activeDrawerRef?.close();
+        this.changeDetectorRef.markForCheck();
+        return;
+      }
+      return;
+    }
+
+    // 2. Handle Ctrl/Cmd KeePassXC shortcuts
     if (!event.ctrlKey && !event.metaKey) {
       return;
     }
@@ -1343,8 +1386,15 @@ export class VaultComponent<C extends CipherViewLike> implements OnInit, OnDestr
       return;
     }
 
-    const key = event.key.toLowerCase();
-    if (!["b", "c", "t", "u"].includes(key)) {
+    const code = event.code;
+    const key = event.key ? event.key.toLowerCase() : "";
+
+    const isB = code === "KeyB" || key === "b" || key === "и";
+    const isC = code === "KeyC" || key === "c" || key === "с";
+    const isT = code === "KeyT" || key === "t" || key === "е";
+    const isU = code === "KeyU" || key === "u" || key === "г";
+
+    if (!isB && !isC && !isT && !isU) {
       return;
     }
 
@@ -1358,7 +1408,7 @@ export class VaultComponent<C extends CipherViewLike> implements OnInit, OnDestr
     }
 
     // If user presses Ctrl+C and has highlighted text on screen, let default copy proceed
-    if (key === "c") {
+    if (isC) {
       const selectionText = window.getSelection()?.toString();
       if (selectionText && selectionText.trim().length > 0) {
         return;
@@ -1379,46 +1429,40 @@ export class VaultComponent<C extends CipherViewLike> implements OnInit, OnDestr
       event.preventDefault();
       event.stopPropagation();
 
-      switch (key) {
-        case "b": {
-          // KeePassXC: Ctrl+B = Copy Username
-          if (cipher.login?.username) {
-            this.copyValue(cipher, cipher.login.username, "username", "Username");
-          } else {
-            this.toastService.showToast({
-              variant: "warning",
-              title: undefined,
-              message: this.i18nService.t("noUsername"),
-            });
-          }
-          break;
+      if (isB) {
+        // KeePassXC: Ctrl+B = Copy Username
+        if (cipher.login?.username) {
+          this.copyValue(cipher, cipher.login.username, "username", "Username");
+        } else {
+          this.toastService.showToast({
+            variant: "warning",
+            title: undefined,
+            message: this.i18nService.t("noUsername"),
+          });
         }
-        case "c": {
-          // KeePassXC: Ctrl+C = Copy Password
-          if (cipher.login?.password && cipher.viewPassword) {
-            this.copyValue(cipher, cipher.login.password, "password", "Password");
-            await this.eventCollectionService.collect(
-              EventType.Cipher_ClientCopiedPassword,
-              cipher.id,
-            );
-          } else {
-            this.toastService.showToast({
-              variant: "warning",
-              title: undefined,
-              message: this.i18nService.t("noPassword"),
-            });
-          }
-          break;
+      } else if (isC) {
+        // KeePassXC: Ctrl+C = Copy Password
+        if (cipher.login?.password) {
+          this.copyValue(cipher, cipher.login.password, "password", "Password");
+          await this.eventCollectionService.collect(
+            EventType.Cipher_ClientCopiedPassword,
+            cipher.id,
+          );
+        } else {
+          this.toastService.showToast({
+            variant: "warning",
+            title: undefined,
+            message: this.i18nService.t("noPassword"),
+          });
         }
-        case "t": {
-          // KeePassXC: Ctrl+T = Copy TOTP
-          if (cipher.login?.hasTotp && (cipher.organizationUseTotp || this.userHasPremium())) {
-            const val = await firstValueFrom(this.totpService.getCode$(cipher.login.totp)).catch(
-              (): any => null,
-            );
-            if (val) {
-              this.copyValue(cipher, val.code, "verificationCodeTotp", "TOTP");
-            }
+      } else if (isT) {
+        // KeePassXC: Ctrl+T = Copy TOTP
+        if (cipher.login?.totp) {
+          const val = await firstValueFrom(this.totpService.getCode$(cipher.login.totp)).catch(
+            (): any => null,
+          );
+          if (val?.code) {
+            this.copyValue(cipher, val.code, "verificationCodeTotp", "TOTP");
           } else {
             this.toastService.showToast({
               variant: "warning",
@@ -1426,15 +1470,18 @@ export class VaultComponent<C extends CipherViewLike> implements OnInit, OnDestr
               message: this.i18nService.t("noVerificationCodeTotp"),
             });
           }
-          break;
+        } else {
+          this.toastService.showToast({
+            variant: "warning",
+            title: undefined,
+            message: this.i18nService.t("noVerificationCodeTotp"),
+          });
         }
-        case "u": {
-          // KeePassXC: Ctrl+U = Open URL
-          const uri = cipher.login?.uris?.find((u) => u.uri)?.uri;
-          if (uri) {
-            this.platformUtilsService.launchUri(uri);
-          }
-          break;
+      } else if (isU) {
+        // KeePassXC: Ctrl+U = Open URL
+        const uri = cipher.login?.uris?.find((u) => u.uri)?.uri;
+        if (uri) {
+          this.platformUtilsService.launchUri(uri);
         }
       }
     } catch (e) {
