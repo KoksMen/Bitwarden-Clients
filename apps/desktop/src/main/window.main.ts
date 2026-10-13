@@ -481,7 +481,7 @@ export class WindowMain {
         backgroundThrottling: false,
         contextIsolation: true,
         session: this.session,
-        devTools: isDev(),
+        devTools: isDev() && process.env.OPEN_DEVTOOLS === "true",
       },
     });
 
@@ -522,7 +522,7 @@ export class WindowMain {
           userAgent: cleanUserAgent(this.win.webContents.userAgent),
         })
         .then(() => {
-          if (isDev()) {
+          if (isDev() && process.env.OPEN_DEVTOOLS === "true") {
             this.win.webContents.openDevTools();
           }
         });
