@@ -400,6 +400,17 @@ export class SettingsDialogComponent implements OnInit {
       )
       .subscribe();
 
+    this.form.controls.enableAutotype.valueChanges
+      .pipe(
+        concatMap(async (value: boolean | null) => {
+          if (value !== null && value !== undefined) {
+            await this.desktopAutotypeMvpService.setAutotypeEnabledState(value);
+          }
+        }),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe();
+
     this.supportsBiometric.set(await this.biometricsService.canEnableBiometricUnlock());
     const timerId = setInterval(async () => {
       this.supportsBiometric.set(await this.biometricsService.canEnableBiometricUnlock());
@@ -723,7 +734,8 @@ export class SettingsDialogComponent implements OnInit {
   }
 
   protected async saveEnableAutotype() {
-    await this.desktopAutotypeMvpService.setAutotypeEnabledState(this.form.value.enableAutotype);
+    const isEnabled = this.form.controls.enableAutotype.value ?? false;
+    await this.desktopAutotypeMvpService.setAutotypeEnabledState(isEnabled);
     const currentShortcut = await firstValueFrom(
       this.desktopAutotypeMvpService.autotypeKeyboardShortcut$,
     );

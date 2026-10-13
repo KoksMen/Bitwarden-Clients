@@ -32,6 +32,7 @@
       class="tw-min-w-0 tw-flex-1 tw-text-start tw-leading-snug tw-truncate"
       linkType="secondary"
       title="{{ 'viewCollectionWithName' | i18n: collection().name }}"
+      (click)="onTitleClick($event)"
       [routerLink]="[]"
       [queryParams]="{ collectionId: collection().id }"
       queryParamsHandling="merge"

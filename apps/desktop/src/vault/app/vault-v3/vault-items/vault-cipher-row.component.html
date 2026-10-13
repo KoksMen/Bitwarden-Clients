@@ -25,7 +25,7 @@
         bitLink
         class="tw-min-w-0 tw-flex-1 tw-overflow-hidden tw-text-ellipsis tw-text-start tw-leading-snug"
         [disabled]="disabled()"
-        (click)="viewCipher()"
+        (click)="viewCipher($event)"
         title="{{ 'editItemWithName' | i18n: cipher().name }}"
         type="button"
         aria-haspopup="true"

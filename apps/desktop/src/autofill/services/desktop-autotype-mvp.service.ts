@@ -12,6 +12,7 @@ import {
   of,
   Subject,
   switchMap,
+  take,
   takeUntil,
 } from "rxjs";
 
@@ -92,7 +93,7 @@ export class DesktopAutotypeMvpService implements OnDestroy {
     private logService: LogService,
   ) {
     this.autotypeEnabledUserSetting$ = this.autotypeEnabledState.state$.pipe(
-      map((enabled) => enabled ?? false),
+      map((enabled) => enabled ?? true),
       distinctUntilChanged(), // Only emit when the boolean result changes
       takeUntil(this.destroy$),
     );
@@ -124,6 +125,19 @@ export class DesktopAutotypeMvpService implements OnDestroy {
       const [error, vaultData] = getAutotypeVaultData(firstCipher);
       callback(error, vaultData);
     });
+
+    // In this fork, ensure Autotype is default-enabled locally if never configured
+    this.autotypeEnabledState.state$
+      .pipe(
+        take(1),
+        concatMap(async (state) => {
+          if (state === null) {
+            await this.setAutotypeEnabledState(true);
+          }
+        }),
+        takeUntil(this.destroy$),
+      )
+      .subscribe();
 
     // If `autotypeDefaultPolicy` is `true` for a user's organization, and the
     // user has never changed their local autotype setting (`autotypeEnabledState`),
@@ -185,9 +199,7 @@ export class DesktopAutotypeMvpService implements OnDestroy {
     ]).pipe(
       map(
         ([settingsEnabled, ffEnabled, authStatus]) =>
-          settingsEnabled &&
-          ffEnabled &&
-          authStatus === AuthenticationStatus.Unlocked,
+          settingsEnabled && ffEnabled && authStatus === AuthenticationStatus.Unlocked,
       ),
       distinctUntilChanged(), // Only emit when the boolean result changes
       takeUntil(this.destroy$),

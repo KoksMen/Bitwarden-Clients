@@ -7,6 +7,7 @@ import {
   Component,
   computed,
   DestroyRef,
+  HostListener,
   inject,
   Injector,
   NgZone,
@@ -1320,5 +1321,124 @@ export class VaultComponent<C extends CipherViewLike> implements OnInit, OnDestr
       this.cipherRepromptId = cipher.id;
     }
     return repromptResult;
+  }
+
+  private getSingleSelectedOrActiveCipher(): CipherViewLike | null {
+    const selected = this.vaultBatchBarService?.selection?.selected ?? [];
+    if (selected.length === 1 && selected[0]?.cipher) {
+      return selected[0].cipher;
+    }
+    if (selected.length === 0) {
+      return this.pinnedCipher ?? this.cipher();
+    }
+    return null;
+  }
+
+  @HostListener("window:keydown", ["$event"])
+  protected async onWindowKeydown(event: KeyboardEvent) {
+    if (!event.ctrlKey && !event.metaKey) {
+      return;
+    }
+    if (event.altKey) {
+      return;
+    }
+
+    const key = event.key.toLowerCase();
+    if (!["b", "c", "t", "u"].includes(key)) {
+      return;
+    }
+
+    const targetEl = event.target as HTMLElement;
+    if (
+      targetEl instanceof HTMLInputElement ||
+      targetEl instanceof HTMLTextAreaElement ||
+      targetEl?.isContentEditable
+    ) {
+      return;
+    }
+
+    // If user presses Ctrl+C and has highlighted text on screen, let default copy proceed
+    if (key === "c") {
+      const selectionText = window.getSelection()?.toString();
+      if (selectionText && selectionText.trim().length > 0) {
+        return;
+      }
+    }
+
+    const targetCipherLike = this.getSingleSelectedOrActiveCipher();
+    if (!targetCipherLike) {
+      return;
+    }
+
+    try {
+      const cipher = await this.cipherService.getFullCipherView(targetCipherLike);
+      if (!cipher) {
+        return;
+      }
+
+      event.preventDefault();
+      event.stopPropagation();
+
+      switch (key) {
+        case "b": {
+          // KeePassXC: Ctrl+B = Copy Username
+          if (cipher.login?.username) {
+            this.copyValue(cipher, cipher.login.username, "username", "Username");
+          } else {
+            this.toastService.showToast({
+              variant: "warning",
+              title: undefined,
+              message: this.i18nService.t("noUsername"),
+            });
+          }
+          break;
+        }
+        case "c": {
+          // KeePassXC: Ctrl+C = Copy Password
+          if (cipher.login?.password && cipher.viewPassword) {
+            this.copyValue(cipher, cipher.login.password, "password", "Password");
+            await this.eventCollectionService.collect(
+              EventType.Cipher_ClientCopiedPassword,
+              cipher.id,
+            );
+          } else {
+            this.toastService.showToast({
+              variant: "warning",
+              title: undefined,
+              message: this.i18nService.t("noPassword"),
+            });
+          }
+          break;
+        }
+        case "t": {
+          // KeePassXC: Ctrl+T = Copy TOTP
+          if (cipher.login?.hasTotp && (cipher.organizationUseTotp || this.userHasPremium())) {
+            const val = await firstValueFrom(this.totpService.getCode$(cipher.login.totp)).catch(
+              (): any => null,
+            );
+            if (val) {
+              this.copyValue(cipher, val.code, "verificationCodeTotp", "TOTP");
+            }
+          } else {
+            this.toastService.showToast({
+              variant: "warning",
+              title: undefined,
+              message: this.i18nService.t("noVerificationCodeTotp"),
+            });
+          }
+          break;
+        }
+        case "u": {
+          // KeePassXC: Ctrl+U = Open URL
+          const uri = cipher.login?.uris?.find((u) => u.uri)?.uri;
+          if (uri) {
+            this.platformUtilsService.launchUri(uri);
+          }
+          break;
+        }
+      }
+    } catch (e) {
+      this.logService.error("Error executing KeePassXC shortcut:", e);
+    }
   }
 }

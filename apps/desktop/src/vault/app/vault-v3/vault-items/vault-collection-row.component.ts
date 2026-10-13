@@ -1,7 +1,7 @@
 // FIXME: Update this file to be type safe and remove this and next line
 // @ts-strict-ignore
 import { NgClass } from "@angular/common";
-import { Component, HostBinding, input, output } from "@angular/core";
+import { Component, HostBinding, HostListener, input, output } from "@angular/core";
 import { RouterLink } from "@angular/router";
 
 import {
@@ -61,4 +61,21 @@ export class VaultCollectionRowComponent {
   protected readonly organizations = input<Organization[]>();
   protected readonly selected = input<boolean>(false);
   protected readonly checkboxChange = output<void>();
+
+  @HostListener("click", ["$event"])
+  protected onHostClick(event: MouseEvent) {
+    if (event.ctrlKey || event.metaKey) {
+      event.preventDefault();
+      event.stopPropagation();
+      this.checkboxChange.emit();
+    }
+  }
+
+  protected onTitleClick(event: MouseEvent) {
+    if (event.ctrlKey || event.metaKey) {
+      event.preventDefault();
+      event.stopPropagation();
+      this.checkboxChange.emit();
+    }
+  }
 }

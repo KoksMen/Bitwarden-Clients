@@ -265,12 +265,24 @@ export class VaultCipherRowComponent<C extends CipherViewLike> {
     this.onEvent.emit({ type: "editCipher", item: this.cipher() });
   }
 
-  protected viewCipher() {
+  protected viewCipher(event?: MouseEvent) {
+    if (event?.ctrlKey || event?.metaKey) {
+      event.preventDefault();
+      event.stopPropagation();
+      this.checkboxChange.emit();
+      return;
+    }
     this.onEvent.emit({ type: "viewCipher", item: this.cipher() });
   }
 
   @HostListener("click", ["$event"])
   protected onHostClick(event: MouseEvent) {
+    if (event.ctrlKey || event.metaKey) {
+      event.preventDefault();
+      event.stopPropagation();
+      this.checkboxChange.emit();
+      return;
+    }
     const target = event.target as HTMLElement;
     if (target.closest("button, input, a, [bitMenuItem], bit-menu")) {
       return;
