@@ -31,6 +31,7 @@ import {
   KeyDefinition,
 } from "@bitwarden/common/platform/state";
 import { CipherService } from "@bitwarden/common/vault/abstractions/cipher.service";
+import { TotpService } from "@bitwarden/common/vault/abstractions/totp.service";
 import { CipherView } from "@bitwarden/common/vault/models/view/cipher.view";
 import { LogService } from "@bitwarden/logging";
 import { UserId } from "@bitwarden/user-core";
@@ -47,20 +48,39 @@ export const AUTOTYPE_ENABLED = new KeyDefinition<boolean | null>(
   { deserializer: (b) => b },
 );
 
-export type Result<T, E = Error> = [E, null] | [null, T];
-
-/*
-  Valid windows shortcut keys: Control, Alt, Super, Shift, letters A - Z
-  Valid macOS shortcut keys: Control, Alt, Command, Shift, letters A - Z
-
-  See Electron keyboard shortcut docs for more info:
-  https://www.electronjs.org/docs/latest/tutorial/keyboard-shortcuts
-*/
 export const AUTOTYPE_KEYBOARD_SHORTCUT = new KeyDefinition<string[]>(
   AUTOTYPE_SETTINGS_DISK,
   "autotypeKeyboardShortcut",
   { deserializer: (b) => b },
 );
+
+export const AUTOTYPE_GLOBAL_SHORTCUT = new KeyDefinition<string[]>(
+  AUTOTYPE_SETTINGS_DISK,
+  "autotypeGlobalShortcut",
+  { deserializer: (s) => s ?? ["Control", "Alt", "A"] },
+);
+
+export const AUTOTYPE_PICKER_POSITION = new KeyDefinition<"center" | "cursor">(
+  AUTOTYPE_SETTINGS_DISK,
+  "autotypePickerPosition",
+  { deserializer: (p) => (p === "cursor" ? "cursor" : "center") },
+);
+
+export const AUTOTYPE_TCATO_ENABLED = new KeyDefinition<boolean>(
+  AUTOTYPE_SETTINGS_DISK,
+  "autotypeTcatoEnabled",
+  { deserializer: (b) => b ?? false },
+);
+
+export type Result<T, E = Error> = [E, null] | [null, T];
+
+export interface SequenceToken {
+  type: "text" | "key" | "delay";
+  value?: string;
+  key?: string;
+  milliseconds?: number;
+  isSensitive?: boolean;
+}
 
 @Injectable({
   providedIn: "root",
@@ -70,6 +90,11 @@ export class DesktopAutotypeMvpService implements OnDestroy {
   private readonly autotypeKeyboardShortcut = this.globalStateProvider.get(
     AUTOTYPE_KEYBOARD_SHORTCUT,
   );
+  private readonly autotypeGlobalShortcutState =
+    this.globalStateProvider.get(AUTOTYPE_GLOBAL_SHORTCUT);
+  private readonly autotypePickerPositionState =
+    this.globalStateProvider.get(AUTOTYPE_PICKER_POSITION);
+  private readonly autotypeTcatoEnabledState = this.globalStateProvider.get(AUTOTYPE_TCATO_ENABLED);
 
   // if the user's account is Premium
   private readonly isPremiumAccount$: Observable<boolean>;
@@ -78,6 +103,9 @@ export class DesktopAutotypeMvpService implements OnDestroy {
   autotypeEnabledUserSetting$: Observable<boolean> = of(false);
 
   autotypeKeyboardShortcut$: Observable<string[]> = of(DEFAULT_KEYBOARD_SHORTCUT);
+  autotypeGlobalShortcut$: Observable<string[]> = of(["Control", "Alt", "A"]);
+  autotypePickerPosition$: Observable<"center" | "cursor"> = of("center");
+  autotypeTcatoEnabled$: Observable<boolean> = of(false);
 
   private destroy$ = new Subject<void>();
 
@@ -85,6 +113,7 @@ export class DesktopAutotypeMvpService implements OnDestroy {
     private accountService: AccountService,
     private authService: AuthService,
     private cipherService: CipherService,
+    private totpService: TotpService,
     private configService: ConfigService,
     private globalStateProvider: GlobalStateProvider,
     private platformUtilsService: PlatformUtilsService,
@@ -94,7 +123,7 @@ export class DesktopAutotypeMvpService implements OnDestroy {
   ) {
     this.autotypeEnabledUserSetting$ = this.autotypeEnabledState.state$.pipe(
       map((enabled) => enabled ?? true),
-      distinctUntilChanged(), // Only emit when the boolean result changes
+      distinctUntilChanged(),
       takeUntil(this.destroy$),
     );
 
@@ -103,12 +132,27 @@ export class DesktopAutotypeMvpService implements OnDestroy {
       switchMap((account) =>
         this.billingAccountProfileStateService.hasPremiumFromAnySource$(account.id),
       ),
-      distinctUntilChanged(), // Only emit when the boolean result changes
+      distinctUntilChanged(),
       takeUntil(this.destroy$),
     );
 
     this.autotypeKeyboardShortcut$ = this.autotypeKeyboardShortcut.state$.pipe(
       map((shortcut) => shortcut ?? DEFAULT_KEYBOARD_SHORTCUT),
+      takeUntil(this.destroy$),
+    );
+
+    this.autotypeGlobalShortcut$ = this.autotypeGlobalShortcutState.state$.pipe(
+      map((shortcut) => shortcut ?? ["Control", "Alt", "A"]),
+      takeUntil(this.destroy$),
+    );
+
+    this.autotypePickerPosition$ = this.autotypePickerPositionState.state$.pipe(
+      map((pos) => pos ?? "center"),
+      takeUntil(this.destroy$),
+    );
+
+    this.autotypeTcatoEnabled$ = this.autotypeTcatoEnabledState.state$.pipe(
+      map((enabled) => enabled ?? false),
       takeUntil(this.destroy$),
     );
   }
@@ -119,12 +163,64 @@ export class DesktopAutotypeMvpService implements OnDestroy {
       return;
     }
 
-    ipc.autofill.autotypeMvp.listenRequest(async (windowTitle, callback) => {
-      const possibleCiphers = await this.matchCiphersToWindowTitle(windowTitle);
-      const firstCipher = possibleCiphers?.at(0);
-      const [error, vaultData] = getAutotypeVaultData(firstCipher);
-      callback(error, vaultData);
+    ipc.autofill.autotypeMvp.listenRequest(async (data: any, callback) => {
+      const positionMode = await firstValueFrom(this.autotypePickerPosition$);
+      const tcatoEnabled = await firstValueFrom(this.autotypeTcatoEnabled$);
+
+      // 1. If triggered by global spotlight shortcut, open search immediately
+      if (data.isGlobalSearch) {
+        const items = await this.preparePickerItems(data.windowTitle, data.processName);
+        ipc.autofill.autotypeMvp.openPicker({
+          targetWindow: data,
+          mode: "search",
+          positionMode,
+          useTcato: tcatoEnabled,
+          initialQuery: "",
+          items,
+        });
+        return;
+      }
+
+      // 2. Regular autotype trigger: match ciphers by process and title
+      const possibleCiphers = await this.matchCiphers(data.windowTitle, data.processName);
+
+      if (possibleCiphers.length === 1) {
+        const cipher = possibleCiphers[0];
+        const tokens = await this.buildSequenceTokens(cipher);
+        ipc.autofill.autotypeMvp.executeSequence({
+          hwnd: data.hwnd,
+          tokens,
+          useTcato: tcatoEnabled,
+        });
+      } else {
+        const items = await this.preparePickerItems(data.windowTitle, data.processName);
+        ipc.autofill.autotypeMvp.openPicker({
+          targetWindow: data,
+          mode: possibleCiphers.length >= 2 ? "picker" : "search",
+          positionMode,
+          useTcato: tcatoEnabled,
+          initialQuery: "",
+          items,
+        });
+      }
     });
+
+    if (ipc.autofill.autotypeMvp.onPickerItemChosen) {
+      ipc.autofill.autotypeMvp.onPickerItemChosen(
+        async (data: { cipherId: string; targetWindow: any; useTcato: boolean }) => {
+          const cipher = await this.getCipherById(data.cipherId);
+          if (!cipher) {
+            return;
+          }
+          const tokens = await this.buildSequenceTokens(cipher);
+          ipc.autofill.autotypeMvp.executeSequence({
+            hwnd: data.targetWindow?.hwnd || 0,
+            tokens,
+            useTcato: data.useTcato,
+          });
+        },
+      );
+    }
 
     // In this fork, ensure Autotype is default-enabled locally if never configured
     this.autotypeEnabledState.state$
@@ -139,11 +235,6 @@ export class DesktopAutotypeMvpService implements OnDestroy {
       )
       .subscribe();
 
-    // If `autotypeDefaultPolicy` is `true` for a user's organization, and the
-    // user has never changed their local autotype setting (`autotypeEnabledState`),
-    // we set their local setting to `true` (once the local user setting is changed
-    // by this policy or the user themselves, the default policy should
-    // never change the user setting again).
     combineLatest([
       this.autotypeEnabledState.state$,
       this.desktopAutotypePolicy.autotypeDefaultSetting$,
@@ -162,7 +253,7 @@ export class DesktopAutotypeMvpService implements OnDestroy {
       )
       .subscribe();
 
-    // listen for changes in keyboard shortcut settings
+    // Listen for changes in keyboard shortcut settings
     this.autotypeKeyboardShortcut$
       .pipe(
         concatMap(async (keyboardShortcut) => {
@@ -170,6 +261,16 @@ export class DesktopAutotypeMvpService implements OnDestroy {
             keyboardShortcut,
           };
           ipc.autofill.autotypeMvp.configure(config);
+        }),
+        takeUntil(this.destroy$),
+      )
+      .subscribe();
+
+    // Listen for changes in global spotlight shortcut settings
+    this.autotypeGlobalShortcut$
+      .pipe(
+        concatMap(async (shortcut) => {
+          ipc.autofill.autotypeMvp.configureGlobalSearch(shortcut);
         }),
         takeUntil(this.destroy$),
       )
@@ -185,23 +286,19 @@ export class DesktopAutotypeMvpService implements OnDestroy {
       .subscribe();
   }
 
-  // Returns an observable that represents whether autotype is enabled for the current user.
   private get autotypeFeatureEnabled$(): Observable<boolean> {
     return combineLatest([
-      // if the user has enabled the setting
       this.autotypeEnabledUserSetting$,
-      // if the feature flag is set
       autotypeFeatureFlagState$(this.configService).pipe(
         map((state) => state === AutotypeFeatureFlagState.Mvp),
       ),
-      // if there is an active account with an unlocked vault
       this.authService.activeAccountStatus$,
     ]).pipe(
       map(
         ([settingsEnabled, ffEnabled, authStatus]) =>
           settingsEnabled && ffEnabled && authStatus === AuthenticationStatus.Unlocked,
       ),
-      distinctUntilChanged(), // Only emit when the boolean result changes
+      distinctUntilChanged(),
       takeUntil(this.destroy$),
     );
   }
@@ -216,9 +313,22 @@ export class DesktopAutotypeMvpService implements OnDestroy {
     await this.autotypeKeyboardShortcut.update(() => keyboardShortcut);
   }
 
-  async matchCiphersToWindowTitle(windowTitle: string): Promise<CipherView[]> {
-    const URI_PREFIX = "apptitle://";
-    windowTitle = windowTitle.toLowerCase();
+  async setAutotypeGlobalShortcutState(shortcut: string[]): Promise<void> {
+    await this.autotypeGlobalShortcutState.update(() => shortcut);
+  }
+
+  async setAutotypePickerPositionState(pos: "center" | "cursor"): Promise<void> {
+    await this.autotypePickerPositionState.update(() => pos);
+  }
+
+  async setAutotypeTcatoEnabledState(enabled: boolean): Promise<void> {
+    await this.autotypeTcatoEnabledState.update(() => enabled);
+  }
+
+  async matchCiphers(windowTitle: string, processName?: string): Promise<CipherView[]> {
+    const titleLower = (windowTitle || "").toLowerCase();
+    const procLower = (processName || "").toLowerCase();
+    const cleanExe = procLower.replace(/\.exe$/i, "");
 
     const ciphers = await firstValueFrom(
       this.accountService.activeAccount$.pipe(
@@ -228,42 +338,248 @@ export class DesktopAutotypeMvpService implements OnDestroy {
       ),
     );
 
-    const possibleCiphers = ciphers.filter((c) => {
+    return (ciphers || []).filter((c) => {
       if (!c.login?.username || !c.login?.password || c.deletedDate != null) {
         return false;
       }
 
-      // 1. Explicit apptitle:// URI match
-      const uriMatch = c.login?.uris?.some((u) => {
-        if (u.uri?.indexOf(URI_PREFIX) === 0) {
-          const uri = u.uri.substring(URI_PREFIX.length).trim().toLowerCase();
-          return uri.length > 0 && windowTitle.indexOf(uri) > -1;
-        }
-        return false;
-      });
+      const uris = c.login?.uris || [];
 
-      if (uriMatch) {
-        return true;
+      // 1. Process matching
+      if (procLower) {
+        const procMatch = uris.some((u) => {
+          const raw = (u.uri || "").toLowerCase().trim();
+          return (
+            raw === `app://${procLower}` ||
+            raw === `app://${cleanExe}` ||
+            raw === procLower ||
+            raw === cleanExe
+          );
+        });
+        if (procMatch) {return true;}
       }
 
-      // 2. Name-based match
+      // 2. Window title matching
+      if (titleLower) {
+        const titleMatch = uris.some((u) => {
+          const raw = (u.uri || "").toLowerCase().trim();
+          if (raw.startsWith("apptitle://")) {
+            const pat = raw.substring("apptitle://".length).trim();
+            return pat.length > 0 && titleLower.includes(pat);
+          }
+          return false;
+        });
+        if (titleMatch) {return true;}
+      }
+
+      // 3. Name-based match
       if (c.name) {
         const name = c.name.trim().toLowerCase();
-        if (name.length >= 2 && windowTitle.indexOf(name) > -1) {
+        if (procLower && (name === cleanExe || procLower.includes(name))) {
           return true;
         }
 
-        // Handle names like "Steam (main)" matching window "Steam"
+        if (titleLower && name.length >= 2 && titleLower.includes(name)) {
+          return true;
+        }
+
         const primaryName = name.split(/[\s(\-_:]+/)[0]?.trim();
-        if (primaryName && primaryName.length >= 3 && windowTitle.indexOf(primaryName) > -1) {
+        if (primaryName && primaryName.length >= 3 && titleLower.includes(primaryName)) {
           return true;
         }
       }
 
       return false;
     });
+  }
 
-    return possibleCiphers;
+  async matchCiphersToWindowTitle(windowTitle: string): Promise<CipherView[]> {
+    return await this.matchCiphers(windowTitle, undefined);
+  }
+
+  async getCipherById(id: string): Promise<CipherView | null> {
+    try {
+      const ciphers = await firstValueFrom(
+        this.accountService.activeAccount$.pipe(
+          map((account) => account?.id),
+          filter((userId): userId is UserId => userId != null),
+          switchMap((userId) => this.cipherService.cipherViews$(userId)),
+        ),
+      );
+      return (ciphers || []).find((c) => c.id === id) || null;
+    } catch {
+      return null;
+    }
+  }
+
+  async preparePickerItems(windowTitle: string, processName?: string): Promise<any[]> {
+    const titleLower = (windowTitle || "").toLowerCase();
+    const procLower = (processName || "").toLowerCase();
+    const cleanExe = procLower.replace(/\.exe$/i, "");
+
+    try {
+      const ciphers = await firstValueFrom(
+        this.accountService.activeAccount$.pipe(
+          map((account) => account?.id),
+          filter((userId): userId is UserId => userId != null),
+          switchMap((userId) => this.cipherService.cipherViews$(userId)),
+        ),
+      );
+
+      const validCiphers = (ciphers || []).filter(
+        (c) => (c.login?.username || c.login?.password) && c.deletedDate == null,
+      );
+
+      const matchedItems: any[] = [];
+      const otherItems: any[] = [];
+
+      for (const c of validCiphers) {
+        const uris = c.login?.uris || [];
+        const name = (c.name || "").toLowerCase();
+        let matchType: "process" | "title" | "search" | null = null;
+        let badge = "";
+
+        if (procLower) {
+          const procMatch = uris.some((u) => {
+            const raw = (u.uri || "").toLowerCase().trim();
+            return (
+              raw === `app://${procLower}` ||
+              raw === `app://${cleanExe}` ||
+              raw === procLower ||
+              raw === cleanExe
+            );
+          });
+          if (procMatch || name === cleanExe || name.startsWith(cleanExe)) {
+            matchType = "process";
+            badge = `Процесс: ${procLower}`;
+          }
+        }
+
+        if (!matchType && titleLower) {
+          const titleMatch = uris.some((u) => {
+            const raw = (u.uri || "").toLowerCase().trim();
+            if (raw.startsWith("apptitle://")) {
+              const pat = raw.substring("apptitle://".length).trim();
+              return pat.length > 0 && titleLower.includes(pat);
+            }
+            return false;
+          });
+          if (titleMatch || (name.length >= 2 && titleLower.includes(name))) {
+            matchType = "title";
+            badge = "Заголовок окна";
+          }
+        }
+
+        const customSeq = this.getCustomSequence(c);
+        const sequencePreview = customSeq || "{USERNAME} ⇥ {PASSWORD} ↵";
+
+        const item = {
+          id: c.id,
+          name: c.name || "Без названия",
+          username: c.login?.username || "",
+          matchType: matchType || "search",
+          matchBadge: badge || undefined,
+          sequencePreview,
+        };
+
+        if (matchType) {
+          matchedItems.push(item);
+        } else {
+          otherItems.push(item);
+        }
+      }
+
+      return [...matchedItems, ...otherItems];
+    } catch {
+      return [];
+    }
+  }
+
+  private getCustomSequence(cipher: CipherView): string | null {
+    if (cipher.fields && cipher.fields.length > 0) {
+      const field = cipher.fields.find(
+        (f) =>
+          f.name?.toLowerCase() === "autotype_sequence" ||
+          f.name?.toLowerCase() === "autotype-sequence",
+      );
+      if (field && field.value && field.value.trim().length > 0) {
+        return field.value.trim();
+      }
+    }
+    return null;
+  }
+
+  async buildSequenceTokens(cipher: CipherView): Promise<SequenceToken[]> {
+    const username = cipher.login?.username || "";
+    const password = cipher.login?.password || "";
+    let totp = "";
+
+    if (cipher.login?.totp) {
+      try {
+        const res = await firstValueFrom(this.totpService.getCode$(cipher.login.totp));
+        totp = res?.code || "";
+      } catch {
+        totp = "";
+      }
+    }
+
+    const customSeq = this.getCustomSequence(cipher);
+    if (!customSeq) {
+      return [
+        { type: "text", value: username, isSensitive: false },
+        { type: "key", key: "Tab" },
+        { type: "text", value: password, isSensitive: true },
+        { type: "key", key: "Enter" },
+      ];
+    }
+
+    const tokens: SequenceToken[] = [];
+    const regex = /\{([A-Za-z0-9_ ]+)\}/g;
+    let lastIndex = 0;
+    let match: RegExpExecArray | null;
+
+    while ((match = regex.exec(customSeq)) !== null) {
+      if (match.index > lastIndex) {
+        tokens.push({
+          type: "text",
+          value: customSeq.substring(lastIndex, match.index),
+          isSensitive: false,
+        });
+      }
+
+      const tag = match[1].trim().toUpperCase();
+      if (tag === "USERNAME") {
+        tokens.push({ type: "text", value: username, isSensitive: false });
+      } else if (tag === "PASSWORD") {
+        tokens.push({ type: "text", value: password, isSensitive: true });
+      } else if (tag === "TOTP") {
+        tokens.push({ type: "text", value: totp, isSensitive: false });
+      } else if (tag === "TAB") {
+        tokens.push({ type: "key", key: "Tab" });
+      } else if (tag === "ENTER") {
+        tokens.push({ type: "key", key: "Enter" });
+      } else if (tag === "SPACE") {
+        tokens.push({ type: "key", key: "Space" });
+      } else if (tag.startsWith("DELAY")) {
+        const parts = tag.split(/\s+/);
+        const ms = parts[1] ? parseInt(parts[1], 10) : 500;
+        tokens.push({ type: "delay", milliseconds: isNaN(ms) ? 500 : ms });
+      } else {
+        tokens.push({ type: "text", value: match[0], isSensitive: false });
+      }
+
+      lastIndex = regex.lastIndex;
+    }
+
+    if (lastIndex < customSeq.length) {
+      tokens.push({
+        type: "text",
+        value: customSeq.substring(lastIndex),
+        isSensitive: false,
+      });
+    }
+
+    return tokens;
   }
 
   ngOnDestroy() {
@@ -272,10 +588,6 @@ export class DesktopAutotypeMvpService implements OnDestroy {
   }
 }
 
-/**
- * @return an `AutotypeVaultData` object or an `Error` if the
- * cipher or vault data within are undefined.
- */
 export function getAutotypeVaultData(
   cipherView: CipherView | undefined,
 ): Result<AutotypeVaultData> {

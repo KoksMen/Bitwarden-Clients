@@ -1,0 +1,45 @@
+<section class="tw-mb-5 bit-compact:tw-mb-4">
+  <bit-section-header>
+    <h2 bitTypography="h6">Последовательность автонабора (AutoType)</h2>
+  </bit-section-header>
+
+  <bit-card>
+    <bit-form-field>
+      <bit-label>Последовательность клавиш</bit-label>
+      <input
+        bitInput
+        type="text"
+        class="tw-font-mono"
+        [(ngModel)]="sequence"
+        (ngModelChange)="onSequenceChange()"
+        placeholder="{USERNAME}{TAB}{PASSWORD}{ENTER}"
+      />
+    </bit-form-field>
+
+    <!-- Presets -->
+    <div class="presets-row">
+      <span class="label-hint">Готовые шаблоны:</span>
+      <div class="preset-buttons">
+        <button
+          *ngFor="let p of presets"
+          type="button"
+          class="preset-btn"
+          [class.active]="sequence === p.seq"
+          (click)="setPreset(p.seq)"
+        >
+          {{ p.label }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Insert Tags -->
+    <div class="chips-row">
+      <span class="label-hint">Вставить тег:</span>
+      <div class="chip-buttons">
+        <button *ngFor="let chip of chips" type="button" class="chip-btn" (click)="insertTag(chip)">
+          + {{ chip }}
+        </button>
+      </div>
+    </div>
+  </bit-card>
+</section>

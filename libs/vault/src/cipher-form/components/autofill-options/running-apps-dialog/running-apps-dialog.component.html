@@ -1,0 +1,84 @@
+<bit-dialog
+  [title]="'Выбор запущенной программы'"
+  [subtitle]="'Выберите окно или приложение для настройки автонабора'"
+  dialogSize="large"
+>
+  <div bitDialogContent class="running-apps-container">
+    <div class="search-box">
+      <span class="search-icon">🔍</span>
+      <input
+        type="text"
+        class="filter-input"
+        placeholder="Поиск по названию или процессу (например, steam, telegram, chrome)..."
+        [(ngModel)]="searchQuery"
+        (ngModelChange)="onSearchChange()"
+        autofocus
+      />
+      <button
+        *ngIf="searchQuery"
+        type="button"
+        class="clear-btn"
+        (click)="searchQuery = ''; onSearchChange()"
+      >
+        ✕
+      </button>
+    </div>
+
+    <div *ngIf="isLoading" class="state-container">
+      <div class="state-icon">⏳</div>
+      <div class="state-title">Сканирование запущенных программ...</div>
+    </div>
+
+    <div *ngIf="!isLoading && filteredApps.length === 0" class="state-container">
+      <div class="state-icon">🔍</div>
+      <div class="state-title">Программы не найдены</div>
+      <div class="state-subtitle">Попробуйте изменить поисковый запрос</div>
+    </div>
+
+    <div *ngIf="!isLoading && filteredApps.length > 0" class="apps-list">
+      <div
+        *ngFor="let app of filteredApps"
+        class="app-row"
+        (click)="select(app)"
+        [title]="app.processPath || app.windowTitle"
+      >
+        <div class="proc-icon">
+          <span>🖥️</span>
+        </div>
+        <div class="app-info">
+          <div class="proc-line">
+            <span class="proc-name">{{ app.processName }}</span>
+            <span class="app-pid">PID: {{ app.pid }}</span>
+          </div>
+          <div class="title-line" *ngIf="app.windowTitle">
+            {{ app.windowTitle }}
+          </div>
+          <div class="path-line" *ngIf="app.processPath">
+            {{ app.processPath }}
+          </div>
+        </div>
+        <div class="action-btn-col">
+          <button
+            bitButton
+            type="button"
+            buttonType="primaryGhost"
+            size="small"
+            (click)="select(app); $event.stopPropagation()"
+          >
+            Выбрать
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <ng-container bitDialogFooter>
+    <div class="footer-row">
+      <span class="count-badge" *ngIf="!isLoading">
+        Найдено приложений: {{ filteredApps.length }}
+      </span>
+      <span *ngIf="isLoading"></span>
+      <button bitButton type="button" buttonType="secondary" (click)="cancel()">Отмена</button>
+    </div>
+  </ng-container>
+</bit-dialog>

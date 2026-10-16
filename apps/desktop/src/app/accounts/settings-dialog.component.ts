@@ -211,6 +211,9 @@ export class SettingsDialogComponent implements OnInit {
       disabled: false,
     }),
     autotypeShortcut: [null as string | null],
+    autotypeGlobalShortcut: [null as string | null],
+    autotypePickerPosition: ["center" as "center" | "cursor"],
+    autotypeTcatoEnabled: [false],
     enableAutotypeGa: this.formBuilder.control<boolean>({
       value: false,
       disabled: false,
@@ -219,6 +222,11 @@ export class SettingsDialogComponent implements OnInit {
     theme: [null as Theme | null],
     locale: [null as string | null],
   });
+
+  protected readonly autotypePickerPositionOptions: Option<string>[] = [
+    { label: "По центру экрана", value: "center" },
+    { label: "Рядом с курсором мыши", value: "cursor" },
+  ];
 
   constructor() {
     this.isMac = this.platformUtilsService.getDevice() === DeviceType.MacOsDesktop;
@@ -326,6 +334,17 @@ export class SettingsDialogComponent implements OnInit {
       autotypeShortcut: this.getFormattedAutotypeShortcutText(
         (await firstValueFrom(this.desktopAutotypeMvpService.autotypeKeyboardShortcut$)) ?? [],
       ),
+      autotypeGlobalShortcut: this.getFormattedAutotypeShortcutText(
+        (await firstValueFrom(this.desktopAutotypeMvpService.autotypeGlobalShortcut$)) ?? [
+          "Control",
+          "Alt",
+          "A",
+        ],
+      ),
+      autotypePickerPosition:
+        (await firstValueFrom(this.desktopAutotypeMvpService.autotypePickerPosition$)) ?? "center",
+      autotypeTcatoEnabled:
+        (await firstValueFrom(this.desktopAutotypeMvpService.autotypeTcatoEnabled$)) ?? false,
       enableAutotypeGa: await firstValueFrom(
         this.desktopAutotypeService.autotypeEnabledUserSetting$,
       ),
@@ -406,6 +425,26 @@ export class SettingsDialogComponent implements OnInit {
           if (value !== null && value !== undefined) {
             await this.desktopAutotypeMvpService.setAutotypeEnabledState(value);
           }
+        }),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe();
+
+    this.form.controls.autotypePickerPosition.valueChanges
+      .pipe(
+        concatMap(async (value: "center" | "cursor") => {
+          if (value) {
+            await this.desktopAutotypeMvpService.setAutotypePickerPositionState(value);
+          }
+        }),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe();
+
+    this.form.controls.autotypeTcatoEnabled.valueChanges
+      .pipe(
+        concatMap(async (value: boolean | null) => {
+          await this.desktopAutotypeMvpService.setAutotypeTcatoEnabledState(value ?? false);
         }),
         takeUntilDestroyed(this.destroyRef),
       )
@@ -769,6 +808,25 @@ export class SettingsDialogComponent implements OnInit {
       this.getFormattedAutotypeShortcutText(newShortcutArray),
     );
     await this.desktopAutotypeMvpService.setAutotypeKeyboardShortcutState(newShortcutArray);
+  }
+
+  protected async saveAutotypeGlobalShortcut() {
+    await this.desktopAutotypeMvpService.setAutotypeEnabledState(false);
+
+    const dialogRef = AutotypeShortcutComponent.open(this.dialogService);
+
+    const newShortcutArray = await firstValueFrom(dialogRef.closed);
+
+    await this.desktopAutotypeMvpService.setAutotypeEnabledState(true);
+
+    if (!newShortcutArray) {
+      return;
+    }
+
+    this.form.controls.autotypeGlobalShortcut.setValue(
+      this.getFormattedAutotypeShortcutText(newShortcutArray),
+    );
+    await this.desktopAutotypeMvpService.setAutotypeGlobalShortcutState(newShortcutArray);
   }
 
   protected async saveEnableAutotypeGa() {

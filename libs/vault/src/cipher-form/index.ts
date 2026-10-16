@@ -12,4 +12,6 @@ export { CipherFormGeneratorComponent } from "./components/cipher-generator/ciph
 export { CipherFormContainer } from "../cipher-form/cipher-form-container";
 export { CipherFormComponent } from "./components/cipher-form.component";
 export { AdvancedUriOptionDialogComponent } from "./components/autofill-options/advanced-uri-option-dialog.component";
+export { RunningAppsDialogComponent } from "./components/autofill-options/running-apps-dialog/running-apps-dialog.component";
+export { AutotypeSequenceSectionComponent } from "./components/autotype-sequence-section/autotype-sequence-section.component";
 export { DateFieldGroupComponent } from "./components/date-field-group/date-field-group.component";

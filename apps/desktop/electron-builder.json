@@ -112,6 +112,10 @@
       {
         "from": "desktop_native/dist/windows_plugin_authenticator.win32-${arch}.exe",
         "to": "bitwarden_plugin_authenticator.exe"
+      },
+      {
+        "from": "resources/autotype-helper/AutotypeHelper.exe",
+        "to": "AutotypeHelper.exe"
       }
     ],
     "extraResources": [
@@ -126,6 +130,10 @@
       {
         "from": "resources/windows_plugin_authenticator_logo_dark.stable.svg",
         "to": "plugin_authenticator_logo_dark.svg"
+      },
+      {
+        "from": "resources/autotype-picker/picker.html",
+        "to": "autotype-picker/picker.html"
       }
     ]
   },

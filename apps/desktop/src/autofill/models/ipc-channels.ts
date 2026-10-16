@@ -5,6 +5,17 @@ export const AUTOTYPE_MVP_IPC_CHANNELS = {
   LISTEN: "autofill.listenAutotypeRequestMvp",
   EXECUTION_ERROR: "autofill.autotypeExecutionErrorMvp",
   EXECUTE: "autofill.executeAutotypeMvp",
+
+  // Qualitative enhancements
+  GET_RUNNING_WINDOWS: "autofill.getRunningWindows",
+  CAPTURE_WINDOW: "autofill.captureWindow",
+  OPEN_PICKER: "autofill.openPicker",
+  CLOSE_PICKER: "autofill.closePicker",
+  EXECUTE_SEQUENCE: "autofill.executeSequence",
+  CONFIGURE_GLOBAL_SEARCH: "autofill.configureGlobalSearch",
+  PICKER_INIT_DATA: "autofill.pickerInitData",
+  PICKER_SELECT: "autofill.pickerSelect",
+  PICKER_ITEM_CHOSEN: "autofill.pickerItemChosen",
 } as const;
 
 export const SSH_AGENT_IPC_CHANNELS = {

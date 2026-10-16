@@ -29,12 +29,21 @@ const autotypeMvp = {
   configure: (config: AutotypeConfig) => {
     ipcRenderer.send(AUTOTYPE_MVP_IPC_CHANNELS.CONFIGURE, config);
   },
+  configureGlobalSearch: (shortcut: string[]) => {
+    ipcRenderer.send(AUTOTYPE_MVP_IPC_CHANNELS.CONFIGURE_GLOBAL_SEARCH, { shortcut });
+  },
   toggle: (enable: boolean) => {
     ipcRenderer.send(AUTOTYPE_MVP_IPC_CHANNELS.TOGGLE, enable);
   },
   listenRequest: (
     fn: (
-      windowTitle: string,
+      data: {
+        windowTitle: string;
+        processName: string;
+        processPath: string;
+        hwnd: number;
+        isGlobalSearch: boolean;
+      },
       completeCallback: (error: Error | null, response: AutotypeVaultData | null) => void,
     ) => void,
   ) => {
@@ -44,14 +53,16 @@ const autotypeMvp = {
         _event,
         data: {
           windowTitle: string;
+          processName: string;
+          processPath: string;
+          hwnd: number;
+          isGlobalSearch: boolean;
         },
       ) => {
-        const { windowTitle } = data;
-
-        fn(windowTitle, (error, vaultData) => {
+        fn(data, (error, vaultData) => {
           if (error) {
             const matchError: AutotypeMatchError = {
-              windowTitle,
+              windowTitle: data.windowTitle,
               errorMessage: error.message,
             };
             ipcRenderer.send(AUTOTYPE_MVP_IPC_CHANNELS.EXECUTION_ERROR, matchError);
@@ -64,6 +75,35 @@ const autotypeMvp = {
         });
       },
     );
+  },
+  getRunningWindows: (): Promise<any[]> => {
+    return ipcRenderer.invoke(AUTOTYPE_MVP_IPC_CHANNELS.GET_RUNNING_WINDOWS);
+  },
+  captureWindow: (): Promise<any | null> => {
+    return ipcRenderer.invoke(AUTOTYPE_MVP_IPC_CHANNELS.CAPTURE_WINDOW);
+  },
+  openPicker: (data: any) => {
+    ipcRenderer.send(AUTOTYPE_MVP_IPC_CHANNELS.OPEN_PICKER, data);
+  },
+  closePicker: () => {
+    ipcRenderer.send(AUTOTYPE_MVP_IPC_CHANNELS.CLOSE_PICKER);
+  },
+  selectPicker: (data: any) => {
+    ipcRenderer.send(
+      AUTOTYPE_MVP_IPC_CHANNELS.PICKER_SELECT,
+      Array.isArray(data) ? { tokens: data } : data,
+    );
+  },
+  executeSequence: (data: { hwnd: number; tokens: any[]; useTcato: boolean }) => {
+    ipcRenderer.send(AUTOTYPE_MVP_IPC_CHANNELS.EXECUTE_SEQUENCE, data);
+  },
+  onPickerInitData: (fn: (data: any) => void) => {
+    ipcRenderer.on(AUTOTYPE_MVP_IPC_CHANNELS.PICKER_INIT_DATA, (_event, data) => fn(data));
+  },
+  onPickerItemChosen: (
+    fn: (data: { cipherId: string; targetWindow: any; useTcato: boolean }) => void,
+  ) => {
+    ipcRenderer.on(AUTOTYPE_MVP_IPC_CHANNELS.PICKER_ITEM_CHOSEN, (_event, data) => fn(data));
   },
 };
 

@@ -24,45 +24,68 @@
     </ng-container>
 
     @if (autofillOptionsForm.enabled) {
-      @if (showAddAppDropdown()) {
-        <button
-          type="button"
-          bitLink
-          linkType="primary"
-          [class.tw-mb-6]="autofillOnPageLoadEnabled$ | async"
-          startIcon="bwi-plus"
-          [bitMenuTriggerFor]="addUriMenu"
-        >
-          {{ "addWebsiteOrApp" | i18n }}
-        </button>
-        <bit-menu #addUriMenu>
+      <div class="tw-flex tw-flex-wrap tw-items-center tw-gap-3 tw-mb-4">
+        @if (showAddAppDropdown()) {
           <button
             type="button"
-            bitMenuItem
+            bitLink
+            linkType="primary"
+            startIcon="bwi-plus"
+            [bitMenuTriggerFor]="addUriMenu"
+          >
+            {{ "addWebsiteOrApp" | i18n }}
+          </button>
+          <bit-menu #addUriMenu>
+            <button
+              type="button"
+              bitMenuItem
+              (click)="addUri({ uri: null, matchDetection: null }, true)"
+            >
+              {{ "website" | i18n }}
+            </button>
+            <button
+              type="button"
+              bitMenuItem
+              (click)="addUri({ uri: desktopAppUriPrefix, matchDetection: null }, true)"
+            >
+              {{ "app" | i18n }}
+            </button>
+          </bit-menu>
+        } @else {
+          <button
+            type="button"
+            bitLink
+            linkType="primary"
             (click)="addUri({ uri: null, matchDetection: null }, true)"
+            startIcon="bwi-plus"
           >
-            {{ "website" | i18n }}
+            {{ "addWebsite" | i18n }}
+          </button>
+        }
+
+        <div class="tw-flex tw-gap-2 tw-ml-auto">
+          <button
+            type="button"
+            bitButton
+            buttonType="secondary"
+            size="small"
+            (click)="captureWindowTarget()"
+            title="Нажмите, затем кликните по целевому окну на экране для захвата"
+          >
+            🎯 Захватить окно
           </button>
           <button
             type="button"
-            bitMenuItem
-            (click)="addUri({ uri: desktopAppUriPrefix, matchDetection: null }, true)"
+            bitButton
+            buttonType="secondary"
+            size="small"
+            (click)="openRunningAppsDialog()"
+            title="Выбрать программу из списка запущенных в Windows"
           >
-            {{ "app" | i18n }}
+            📋 Выбрать из запущенных...
           </button>
-        </bit-menu>
-      } @else {
-        <button
-          type="button"
-          bitLink
-          linkType="primary"
-          [class.tw-mb-6]="autofillOnPageLoadEnabled$ | async"
-          (click)="addUri({ uri: null, matchDetection: null }, true)"
-          startIcon="bwi-plus"
-        >
-          {{ "addWebsite" | i18n }}
-        </button>
-      }
+        </div>
+      </div>
     }
 
     @if (autofillOnPageLoadEnabled$ | async) {

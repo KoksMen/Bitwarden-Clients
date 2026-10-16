@@ -8,7 +8,7 @@ export const SUPER_KEY_STR = "Super";
 
 export const VALID_SHORTCUT_MODIFIER_KEYS: string[] = [CONTROL_KEY_STR, ALT_KEY_STR, SUPER_KEY_STR];
 
-export const DEFAULT_KEYBOARD_SHORTCUT: string[] = [CONTROL_KEY_STR, ALT_KEY_STR, "B"];
+export const DEFAULT_KEYBOARD_SHORTCUT: string[] = [CONTROL_KEY_STR, ALT_KEY_STR, "V"];
 
 /*
   This class provides the following:

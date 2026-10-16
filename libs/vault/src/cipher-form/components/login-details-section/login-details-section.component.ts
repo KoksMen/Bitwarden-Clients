@@ -29,6 +29,7 @@ import { CipherFormGenerationService } from "../../abstractions/cipher-form-gene
 import { TotpCaptureService } from "../../abstractions/totp-capture.service";
 import { CipherFormContainer } from "../../cipher-form-container";
 import { AutofillOptionsComponent } from "../autofill-options/autofill-options.component";
+import { AutotypeSequenceSectionComponent } from "../autotype-sequence-section/autotype-sequence-section.component";
 
 import {
   DeletePasskeyDialogComponent,
@@ -51,6 +52,7 @@ import {
     AsyncActionsModule,
     PopoverModule,
     AutofillOptionsComponent,
+    AutotypeSequenceSectionComponent,
     LinkModule,
   ],
 })

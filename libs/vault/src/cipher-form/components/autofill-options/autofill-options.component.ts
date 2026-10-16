@@ -6,7 +6,7 @@ import { AsyncPipe } from "@angular/common";
 import { Component, OnInit, QueryList, ViewChildren } from "@angular/core";
 import { takeUntilDestroyed, toSignal } from "@angular/core/rxjs-interop";
 import { FormBuilder, ReactiveFormsModule } from "@angular/forms";
-import { filter, map, of, Subject, switchMap, take } from "rxjs";
+import { filter, firstValueFrom, map, of, Subject, switchMap, take } from "rxjs";
 
 import { JslibModule } from "@bitwarden/angular/jslib.module";
 import { AutofillSettingsServiceAbstraction } from "@bitwarden/common/autofill/services/autofill-settings.service";
@@ -21,7 +21,9 @@ import { PlatformUtilsService } from "@bitwarden/common/platform/abstractions/pl
 import { LoginUriView } from "@bitwarden/common/vault/models/view/login-uri.view";
 import { LoginView } from "@bitwarden/common/vault/models/view/login.view";
 import {
+  ButtonModule,
   CardComponent,
+  DialogService,
   FormFieldModule,
   IconButtonModule,
   LinkModule,
@@ -34,6 +36,7 @@ import {
 import { DESKTOP_APP_URI_PREFIX } from "../../../models/desktop-app-uri.constants";
 import { CipherFormContainer } from "../../cipher-form-container";
 
+import { RunningAppsDialogComponent } from "./running-apps-dialog/running-apps-dialog.component";
 import { UriOptionComponent } from "./uri-option.component";
 
 interface UriField {
@@ -59,6 +62,7 @@ interface UriField {
     UriOptionComponent,
     LinkModule,
     MenuModule,
+    ButtonModule,
     AsyncPipe,
   ],
 })
@@ -126,6 +130,7 @@ export class AutofillOptionsComponent implements OnInit {
     private autofillSettingsService: AutofillSettingsServiceAbstraction,
     private platformUtilsService: PlatformUtilsService,
     private configService: ConfigService,
+    private dialogService: DialogService,
   ) {
     this.cipherFormContainer.registerChildForm("autoFillOptions", this.autofillOptionsForm);
 
@@ -268,6 +273,49 @@ export class AutofillOptionsComponent implements OnInit {
 
   removeUri(i: number) {
     this.autofillOptionsForm.controls.uris.removeAt(i);
+  }
+
+  async captureWindowTarget() {
+    try {
+      if ((window as any).ipc?.autofill?.autotypeMvp?.captureWindow) {
+        const captured = await (window as any).ipc.autofill.autotypeMvp.captureWindow();
+        if (captured && captured.processName) {
+          const uri = `app://${captured.processName}`;
+          this.addUri({ uri, matchDetection: null }, true);
+
+          const currentCipher = this.cipherFormContainer.getInitialCipherView();
+          if (!currentCipher.name && (captured.windowTitle || captured.processName)) {
+            this.cipherFormContainer.patchCipher((c) => {
+              c.name = captured.windowTitle || captured.processName.replace(/\.exe$/i, "");
+              return c;
+            });
+          }
+        }
+      }
+    } catch {
+      // Capture cancelled or failed
+    }
+  }
+
+  async openRunningAppsDialog() {
+    try {
+      const dialogRef = RunningAppsDialogComponent.open(this.dialogService);
+      const selected = await firstValueFrom(dialogRef.closed);
+      if (selected && selected.processName) {
+        const uri = `app://${selected.processName}`;
+        this.addUri({ uri, matchDetection: null }, true);
+
+        const currentCipher = this.cipherFormContainer.getInitialCipherView();
+        if (!currentCipher.name && (selected.windowTitle || selected.processName)) {
+          this.cipherFormContainer.patchCipher((c) => {
+            c.name = selected.windowTitle || selected.processName.replace(/\.exe$/i, "");
+            return c;
+          });
+        }
+      }
+    } catch {
+      // Dialog closed or cancelled
+    }
   }
 
   /** Create a new list of LoginUriViews from the form objects and update the cipher */

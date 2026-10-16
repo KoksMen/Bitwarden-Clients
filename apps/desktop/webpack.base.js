@@ -182,6 +182,7 @@ module.exports.buildConfig = function buildConfig(params) {
               ]
             : []),
           { from: path.resolve(__dirname, "src/locales"), to: "locales" },
+          { from: path.resolve(__dirname, "src/autofill/picker/picker.html"), to: "picker.html" },
         ],
       }),
       new DefinePlugin({

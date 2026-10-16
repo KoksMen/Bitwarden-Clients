@@ -161,6 +161,52 @@
               </bit-hint>
             }
           </bit-form-control>
+
+          @if (form.value.enableAutotype) {
+            <div
+              class="tw-ml-6 tw-flex tw-flex-col tw-gap-3 tw-mt-2 tw-mb-4 tw-p-3 tw-rounded tw-bg-secondary-100 dark:tw-bg-secondary-800"
+            >
+              <div class="tw-flex tw-items-center tw-justify-between">
+                <div>
+                  <div class="tw-text-sm tw-font-medium">
+                    Глобальный поиск AutoType (Spotlight):
+                  </div>
+                  <div class="tw-text-xs tw-text-muted">
+                    Открывает спотлайт-поиск AutoType в любое активное окно
+                  </div>
+                </div>
+                <div class="tw-flex tw-items-center tw-gap-2">
+                  <code>{{ form.value.autotypeGlobalShortcut }}</code>
+                  <a
+                    class="tw-cursor-pointer"
+                    bitLink
+                    tabindex="0"
+                    (click)="saveAutotypeGlobalShortcut(); $event.preventDefault()"
+                    (keydown.enter)="saveAutotypeGlobalShortcut(); $event.preventDefault()"
+                  >
+                    {{ "editShortcut" | i18n }}
+                  </a>
+                </div>
+              </div>
+
+              <bit-form-field disableMargin>
+                <bit-label>Позиция всплывающего селектора</bit-label>
+                <bit-select
+                  formControlName="autotypePickerPosition"
+                  [items]="autotypePickerPositionOptions"
+                ></bit-select>
+              </bit-form-field>
+
+              <bit-form-control>
+                <input type="checkbox" bitCheckbox formControlName="autotypeTcatoEnabled" />
+                <bit-label>Защита от кейлоггеров (Two-Channel Auto-Type Obfuscation)</bit-label>
+                <bit-hint>
+                  Разделяет ввод учетных данных между имитацией нажатий клавиш и буфером обмена
+                  (TCATO) с автоматической очисткой памяти.
+                </bit-hint>
+              </bit-form-control>
+            </div>
+          }
         }
 
         @if (showEnableAutotypeGa()) {
