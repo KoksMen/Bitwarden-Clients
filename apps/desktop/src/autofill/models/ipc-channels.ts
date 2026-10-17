@@ -18,6 +18,7 @@ export const AUTOTYPE_MVP_IPC_CHANNELS = {
   PICKER_ITEM_CHOSEN: "autofill.pickerItemChosen",
   PICKER_COPY_FIELD: "autofill.pickerCopyField",
   PICKER_EDIT_CIPHER: "autofill.pickerEditCipher",
+  PICKER_CLEAR_CLIPBOARD: "autofill.pickerClearClipboard",
 } as const;
 
 export const SSH_AGENT_IPC_CHANNELS = {

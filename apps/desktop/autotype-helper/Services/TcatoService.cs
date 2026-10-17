@@ -23,8 +23,16 @@ public sealed class TcatoService
             Thread.Sleep(150);
         }
 
+        // Target window keyboard layout for accurate scan-code mapping
+        uint targetThread = request.Hwnd != 0 ? Win32.GetWindowThreadProcessId((nint)request.Hwnd, out _) : 0;
+        nint hkl = targetThread != 0 ? Win32.GetKeyboardLayout(targetThread) : Win32.GetKeyboardLayout(0);
+        if (hkl == 0)
+        {
+            hkl = Win32.GetKeyboardLayout(0);
+        }
+
         // Release any held modifier keys from hotkey activation
-        ReleaseModifiers();
+        ReleaseModifiers(hkl);
         Thread.Sleep(50);
 
         foreach (var token in request.Tokens)
@@ -36,17 +44,21 @@ public sealed class TcatoService
                     {
                         if (token.IsSensitive && request.UseTcato)
                         {
-                            TypeWithTcato(token.Value);
+                            TypeWithTcato(token.Value, hkl);
                         }
                         else
                         {
-                            TypeNormal(token.Value);
+                            TypeNormal(token.Value, hkl);
                         }
                     }
                     break;
 
                 case "key":
-                    SendSpecialKey(token.Key);
+                    SendSpecialKey(token.Key, hkl);
+                    break;
+
+                case "clearfield":
+                    SendClearField(hkl);
                     break;
 
                 case "delay":
@@ -62,32 +74,28 @@ public sealed class TcatoService
         return true;
     }
 
-    private static void ReleaseModifiers()
+    private static void ReleaseModifiers(nint hkl)
     {
         var modifiers = new[] { Win32.VK_CONTROL, Win32.VK_MENU, Win32.VK_SHIFT, Win32.VK_LWIN, Win32.VK_RWIN };
         foreach (var vk in modifiers)
         {
             if ((Win32.GetAsyncKeyState(vk) & 0x8000) != 0)
             {
-                var input = new Win32.INPUT[1];
-                input[0].type = Win32.INPUT_KEYBOARD;
-                input[0].mkhi.ki.wVk = vk;
-                input[0].mkhi.ki.dwFlags = Win32.KEYEVENTF_KEYUP;
-                Win32.SendInput(1, input, Marshal.SizeOf<Win32.INPUT>());
+                SendKeyUpScanCode(vk, hkl);
             }
         }
     }
 
-    private static void TypeNormal(string text)
+    private static void TypeNormal(string text, nint hkl)
     {
         foreach (char c in text)
         {
-            SendUnicodeChar(c);
+            SendCharScanCode(c, hkl);
             Thread.Sleep(5);
         }
     }
 
-    private static void TypeWithTcato(string sensitiveText)
+    private static void TypeWithTcato(string sensitiveText, nint hkl)
     {
         string? previousClipboard = ReadClipboardText();
         char[] chars = sensitiveText.ToCharArray();
@@ -109,14 +117,14 @@ public sealed class TcatoService
                 {
                     SetClipboardText(chunk);
                     Thread.Sleep(15);
-                    SendPaste();
+                    SendPaste(hkl);
                     Thread.Sleep(25);
                 }
                 else
                 {
                     foreach (char c in chunk)
                     {
-                        SendUnicodeChar(c);
+                        SendCharScanCode(c, hkl);
                         Thread.Sleep(random.Next(5, 15));
                     }
                 }
@@ -140,6 +148,124 @@ public sealed class TcatoService
         }
     }
 
+    /// <summary>
+    /// Types a character using hardware Scan-codes (KEYEVENTF_SCANCODE) matching KeePassXC.
+    /// If the character cannot be mapped to the current layout, falls back to KEYEVENTF_UNICODE.
+    /// </summary>
+    private static void SendCharScanCode(char c, nint hkl)
+    {
+        short res = Win32.VkKeyScanExW(c, hkl);
+        if (res == -1)
+        {
+            // Fallback to unicode injection for characters outside the active layout
+            SendUnicodeChar(c);
+            return;
+        }
+
+        byte vk = (byte)(res & 0xFF);
+        byte shiftState = (byte)((res >> 8) & 0xFF);
+
+        bool shift = (shiftState & 1) != 0;
+        bool ctrl = (shiftState & 2) != 0;
+        bool alt = (shiftState & 4) != 0;
+
+        if (shift) SendKeyDownScanCode(Win32.VK_SHIFT, hkl);
+        if (ctrl) SendKeyDownScanCode(Win32.VK_CONTROL, hkl);
+        if (alt) SendKeyDownScanCode(Win32.VK_MENU, hkl);
+
+        SendKeyScanCode(vk, hkl);
+
+        if (alt) SendKeyUpScanCode(Win32.VK_MENU, hkl);
+        if (ctrl) SendKeyUpScanCode(Win32.VK_CONTROL, hkl);
+        if (shift) SendKeyUpScanCode(Win32.VK_SHIFT, hkl);
+    }
+
+    private static void SendKeyScanCode(ushort vk, nint hkl, bool isExtended = false)
+    {
+        uint scan = Win32.MapVirtualKeyExW(vk, Win32.MAPVK_VK_TO_VSC_EX, hkl);
+        if (scan == 0)
+        {
+            scan = Win32.MapVirtualKeyExW(vk, Win32.MAPVK_VK_TO_VSC, hkl);
+        }
+
+        bool ext = isExtended || (scan > 0xFF) || ((scan & 0xFF00) == 0xE000);
+        ushort scanCode = (ushort)(scan & 0xFF);
+        uint baseFlags = Win32.KEYEVENTF_SCANCODE | (ext ? Win32.KEYEVENTF_EXTENDEDKEY : 0);
+
+        var inputs = new Win32.INPUT[2];
+        // Down
+        inputs[0].type = Win32.INPUT_KEYBOARD;
+        inputs[0].mkhi.ki.wVk = 0;
+        inputs[0].mkhi.ki.wScan = scanCode;
+        inputs[0].mkhi.ki.dwFlags = baseFlags;
+
+        // Up
+        inputs[1].type = Win32.INPUT_KEYBOARD;
+        inputs[1].mkhi.ki.wVk = 0;
+        inputs[1].mkhi.ki.wScan = scanCode;
+        inputs[1].mkhi.ki.dwFlags = baseFlags | Win32.KEYEVENTF_KEYUP;
+
+        Win32.SendInput(2, inputs, Marshal.SizeOf<Win32.INPUT>());
+    }
+
+    private static void SendKeyDownScanCode(ushort vk, nint hkl, bool isExtended = false)
+    {
+        uint scan = Win32.MapVirtualKeyExW(vk, Win32.MAPVK_VK_TO_VSC_EX, hkl);
+        if (scan == 0)
+        {
+            scan = Win32.MapVirtualKeyExW(vk, Win32.MAPVK_VK_TO_VSC, hkl);
+        }
+
+        bool ext = isExtended || (scan > 0xFF) || ((scan & 0xFF00) == 0xE000);
+        ushort scanCode = (ushort)(scan & 0xFF);
+
+        var inputs = new Win32.INPUT[1];
+        inputs[0].type = Win32.INPUT_KEYBOARD;
+        inputs[0].mkhi.ki.wVk = 0;
+        inputs[0].mkhi.ki.wScan = scanCode;
+        inputs[0].mkhi.ki.dwFlags = Win32.KEYEVENTF_SCANCODE | (ext ? Win32.KEYEVENTF_EXTENDEDKEY : 0);
+
+        Win32.SendInput(1, inputs, Marshal.SizeOf<Win32.INPUT>());
+    }
+
+    private static void SendKeyUpScanCode(ushort vk, nint hkl, bool isExtended = false)
+    {
+        uint scan = Win32.MapVirtualKeyExW(vk, Win32.MAPVK_VK_TO_VSC_EX, hkl);
+        if (scan == 0)
+        {
+            scan = Win32.MapVirtualKeyExW(vk, Win32.MAPVK_VK_TO_VSC, hkl);
+        }
+
+        bool ext = isExtended || (scan > 0xFF) || ((scan & 0xFF00) == 0xE000);
+        ushort scanCode = (ushort)(scan & 0xFF);
+
+        var inputs = new Win32.INPUT[1];
+        inputs[0].type = Win32.INPUT_KEYBOARD;
+        inputs[0].mkhi.ki.wVk = 0;
+        inputs[0].mkhi.ki.wScan = scanCode;
+        inputs[0].mkhi.ki.dwFlags = Win32.KEYEVENTF_SCANCODE | (ext ? Win32.KEYEVENTF_EXTENDEDKEY : 0) | Win32.KEYEVENTF_KEYUP;
+
+        Win32.SendInput(1, inputs, Marshal.SizeOf<Win32.INPUT>());
+    }
+
+    /// <summary>
+    /// Clears the active input field (KeePassXC {CLEARFIELD} equivalent: Ctrl+A followed by Backspace).
+    /// </summary>
+    private static void SendClearField(nint hkl)
+    {
+        // Select All (Ctrl+A)
+        SendKeyDownScanCode(Win32.VK_CONTROL, hkl);
+        Thread.Sleep(15);
+        SendKeyScanCode(Win32.VK_A, hkl);
+        Thread.Sleep(15);
+        SendKeyUpScanCode(Win32.VK_CONTROL, hkl);
+        Thread.Sleep(25);
+
+        // Delete selection with Backspace
+        SendKeyScanCode(Win32.VK_BACK, hkl);
+        Thread.Sleep(25);
+    }
+
     private static void SendUnicodeChar(char c)
     {
         var inputs = new Win32.INPUT[2];
@@ -157,55 +283,55 @@ public sealed class TcatoService
         Win32.SendInput((uint)inputs.Length, inputs, Marshal.SizeOf<Win32.INPUT>());
     }
 
-    private static void SendSpecialKey(string? key)
+    private static void SendSpecialKey(string? key, nint hkl)
     {
         if (string.IsNullOrWhiteSpace(key)) return;
 
-        ushort vk = key.ToLowerInvariant() switch
+        switch (key.ToLowerInvariant())
         {
-            "tab" => Win32.VK_TAB,
-            "enter" or "return" => Win32.VK_RETURN,
-            "space" => Win32.VK_SPACE,
-            _ => 0
-        };
-
-        if (vk == 0) return;
-
-        var inputs = new Win32.INPUT[2];
-
-        inputs[0].type = Win32.INPUT_KEYBOARD;
-        inputs[0].mkhi.ki.wVk = vk;
-
-        inputs[1].type = Win32.INPUT_KEYBOARD;
-        inputs[1].mkhi.ki.wVk = vk;
-        inputs[1].mkhi.ki.dwFlags = Win32.KEYEVENTF_KEYUP;
-
-        Win32.SendInput((uint)inputs.Length, inputs, Marshal.SizeOf<Win32.INPUT>());
+            case "tab":
+                SendKeyScanCode(Win32.VK_TAB, hkl);
+                break;
+            case "enter" or "return":
+                SendKeyScanCode(Win32.VK_RETURN, hkl);
+                break;
+            case "space":
+                SendKeyScanCode(Win32.VK_SPACE, hkl);
+                break;
+            case "backspace":
+                SendKeyScanCode(Win32.VK_BACK, hkl);
+                break;
+            case "delete":
+                SendKeyScanCode(Win32.VK_DELETE, hkl, isExtended: true);
+                break;
+            case "home":
+                SendKeyScanCode(Win32.VK_HOME, hkl, isExtended: true);
+                break;
+            case "end":
+                SendKeyScanCode(Win32.VK_END, hkl, isExtended: true);
+                break;
+            case "up":
+                SendKeyScanCode(Win32.VK_UP, hkl, isExtended: true);
+                break;
+            case "down":
+                SendKeyScanCode(Win32.VK_DOWN, hkl, isExtended: true);
+                break;
+            case "left":
+                SendKeyScanCode(Win32.VK_LEFT, hkl, isExtended: true);
+                break;
+            case "right":
+                SendKeyScanCode(Win32.VK_RIGHT, hkl, isExtended: true);
+                break;
+        }
     }
 
-    private static void SendPaste()
+    private static void SendPaste(nint hkl)
     {
-        var inputs = new Win32.INPUT[4];
-
-        // Ctrl down
-        inputs[0].type = Win32.INPUT_KEYBOARD;
-        inputs[0].mkhi.ki.wVk = Win32.VK_CONTROL;
-
-        // V down
-        inputs[1].type = Win32.INPUT_KEYBOARD;
-        inputs[1].mkhi.ki.wVk = Win32.VK_V;
-
-        // V up
-        inputs[2].type = Win32.INPUT_KEYBOARD;
-        inputs[2].mkhi.ki.wVk = Win32.VK_V;
-        inputs[2].mkhi.ki.dwFlags = Win32.KEYEVENTF_KEYUP;
-
-        // Ctrl up
-        inputs[3].type = Win32.INPUT_KEYBOARD;
-        inputs[3].mkhi.ki.wVk = Win32.VK_CONTROL;
-        inputs[3].mkhi.ki.dwFlags = Win32.KEYEVENTF_KEYUP;
-
-        Win32.SendInput((uint)inputs.Length, inputs, Marshal.SizeOf<Win32.INPUT>());
+        SendKeyDownScanCode(Win32.VK_CONTROL, hkl);
+        Thread.Sleep(15);
+        SendKeyScanCode(Win32.VK_V, hkl);
+        Thread.Sleep(15);
+        SendKeyUpScanCode(Win32.VK_CONTROL, hkl);
     }
 
     private static string? ReadClipboardText()

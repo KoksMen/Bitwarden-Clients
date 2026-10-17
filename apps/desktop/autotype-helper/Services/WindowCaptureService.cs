@@ -9,6 +9,7 @@ public sealed class WindowCaptureService
 {
     public WindowInfo? CaptureInteractive(int timeoutSeconds = 20)
     {
+        WindowService.EnsureInputDesktop();
         uint currentPid = (uint)Process.GetCurrentProcess().Id;
         var deadline = DateTime.UtcNow.AddSeconds(timeoutSeconds);
 

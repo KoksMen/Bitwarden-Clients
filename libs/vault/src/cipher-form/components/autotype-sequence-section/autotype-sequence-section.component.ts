@@ -96,6 +96,10 @@ export class AutotypeSequenceSectionComponent implements OnInit {
   sequence: string = DEFAULT_SEQUENCE;
 
   readonly presets = [
+    {
+      label: "Очистить + Логин + Пароль + Enter",
+      seq: "{CLEARFIELD}{USERNAME}{TAB}{PASSWORD}{ENTER}",
+    },
     { label: "Логин + Пароль + Enter", seq: "{USERNAME}{TAB}{PASSWORD}{ENTER}" },
     { label: "Только пароль + Enter", seq: "{PASSWORD}{ENTER}" },
     { label: "Логин + Пароль", seq: "{USERNAME}{TAB}{PASSWORD}" },
@@ -103,6 +107,7 @@ export class AutotypeSequenceSectionComponent implements OnInit {
   ];
 
   readonly chips = [
+    "{CLEARFIELD}",
     "{USERNAME}",
     "{PASSWORD}",
     "{TOTP}",

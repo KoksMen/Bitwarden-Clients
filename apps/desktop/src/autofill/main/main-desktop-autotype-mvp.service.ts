@@ -165,6 +165,12 @@ export class MainDesktopAutotypeMvpService {
       },
     );
 
+    ipcMain.on(AUTOTYPE_MVP_IPC_CHANNELS.PICKER_CLEAR_CLIPBOARD, () => {
+      if (this.windowMain.win && !this.windowMain.win.isDestroyed()) {
+        this.windowMain.win.webContents.send(AUTOTYPE_MVP_IPC_CHANNELS.PICKER_CLEAR_CLIPBOARD);
+      }
+    });
+
     ipcMain.on(
       AUTOTYPE_MVP_IPC_CHANNELS.EXECUTE_SEQUENCE,
       async (

@@ -108,11 +108,17 @@ const autotypeMvp = {
   copyPickerField: (data: {
     cipherId: string;
     field: "username" | "password" | "totp" | "url";
-  }): Promise<{ success: boolean; message: string }> => {
+  }): Promise<{ success: boolean; message: string; timeoutSec?: number | null }> => {
     return ipcRenderer.invoke(AUTOTYPE_MVP_IPC_CHANNELS.PICKER_COPY_FIELD, data);
   },
   editPickerCipher: (data: { cipherId: string }) => {
     ipcRenderer.send(AUTOTYPE_MVP_IPC_CHANNELS.PICKER_EDIT_CIPHER, data);
+  },
+  clearClipboard: () => {
+    ipcRenderer.send(AUTOTYPE_MVP_IPC_CHANNELS.PICKER_CLEAR_CLIPBOARD);
+  },
+  onPickerClearClipboard: (fn: () => void) => {
+    ipcRenderer.on(AUTOTYPE_MVP_IPC_CHANNELS.PICKER_CLEAR_CLIPBOARD, () => fn());
   },
   onPickerCopyField: (
     fn: (data: { cipherId: string; field: string; replyChannel: string }) => void,

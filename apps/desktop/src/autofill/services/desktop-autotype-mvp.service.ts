@@ -1,6 +1,6 @@
 // MVP, delete with PM-41067
 
-import { Injectable, OnDestroy } from "@angular/core";
+import { Injectable, OnDestroy, Optional } from "@angular/core";
 import {
   combineLatest,
   concatMap,
@@ -19,6 +19,9 @@ import {
 import { Account, AccountService } from "@bitwarden/common/auth/abstractions/account.service";
 import { AuthService } from "@bitwarden/common/auth/abstractions/auth.service";
 import { AuthenticationStatus } from "@bitwarden/common/auth/enums/authentication-status";
+import { ClearClipboardDelay } from "@bitwarden/common/autofill/constants";
+import { AutofillSettingsServiceAbstraction } from "@bitwarden/common/autofill/services/autofill-settings.service";
+import { ClearClipboardDelaySetting } from "@bitwarden/common/autofill/types";
 import { BillingAccountProfileStateService } from "@bitwarden/common/billing/abstractions";
 import { AutotypeFeatureFlagState } from "@bitwarden/common/desktop-native/enums/autotype-feature-flag-state.enum";
 import { autotypeFeatureFlagState$ } from "@bitwarden/common/desktop-native/services/autotype-feature-flags";
@@ -29,7 +32,9 @@ import { PlatformUtilsService } from "@bitwarden/common/platform/abstractions/pl
 import {
   GlobalStateProvider,
   AUTOTYPE_SETTINGS_DISK,
+  AUTOFILL_SETTINGS_DISK_LOCAL,
   KeyDefinition,
+  UserKeyDefinition,
 } from "@bitwarden/common/platform/state";
 import { CipherService } from "@bitwarden/common/vault/abstractions/cipher.service";
 import { TotpService } from "@bitwarden/common/vault/abstractions/totp.service";
@@ -73,10 +78,19 @@ export const AUTOTYPE_TCATO_ENABLED = new KeyDefinition<boolean>(
   { deserializer: (b) => b ?? false },
 );
 
+export const CLEAR_CLIPBOARD_DELAY = new UserKeyDefinition(
+  AUTOFILL_SETTINGS_DISK_LOCAL,
+  "clearClipboardDelay",
+  {
+    deserializer: (value: ClearClipboardDelaySetting) => value ?? ClearClipboardDelay.FiveMinutes,
+    clearOn: [],
+  },
+);
+
 export type Result<T, E = Error> = [E, null] | [null, T];
 
 export interface SequenceToken {
-  type: "text" | "key" | "delay";
+  type: "text" | "key" | "clearfield" | "delay";
   value?: string;
   key?: string;
   milliseconds?: number;
@@ -122,6 +136,7 @@ export class DesktopAutotypeMvpService implements OnDestroy {
     private desktopAutotypePolicy: DesktopAutotypeDefaultSettingPolicy,
     private logService: LogService,
     private messagingService: MessagingService,
+    @Optional() private autofillSettingsService?: AutofillSettingsServiceAbstraction,
   ) {
     this.autotypeEnabledUserSetting$ = this.autotypeEnabledState.state$.pipe(
       map((enabled) => enabled ?? true),
@@ -298,7 +313,12 @@ export class DesktopAutotypeMvpService implements OnDestroy {
             }
           }
 
-          ipc.autofill.autotypeMvp.sendReply(data.replyChannel, { success: copied, message });
+          const timeoutSec = copied ? await this.getClearClipboardSeconds() : null;
+          ipc.autofill.autotypeMvp.sendReply(data.replyChannel, {
+            success: copied,
+            message,
+            timeoutSec,
+          });
         },
       );
     }
@@ -306,6 +326,12 @@ export class DesktopAutotypeMvpService implements OnDestroy {
     if (ipc.autofill.autotypeMvp.onPickerEditCipher) {
       ipc.autofill.autotypeMvp.onPickerEditCipher((data: { cipherId: string }) => {
         this.messagingService.send("editCipherById", { cipherId: data.cipherId });
+      });
+    }
+
+    if (ipc.autofill.autotypeMvp.onPickerClearClipboard) {
+      ipc.autofill.autotypeMvp.onPickerClearClipboard(() => {
+        this.platformUtilsService.copyToClipboard("", { clearing: true });
       });
     }
 
@@ -649,7 +675,9 @@ export class DesktopAutotypeMvpService implements OnDestroy {
       }
 
       const tag = match[1].trim().toUpperCase();
-      if (tag === "USERNAME") {
+      if (tag === "CLEARFIELD") {
+        tokens.push({ type: "clearfield" });
+      } else if (tag === "USERNAME") {
         tokens.push({ type: "text", value: username, isSensitive: false });
       } else if (tag === "PASSWORD") {
         tokens.push({ type: "text", value: password, isSensitive: true });
@@ -681,6 +709,43 @@ export class DesktopAutotypeMvpService implements OnDestroy {
     }
 
     return tokens;
+  }
+
+  private convertClearClipboardDelayToSeconds(
+    setting: ClearClipboardDelaySetting | null | undefined,
+  ): number | null {
+    switch (setting) {
+      case ClearClipboardDelay.Never:
+        return null;
+      case ClearClipboardDelay.TenSeconds:
+        return 10;
+      case ClearClipboardDelay.TwentySeconds:
+        return 20;
+      case ClearClipboardDelay.ThirtySeconds:
+        return 30;
+      case ClearClipboardDelay.OneMinute:
+        return 60;
+      case ClearClipboardDelay.TwoMinutes:
+        return 120;
+      case ClearClipboardDelay.FiveMinutes:
+        return 300;
+      default:
+        return 300;
+    }
+  }
+
+  private async getClearClipboardSeconds(): Promise<number | null> {
+    try {
+      if (this.autofillSettingsService) {
+        const setting = await firstValueFrom(
+          this.autofillSettingsService.clearClipboardDelay$.pipe(take(1)),
+        );
+        return this.convertClearClipboardDelayToSeconds(setting);
+      }
+    } catch (e) {
+      this.logService.error("Failed to get clear clipboard delay setting", e);
+    }
+    return 300;
   }
 
   ngOnDestroy() {

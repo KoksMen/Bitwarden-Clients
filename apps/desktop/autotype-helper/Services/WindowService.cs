@@ -39,8 +39,25 @@ public sealed class WindowService
         };
     }
 
+    public static void EnsureInputDesktop()
+    {
+        try
+        {
+            nint hDesk = Win32.OpenInputDesktop(0, false, 0x01FF);
+            if (hDesk != 0)
+            {
+                Win32.SetThreadDesktop(hDesk);
+            }
+        }
+        catch
+        {
+            // Ignore if desktop station attachment is not permitted
+        }
+    }
+
     public WindowInfo? GetActiveWindow()
     {
+        EnsureInputDesktop();
         nint hwnd = Win32.GetForegroundWindow();
         if (hwnd == 0)
         {
@@ -50,22 +67,82 @@ public sealed class WindowService
         return ResolveWindow(hwnd);
     }
 
+    /// <summary>
+    /// Raymond Chen Alt-Tab window filter (KeePassXC / The Old New Thing equivalent).
+    /// Determines whether a window is a genuine top-level application window.
+    /// </summary>
+    public static bool IsAltTabWindow(nint hwnd)
+    {
+        if (hwnd == 0 || !Win32.IsWindow(hwnd))
+        {
+            return false;
+        }
+
+        // Must be visible
+        if (!Win32.IsWindowVisible(hwnd))
+        {
+            return false;
+        }
+
+        // Exclude shell desktop window
+        if (hwnd == Win32.GetShellWindow())
+        {
+            return false;
+        }
+
+        // Raymond Chen algorithm: walk to root owner, then check if hwnd is the most recently active popup of that root
+        nint root = Win32.GetAncestor(hwnd, Win32.GA_ROOTOWNER);
+        if (root == 0)
+        {
+            root = hwnd;
+        }
+
+        nint lastPopup = Win32.GetLastActivePopup(root);
+        if (lastPopup != hwnd && hwnd != root)
+        {
+            return false;
+        }
+
+        // Tool windows don't appear in Alt+Tab unless explicitly marked with WS_EX_APPWINDOW
+        int exStyle = Win32.GetWindowLongW(hwnd, Win32.GWL_EXSTYLE);
+        if ((exStyle & Win32.WS_EX_TOOLWINDOW) != 0 && (exStyle & Win32.WS_EX_APPWINDOW) == 0)
+        {
+            return false;
+        }
+
+        // Windows 10/11 DWM Cloaked window check (virtual desktops, minimized/suspended UWP apps)
+        try
+        {
+            if (Win32.DwmGetWindowAttribute(hwnd, Win32.DWMWA_CLOAKED, out int cloaked, sizeof(int)) == 0 && cloaked != 0)
+            {
+                return false;
+            }
+        }
+        catch
+        {
+            // DWM cloaked API fallback on older OS
+        }
+
+        // Must have non-empty title
+        if (Win32.GetWindowTextLengthW(hwnd) == 0)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
     public IReadOnlyList<WindowInfo> ListRunningWindows()
     {
+        EnsureInputDesktop();
         var list = new Dictionary<string, WindowInfo>(StringComparer.OrdinalIgnoreCase);
         int currentSession = Process.GetCurrentProcess().SessionId;
         uint currentPid = (uint)Process.GetCurrentProcess().Id;
 
-        // 1. Enumerate visible top-level windows with handles
+        // 1. Enumerate visible top-level windows using the Raymond Chen Alt-Tab filter
         Win32.EnumWindows((hwnd, _) =>
         {
-            if (!Win32.IsWindowVisible(hwnd))
-            {
-                return true;
-            }
-
-            int exStyle = Win32.GetWindowLongW(hwnd, Win32.GWL_EXSTYLE);
-            if ((exStyle & Win32.WS_EX_TOOLWINDOW) != 0)
+            if (!IsAltTabWindow(hwnd))
             {
                 return true;
             }
@@ -186,6 +263,7 @@ public sealed class WindowService
 
     public bool FocusWindow(nint hwnd)
     {
+        EnsureInputDesktop();
         if (hwnd == 0 || !Win32.IsWindow(hwnd))
         {
             return false;

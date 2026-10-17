@@ -1,7 +1,9 @@
 namespace Bitwarden.Autotype;
 
+using System.Runtime.InteropServices;
 using System.Text.Json;
 using Bitwarden.Autotype.Models;
+using Bitwarden.Autotype.Native;
 using Bitwarden.Autotype.Services;
 
 internal static class Program

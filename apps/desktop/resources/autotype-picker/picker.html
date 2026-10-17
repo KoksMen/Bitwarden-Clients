@@ -15,7 +15,7 @@
 
       body {
         background: transparent;
-        color: #f4f4f5;
+        color: #f8fafc;
         font-family:
           "Segoe UI Variable Text",
           "Segoe UI",
@@ -35,14 +35,14 @@
         flex-direction: column;
         width: 100%;
         height: 100%;
-        background: rgba(24, 24, 27, 0.96);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        border: 1px solid rgba(255, 255, 255, 0.14);
-        border-radius: 10px;
+        background: rgba(15, 23, 42, 0.96);
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
+        border: 1.5px solid #334155;
+        border-radius: 14px;
         box-shadow:
-          0 16px 40px rgba(0, 0, 0, 0.65),
-          0 0 1px rgba(255, 255, 255, 0.2);
+          0 20px 50px rgba(0, 0, 0, 0.75),
+          0 0 0 1px rgba(255, 255, 255, 0.05);
         overflow: hidden;
         position: relative;
       }
@@ -53,31 +53,33 @@
         align-items: center;
         justify-content: space-between;
         padding: 8px 12px;
-        background: rgba(255, 255, 255, 0.04);
-        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(30, 41, 59, 0.85);
+        border-bottom: 1px solid #334155;
         gap: 8px;
+        flex-shrink: 0;
       }
 
       .target-badge {
         display: flex;
         align-items: center;
-        gap: 6px;
-        font-size: 11.5px;
-        color: #a1a1aa;
+        gap: 8px;
+        font-size: 12px;
+        color: #94a3b8;
         min-width: 0;
         flex: 1;
       }
 
       .target-icon {
-        font-size: 13px;
+        font-size: 14px;
         flex-shrink: 0;
       }
 
       .proc-name {
-        background: rgba(59, 130, 246, 0.2);
-        color: #60a5fa;
-        padding: 1px 6px;
-        border-radius: 4px;
+        background: #1e3a8a;
+        color: #93c5fd;
+        border: 1px solid #3b82f6;
+        padding: 2px 8px;
+        border-radius: 6px;
         font-weight: 600;
         font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
         font-size: 11px;
@@ -85,7 +87,8 @@
       }
 
       .title-text {
-        color: #d4d4d8;
+        color: #f8fafc;
+        font-weight: 500;
         overflow: hidden;
         white-space: nowrap;
         text-overflow: ellipsis;
@@ -103,12 +106,13 @@
         display: none;
         align-items: center;
         gap: 4px;
-        font-size: 10.5px;
-        padding: 1px 6px;
-        border-radius: 4px;
-        background: rgba(16, 185, 129, 0.2);
+        font-size: 11px;
+        padding: 2px 8px;
+        border-radius: 6px;
+        background: rgba(16, 185, 129, 0.18);
+        border: 1px solid rgba(16, 185, 129, 0.4);
         color: #34d399;
-        font-weight: 500;
+        font-weight: 600;
       }
 
       .tcato-badge.visible {
@@ -118,18 +122,18 @@
       .close-btn {
         background: transparent;
         border: none;
-        color: #a1a1aa;
-        font-size: 14px;
+        color: #94a3b8;
+        font-size: 13px;
         cursor: pointer;
-        width: 22px;
-        height: 22px;
+        width: 24px;
+        height: 24px;
         display: flex;
         align-items: center;
         justify-content: center;
-        border-radius: 4px;
+        border-radius: 6px;
         transition:
-          background 0.1s,
-          color 0.1s;
+          background 0.12s ease,
+          color 0.12s ease;
       }
 
       .close-btn:hover {
@@ -141,16 +145,17 @@
       .search-bar {
         display: flex;
         align-items: center;
-        padding: 8px 12px;
-        background: rgba(255, 255, 255, 0.02);
-        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        padding: 9px 12px;
+        background: rgba(15, 23, 42, 0.6);
+        border-bottom: 1px solid #334155;
         gap: 8px;
         position: relative;
+        flex-shrink: 0;
       }
 
       .search-icon {
         font-size: 14px;
-        color: #71717a;
+        color: #60a5fa;
         flex-shrink: 0;
       }
 
@@ -159,7 +164,7 @@
         background: transparent;
         border: none;
         outline: none;
-        color: #f4f4f5;
+        color: #f8fafc;
         font-family: inherit;
         font-size: 13.5px;
         min-width: 0;
@@ -167,23 +172,124 @@
       }
 
       .search-input::placeholder {
-        color: #71717a;
+        color: #64748b;
       }
 
       .clear-search-btn {
         background: transparent;
         border: none;
-        color: #71717a;
+        color: #64748b;
         cursor: pointer;
         font-size: 12px;
         padding: 2px 6px;
         border-radius: 4px;
         display: none;
+        transition: all 0.12s ease;
       }
 
       .clear-search-btn:hover {
-        color: #f4f4f5;
+        color: #f8fafc;
         background: rgba(255, 255, 255, 0.08);
+      }
+
+      /* Visual Clipboard Timer Banner */
+      .clipboard-timer {
+        display: none;
+        flex-direction: column;
+        margin: 6px 10px 4px;
+        background: #1e293b;
+        border: 1.5px solid #3b82f6;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25);
+        flex-shrink: 0;
+        animation: timerSlideIn 0.18s ease-out;
+      }
+
+      @keyframes timerSlideIn {
+        from {
+          opacity: 0;
+          transform: translateY(-6px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .timer-progress-track {
+        height: 3px;
+        background: rgba(255, 255, 255, 0.1);
+        width: 100%;
+        position: relative;
+      }
+
+      .timer-progress-bar {
+        height: 100%;
+        width: 100%;
+        background: linear-gradient(90deg, #3b82f6, #60a5fa);
+        transition: width 0.1s linear;
+      }
+
+      .clipboard-timer.is-cleared .timer-progress-bar {
+        background: #10b981;
+      }
+
+      .timer-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 6px 10px;
+        gap: 8px;
+      }
+
+      .timer-info {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+        color: #f8fafc;
+        min-width: 0;
+        flex: 1;
+      }
+
+      .timer-icon {
+        font-size: 13px;
+        flex-shrink: 0;
+      }
+
+      .timer-text {
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+      }
+
+      .timer-countdown {
+        color: #60a5fa;
+        font-weight: 700;
+      }
+
+      .clear-now-btn {
+        background: rgba(239, 68, 68, 0.18);
+        border: 1px solid rgba(239, 68, 68, 0.45);
+        color: #fca5a5;
+        font-size: 11px;
+        font-weight: 600;
+        padding: 3px 8px;
+        border-radius: 6px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        flex-shrink: 0;
+        transition: all 0.12s ease;
+      }
+
+      .clear-now-btn:hover {
+        background: #dc2626;
+        border-color: #ef4444;
+        color: #ffffff;
+        box-shadow: 0 2px 8px rgba(220, 38, 38, 0.35);
       }
 
       /* Results list */
@@ -191,10 +297,10 @@
         flex: 1;
         overflow-y: auto;
         overflow-x: hidden;
-        padding: 6px;
+        padding: 8px 10px;
         display: flex;
         flex-direction: column;
-        gap: 3px;
+        gap: 4px;
       }
 
       .results-list::-webkit-scrollbar {
@@ -211,41 +317,64 @@
       }
 
       .results-list::-webkit-scrollbar-thumb:hover {
-        background: rgba(255, 255, 255, 0.25);
+        background: rgba(255, 255, 255, 0.28);
       }
 
+      /* Cipher Card Items (Styled exactly as Fork's custom vault cards) */
       .cipher-item {
         display: flex;
         align-items: center;
         gap: 10px;
-        padding: 7px 10px;
-        border-radius: 6px;
+        padding: 8px 12px;
+        border-radius: 12px;
         cursor: pointer;
-        background: transparent;
-        border: 1px solid transparent;
+        background-color: #1e293b;
+        border: 1.5px solid #334155;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
         transition:
-          background 0.08s,
-          border-color 0.08s;
+          background-color 0.12s ease,
+          border-color 0.12s ease,
+          transform 0.12s ease,
+          box-shadow 0.12s ease;
         outline: none;
         position: relative;
       }
 
-      .cipher-item:hover,
+      .cipher-item:hover {
+        background-color: #1e3a8a !important;
+        border-color: #60a5fa !important;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(30, 58, 138, 0.35);
+      }
+
       .cipher-item.is-selected {
-        background: rgba(59, 130, 246, 0.14);
-        border-color: rgba(59, 130, 246, 0.4);
+        background-color: #2563eb !important;
+        border-color: #93c5fd !important;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 18px rgba(37, 99, 235, 0.45);
+      }
+
+      .cipher-item:hover *,
+      .cipher-item.is-selected * {
+        color: #ffffff !important;
       }
 
       .item-icon-box {
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 28px;
-        height: 28px;
-        border-radius: 6px;
-        background: rgba(255, 255, 255, 0.06);
-        font-size: 14px;
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.08);
+        font-size: 15px;
         flex-shrink: 0;
+        transition: background 0.12s ease;
+      }
+
+      .cipher-item:hover .item-icon-box,
+      .cipher-item.is-selected .item-icon-box {
+        background: rgba(255, 255, 255, 0.2);
       }
 
       .item-details {
@@ -262,29 +391,32 @@
       .item-name {
         font-size: 13.5px;
         font-weight: 600;
-        color: #f4f4f5;
+        color: #f8fafc;
         overflow: hidden;
         white-space: nowrap;
         text-overflow: ellipsis;
       }
 
       .match-badge {
-        font-size: 10px;
-        padding: 1px 5px;
-        border-radius: 4px;
+        font-size: 10.5px;
+        padding: 1px 6px;
+        border-radius: 6px;
         background: rgba(255, 255, 255, 0.08);
-        color: #a1a1aa;
+        color: #cbd5e1;
+        border: 1px solid rgba(255, 255, 255, 0.12);
         flex-shrink: 0;
-        font-weight: 500;
+        font-weight: 600;
       }
 
       .match-badge.badge-proc {
         background: rgba(16, 185, 129, 0.2);
+        border-color: rgba(16, 185, 129, 0.4);
         color: #34d399;
       }
 
       .match-badge.badge-title {
         background: rgba(168, 85, 247, 0.2);
+        border-color: rgba(168, 85, 247, 0.4);
         color: #c084fc;
       }
 
@@ -293,8 +425,8 @@
         align-items: center;
         gap: 8px;
         font-size: 11.5px;
-        color: #71717a;
-        margin-top: 2px;
+        color: #cbd5e1;
+        margin-top: 3px;
       }
 
       .item-username {
@@ -303,29 +435,31 @@
         white-space: nowrap;
         text-overflow: ellipsis;
         max-width: 170px;
+        font-weight: 500;
       }
 
       .item-sequence {
         font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-        background: rgba(255, 255, 255, 0.05);
-        padding: 0 4px;
-        border-radius: 3px;
-        font-size: 10px;
-        color: #a1a1aa;
+        background: rgba(15, 23, 42, 0.5);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        padding: 1px 6px;
+        border-radius: 4px;
+        font-size: 10.5px;
+        color: #cbd5e1;
         overflow: hidden;
         white-space: nowrap;
         text-overflow: ellipsis;
-        max-width: 140px;
+        max-width: 160px;
       }
 
-      /* Quick Action Buttons on row */
+      /* Quick Action Buttons on row (Styled like fork's [bit-chip-action]) */
       .item-actions {
         display: flex;
         align-items: center;
-        gap: 3px;
+        gap: 4px;
         flex-shrink: 0;
-        opacity: 0.35;
-        transition: opacity 0.1s ease;
+        opacity: 0.5;
+        transition: opacity 0.12s ease;
       }
 
       .cipher-item:hover .item-actions,
@@ -334,36 +468,41 @@
       }
 
       .action-btn {
-        background: rgba(255, 255, 255, 0.06);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        color: #e4e4e7;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        color: #f8fafc;
         font-size: 12px;
-        width: 26px;
-        height: 26px;
-        border-radius: 5px;
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
         display: flex;
         align-items: center;
         justify-content: center;
         cursor: pointer;
-        transition: all 0.1s ease;
+        transition: all 0.12s ease;
         position: relative;
       }
 
+      .cipher-item.is-selected .action-btn {
+        background: rgba(255, 255, 255, 0.18);
+        border-color: rgba(255, 255, 255, 0.35);
+      }
+
       .action-btn:hover {
-        background: rgba(59, 130, 246, 0.35);
-        border-color: rgba(96, 165, 250, 0.6);
-        color: #ffffff;
+        background: #1d4ed8 !important;
+        border-color: #93c5fd !important;
+        color: #ffffff !important;
         transform: scale(1.08);
       }
 
       .action-btn.btn-autotype:hover {
-        background: rgba(16, 185, 129, 0.35);
-        border-color: rgba(52, 211, 153, 0.6);
+        background: #059669 !important;
+        border-color: #34d399 !important;
       }
 
       .action-btn.btn-edit:hover {
-        background: rgba(168, 85, 247, 0.35);
-        border-color: rgba(192, 132, 252, 0.6);
+        background: #7c3aed !important;
+        border-color: #c084fc !important;
       }
 
       /* Empty state */
@@ -374,24 +513,25 @@
         justify-content: center;
         padding: 40px 16px;
         text-align: center;
-        color: #71717a;
+        color: #94a3b8;
         gap: 6px;
       }
 
       .empty-icon {
-        font-size: 28px;
+        font-size: 30px;
         margin-bottom: 4px;
+        color: #60a5fa;
       }
 
       .empty-title {
         font-size: 14px;
-        font-weight: 500;
-        color: #a1a1aa;
+        font-weight: 600;
+        color: #f8fafc;
       }
 
       .empty-subtitle {
         font-size: 12px;
-        color: #71717a;
+        color: #94a3b8;
       }
 
       /* Footer */
@@ -399,17 +539,18 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 7px 12px;
-        background: rgba(0, 0, 0, 0.4);
-        border-top: 1px solid rgba(255, 255, 255, 0.06);
+        padding: 8px 12px;
+        background: rgba(15, 23, 42, 0.9);
+        border-top: 1px solid #334155;
         font-size: 11px;
-        color: #71717a;
+        color: #94a3b8;
+        flex-shrink: 0;
       }
 
       .hints-group {
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 8px;
         flex-wrap: wrap;
       }
 
@@ -420,35 +561,31 @@
       }
 
       kbd {
-        background: rgba(255, 255, 255, 0.08);
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        border-radius: 3px;
-        padding: 1px 4px;
+        background: #1e293b;
+        border: 1px solid #475569;
+        border-radius: 4px;
+        padding: 2px 5px;
         font-size: 10px;
         font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-        color: #d4d4d8;
+        color: #cbd5e1;
       }
 
       kbd.kbd-enter {
-        background: rgba(59, 130, 246, 0.2);
-        border-color: rgba(59, 130, 246, 0.4);
+        background: #1e3a8a;
+        border-color: #3b82f6;
         color: #93c5fd;
       }
 
-      /* Custom Right-Click Context Menu */
+      /* Custom Right-Click Context Menu (Fork style) */
       .context-menu {
         position: fixed;
         z-index: 10000;
-        background: rgba(24, 24, 27, 0.98);
-        backdrop-filter: blur(25px);
-        -webkit-backdrop-filter: blur(25px);
-        border: 1px solid rgba(255, 255, 255, 0.14);
-        border-radius: 8px;
-        box-shadow:
-          0 12px 32px rgba(0, 0, 0, 0.75),
-          0 0 1px rgba(255, 255, 255, 0.25);
-        padding: 4px;
-        min-width: 220px;
+        background: #1e293b;
+        border: 1.5px solid #334155;
+        border-radius: 14px;
+        box-shadow: 0 12px 36px rgba(0, 0, 0, 0.65);
+        padding: 6px;
+        min-width: 230px;
         display: none;
         flex-direction: column;
         gap: 2px;
@@ -459,16 +596,17 @@
         align-items: center;
         justify-content: space-between;
         gap: 10px;
-        padding: 6px 10px;
-        border-radius: 5px;
+        padding: 7px 12px;
+        border-radius: 8px;
         font-size: 12.5px;
-        color: #f4f4f5;
+        font-weight: 500;
+        color: #f8fafc;
         cursor: pointer;
-        transition: background 0.08s;
+        transition: background 0.12s ease;
       }
 
       .context-item:hover {
-        background: rgba(59, 130, 246, 0.25);
+        background-color: #2563eb;
         color: #ffffff;
       }
 
@@ -486,32 +624,36 @@
 
       .context-kbd {
         font-size: 10px;
-        color: #a1a1aa;
+        color: #94a3b8;
+      }
+
+      .context-item:hover .context-kbd {
+        color: #e0e7ff;
       }
 
       .context-divider {
         height: 1px;
-        background: rgba(255, 255, 255, 0.08);
-        margin: 3px 0;
+        background: #334155;
+        margin: 4px 0;
       }
 
       /* Toast Notification Pill */
       .toast-pill {
         position: absolute;
-        bottom: 42px;
+        bottom: 46px;
         left: 50%;
         transform: translateX(-50%) translateY(16px);
-        background: rgba(30, 41, 59, 0.96);
-        border: 1px solid rgba(59, 130, 246, 0.5);
+        background: #1e293b;
+        border: 1px solid #3b82f6;
         color: #93c5fd;
-        padding: 6px 14px;
+        padding: 7px 16px;
         border-radius: 20px;
-        font-size: 11.5px;
-        font-weight: 500;
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+        font-size: 12px;
+        font-weight: 600;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.65);
         display: flex;
         align-items: center;
-        gap: 6px;
+        gap: 8px;
         opacity: 0;
         pointer-events: none;
         transition:
@@ -526,8 +668,8 @@
       }
 
       .toast-pill.toast-error {
-        background: rgba(69, 10, 10, 0.96);
-        border-color: rgba(239, 68, 68, 0.5);
+        background: #450a0a;
+        border-color: #ef4444;
         color: #fca5a5;
       }
     </style>
@@ -542,7 +684,7 @@
           <span id="targetTitle" class="title-text">AutoType Quick Picker</span>
         </div>
         <div class="header-actions">
-          <span id="tcatoBadge" class="tcato-badge" title="Защита от кейлоггеров активна">
+          <span id="tcatoBadge" class="tcato-badge" title="Защита от кейлоггеров (TCATO) активна">
             🛡️ TCATO
           </span>
           <button id="closeBtn" class="close-btn" title="Закрыть (Esc)">✕</button>
@@ -561,6 +703,25 @@
           spellcheck="false"
         />
         <button id="clearSearchBtn" class="clear-search-btn">✕</button>
+      </div>
+
+      <!-- Visual Clipboard Countdown Timer -->
+      <div id="clipboardTimer" class="clipboard-timer">
+        <div class="timer-progress-track">
+          <div id="timerProgressBar" class="timer-progress-bar"></div>
+        </div>
+        <div class="timer-content">
+          <div class="timer-info">
+            <span class="timer-icon">📋</span>
+            <span id="timerText" class="timer-text">
+              Буфер очистится через: <span id="timerCountdown" class="timer-countdown">10</span> с
+            </span>
+          </div>
+          <button id="clearNowBtn" class="clear-now-btn" title="Очистить буфер обмена сейчас">
+            <span>✕</span>
+            <span>Очистить сейчас</span>
+          </button>
+        </div>
       </div>
 
       <!-- Results list -->
@@ -643,6 +804,11 @@
         let mode = "picker";
         let toastTimeout = null;
 
+        // Clipboard timer state
+        let clipboardInterval = null;
+        let clipboardEndTime = 0;
+        let clipboardTotalMs = 0;
+
         const searchInput = document.getElementById("searchInput");
         const clearSearchBtn = document.getElementById("clearSearchBtn");
         const resultsList = document.getElementById("resultsList");
@@ -657,6 +823,12 @@
         const contextMenu = document.getElementById("contextMenu");
         const ctxTotp = document.getElementById("ctxTotp");
         const ctxUrl = document.getElementById("ctxUrl");
+
+        const clipboardTimer = document.getElementById("clipboardTimer");
+        const timerProgressBar = document.getElementById("timerProgressBar");
+        const timerText = document.getElementById("timerText");
+        const timerCountdown = document.getElementById("timerCountdown");
+        const clearNowBtn = document.getElementById("clearNowBtn");
 
         function showToast(message, isSuccess = true) {
           if (toastTimeout) {
@@ -675,6 +847,70 @@
           }, 1800);
         }
 
+        function startClipboardTimer(timeoutSec) {
+          if (!timeoutSec || timeoutSec <= 0) return;
+
+          if (clipboardInterval) {
+            clearInterval(clipboardInterval);
+            clipboardInterval = null;
+          }
+
+          clipboardTotalMs = timeoutSec * 1000;
+          clipboardEndTime = Date.now() + clipboardTotalMs;
+
+          clipboardTimer.classList.remove("is-cleared");
+          clearNowBtn.style.display = "flex";
+          timerProgressBar.style.width = "100%";
+          timerText.innerHTML = `Буфер очистится через: <span id="timerCountdown" class="timer-countdown">${timeoutSec}</span> с`;
+          clipboardTimer.style.display = "flex";
+
+          clipboardInterval = setInterval(() => {
+            const now = Date.now();
+            const remainingMs = clipboardEndTime - now;
+
+            if (remainingMs <= 0) {
+              clearInterval(clipboardInterval);
+              clipboardInterval = null;
+              finishClipboardTimer(true);
+            } else {
+              const remainingSec = Math.ceil(remainingMs / 1000);
+              const countdownEl = document.getElementById("timerCountdown");
+              if (countdownEl) {
+                countdownEl.textContent = remainingSec;
+              }
+              const percent = Math.max(0, Math.min(100, (remainingMs / clipboardTotalMs) * 100));
+              timerProgressBar.style.width = `${percent}%`;
+            }
+          }, 100);
+        }
+
+        function finishClipboardTimer(callIpcClear = true) {
+          if (clipboardInterval) {
+            clearInterval(clipboardInterval);
+            clipboardInterval = null;
+          }
+
+          if (callIpcClear) {
+            if (window.ipc?.autofill?.autotypeMvp?.clearClipboard) {
+              window.ipc.autofill.autotypeMvp.clearClipboard();
+            }
+          }
+
+          clipboardTimer.classList.add("is-cleared");
+          timerProgressBar.style.width = "0%";
+          timerText.innerHTML = `<span style="color: #34d399; font-weight: 600;">✓ Буфер обмена очищен</span>`;
+          clearNowBtn.style.display = "none";
+
+          setTimeout(() => {
+            clipboardTimer.style.display = "none";
+          }, 1600);
+        }
+
+        clearNowBtn.addEventListener("click", () => {
+          finishClipboardTimer(true);
+          showToast("Буфер очищен");
+        });
+
         function hideContextMenu() {
           contextMenu.style.display = "none";
         }
@@ -682,7 +918,6 @@
         function openContextMenu(x, y, item) {
           if (!item) return;
 
-          // Show/hide context options depending on cipher data
           ctxTotp.style.display = item.hasTotp ? "flex" : "none";
           ctxUrl.style.display = item.hasUrl ? "flex" : "none";
 
@@ -706,6 +941,9 @@
                 field,
               });
               showToast(res.message, res.success);
+              if (res.success && typeof res.timeoutSec === "number" && res.timeoutSec > 0) {
+                startClipboardTimer(res.timeoutSec);
+              }
             }
           } catch {
             showToast("Ошибка при копировании", false);
@@ -732,6 +970,14 @@
           if (window.ipc?.autofill?.autotypeMvp?.closePicker) {
             window.ipc.autofill.autotypeMvp.closePicker();
           }
+        }
+
+        function formatSequencePreview(raw) {
+          if (!raw) return "{USERNAME} ⇥ {PASSWORD} ↵";
+          return raw
+            .replace(/\{CLEARFIELD\}/gi, "⌫ {CLEARFIELD} ")
+            .replace(/\{TAB\}/gi, " ⇥ ")
+            .replace(/\{ENTER\}/gi, " ↵ ");
         }
 
         function renderItems() {
@@ -776,6 +1022,8 @@
               ? `<button class="action-btn btn-copy-url" title="Скопировать URL (Ctrl+U)" data-action="copy-url">🔗</button>`
               : "";
 
+            const formattedSeq = formatSequencePreview(item.sequencePreview);
+
             row.innerHTML = `
             <div class="item-icon-box">🔑</div>
             <div class="item-details">
@@ -785,7 +1033,7 @@
               </div>
               <div class="sub-row">
                 <span class="item-username">${escapeHtml(item.username || "Без логина")}</span>
-                <span class="item-sequence">${escapeHtml(item.sequencePreview || "{USERNAME} ⇥ {PASSWORD} ↵")}</span>
+                <span class="item-sequence">${escapeHtml(formattedSeq)}</span>
               </div>
             </div>
             <div class="item-actions">
@@ -943,7 +1191,6 @@
 
         // Keyboard navigation and KeePassXC copy/edit shortcuts
         window.addEventListener("keydown", (e) => {
-          // If context menu is open, Escape closes it
           if (e.key === "Escape") {
             e.preventDefault();
             if (contextMenu.style.display === "flex") {
@@ -954,7 +1201,6 @@
             return;
           }
 
-          // F2 = Edit selected cipher
           if (e.key === "F2") {
             e.preventDefault();
             if (
@@ -991,7 +1237,6 @@
                 document.activeElement === searchInput &&
                 searchInput.selectionStart !== searchInput.selectionEnd
               ) {
-                // User has highlighted text in the search input, let native copy happen
                 return;
               }
               e.preventDefault();

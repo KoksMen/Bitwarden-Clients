@@ -10,24 +10,52 @@ internal static partial class Win32
     public const int GWL_EXSTYLE = -20;
     public const int WS_VISIBLE = 0x10000000;
     public const int WS_EX_TOOLWINDOW = 0x00000080;
+    public const int WS_EX_APPWINDOW = 0x00040000;
     public const uint GW_OWNER = 4;
+    public const uint GA_PARENT = 1;
     public const uint GA_ROOT = 2;
+    public const uint GA_ROOTOWNER = 3;
+    public const uint DWMWA_CLOAKED = 14;
+
     public const int VK_LBUTTON = 0x01;
     public const int VK_ESCAPE = 0x1B;
 
     public const uint INPUT_KEYBOARD = 1;
+    public const uint KEYEVENTF_EXTENDEDKEY = 0x0001;
     public const uint KEYEVENTF_KEYUP = 0x0002;
     public const uint KEYEVENTF_UNICODE = 0x0004;
+    public const uint KEYEVENTF_SCANCODE = 0x0008;
 
+    public const uint MAPVK_VK_TO_VSC = 0;
+    public const uint MAPVK_VSC_TO_VK = 1;
+    public const uint MAPVK_VK_TO_CHAR = 2;
+    public const uint MAPVK_VK_TO_VSC_EX = 4;
+
+    public const ushort VK_BACK = 0x08;
+    public const ushort VK_TAB = 0x09;
+    public const ushort VK_RETURN = 0x0D;
     public const ushort VK_SHIFT = 0x10;
     public const ushort VK_CONTROL = 0x11;
     public const ushort VK_MENU = 0x12; // Alt
-    public const ushort VK_TAB = 0x09;
-    public const ushort VK_RETURN = 0x0D;
     public const ushort VK_SPACE = 0x20;
+    public const ushort VK_END = 0x23;
+    public const ushort VK_HOME = 0x24;
+    public const ushort VK_LEFT = 0x25;
+    public const ushort VK_UP = 0x26;
+    public const ushort VK_RIGHT = 0x27;
+    public const ushort VK_DOWN = 0x28;
+    public const ushort VK_DELETE = 0x2E;
+    public const ushort VK_A = 0x41;
+    public const ushort VK_C = 0x43;
     public const ushort VK_V = 0x56;
     public const ushort VK_LWIN = 0x5B;
     public const ushort VK_RWIN = 0x5C;
+    public const ushort VK_LSHIFT = 0xA0;
+    public const ushort VK_RSHIFT = 0xA1;
+    public const ushort VK_LCONTROL = 0xA2;
+    public const ushort VK_RCONTROL = 0xA3;
+    public const ushort VK_LMENU = 0xA4;
+    public const ushort VK_RMENU = 0xA5;
 
     public const uint CF_UNICODETEXT = 13;
     public const uint GMEM_MOVEABLE = 0x0002;
@@ -111,6 +139,17 @@ internal static partial class Win32
     [DllImport("user32.dll", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
     public static extern bool EnumWindows(EnumWindowsProc lpEnumFunc, nint lParam);
+
+    [DllImport("user32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool EnumDesktopWindows(nint hDesktop, EnumWindowsProc lpfn, nint lParam);
+
+    [DllImport("user32.dll", SetLastError = true)]
+    public static extern nint OpenInputDesktop(uint dwFlags, bool fInherit, uint dwDesiredAccess);
+
+    [DllImport("user32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool SetThreadDesktop(nint hDesktop);
 
     [DllImport("user32.dll")]
     [return: MarshalAs(UnmanagedType.Bool)]
@@ -204,4 +243,22 @@ internal static partial class Win32
 
     [DllImport("kernel32.dll", SetLastError = true)]
     public static extern nuint GlobalSize(nint hMem);
+
+    [DllImport("user32.dll")]
+    public static extern nint GetLastActivePopup(nint hWnd);
+
+    [DllImport("user32.dll")]
+    public static extern nint GetShellWindow();
+
+    [DllImport("dwmapi.dll")]
+    public static extern int DwmGetWindowAttribute(nint hwnd, uint dwAttribute, out int pvAttribute, int cbAttribute);
+
+    [DllImport("user32.dll")]
+    public static extern uint MapVirtualKeyExW(uint uCode, uint uMapType, nint dwhkl);
+
+    [DllImport("user32.dll")]
+    public static extern short VkKeyScanExW(char ch, nint dwhkl);
+
+    [DllImport("user32.dll")]
+    public static extern nint GetKeyboardLayout(uint idThread);
 }
