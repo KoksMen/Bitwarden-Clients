@@ -132,81 +132,139 @@
         }
 
         @if (showEnableAutotype()) {
-          <bit-form-control>
-            <input
-              type="checkbox"
-              bitCheckbox
-              formControlName="enableAutotype"
-              (change)="saveEnableAutotype()"
-            />
-            <bit-label>
-              <span class="tw-flex tw-items-center tw-gap-2">
-                {{ "enableAutotypeShortcutPreview" | i18n }}
-                <code>{{ form.value.autotypeShortcut }}</code>
-              </span>
-            </bit-label>
-            @if (form.value.enableAutotype) {
-              <bit-hint>
-                <b>{{ "important" | i18n }}</b>
-                {{ "enableAutotypeShortcutDescription" | i18n }}
-                <a
-                  class="tw-cursor-pointer"
-                  bitLink
-                  tabindex="0"
-                  (click)="saveAutotypeShortcut(); $event.preventDefault()"
-                  (keydown.enter)="saveAutotypeShortcut(); $event.preventDefault()"
-                >
-                  {{ "editShortcut" | i18n }}
-                </a>
-              </bit-hint>
-            }
-          </bit-form-control>
-
-          @if (form.value.enableAutotype) {
+          <div
+            class="fluent-autotype-card tw-mb-4 tw-rounded-2xl tw-border tw-border-solid tw-border-slate-200 dark:tw-border-slate-700 tw-p-4 tw-bg-white dark:tw-bg-slate-800/80 tw-shadow-sm"
+          >
             <div
-              class="tw-ml-6 tw-flex tw-flex-col tw-gap-3 tw-mt-2 tw-mb-4 tw-p-3 tw-rounded tw-bg-secondary-100 dark:tw-bg-secondary-800"
+              class="tw-flex tw-items-center tw-justify-between tw-pb-3 tw-border-b tw-border-slate-100 dark:tw-border-slate-700/60"
             >
-              <div class="tw-flex tw-items-center tw-justify-between">
-                <div>
-                  <div class="tw-text-sm tw-font-medium">
-                    Глобальный поиск AutoType (Spotlight):
-                  </div>
-                  <div class="tw-text-xs tw-text-muted">
-                    Открывает спотлайт-поиск AutoType в любое активное окно
-                  </div>
+              <div class="tw-flex tw-items-center tw-gap-3">
+                <div
+                  class="tw-w-9 tw-h-9 tw-rounded-xl tw-bg-blue-50 dark:tw-bg-blue-900/40 tw-flex tw-items-center tw-justify-center tw-text-blue-600 dark:tw-text-blue-400 tw-text-lg"
+                >
+                  <i class="bwi bwi-desktop" aria-hidden="true"></i>
                 </div>
-                <div class="tw-flex tw-items-center tw-gap-2">
-                  <code>{{ form.value.autotypeGlobalShortcut }}</code>
-                  <a
-                    class="tw-cursor-pointer"
-                    bitLink
-                    tabindex="0"
-                    (click)="saveAutotypeGlobalShortcut(); $event.preventDefault()"
-                    (keydown.enter)="saveAutotypeGlobalShortcut(); $event.preventDefault()"
-                  >
-                    {{ "editShortcut" | i18n }}
-                  </a>
+                <div>
+                  <div class="tw-flex tw-items-center tw-gap-2">
+                    <span class="tw-text-sm tw-font-bold tw-text-slate-900 dark:tw-text-slate-100"
+                      >Автонабор и быстрый ввод (AutoType)</span
+                    >
+                    <span
+                      class="tw-text-[10px] tw-font-semibold tw-px-2 tw-py-0.5 tw-rounded-full tw-bg-emerald-50 dark:tw-bg-emerald-900/40 tw-text-emerald-700 dark:tw-text-emerald-400 tw-border tw-border-emerald-200 dark:tw-border-emerald-800"
+                      >KeePassXC Engine</span
+                    >
+                  </div>
+                  <div class="tw-text-xs tw-text-slate-500 dark:tw-text-slate-400">
+                    Автоматический ввод учетных данных в сторонние приложения Windows
+                  </div>
                 </div>
               </div>
 
-              <bit-form-field disableMargin>
-                <bit-label>Позиция всплывающего селектора</bit-label>
-                <bit-select
-                  formControlName="autotypePickerPosition"
-                  [items]="autotypePickerPositionOptions"
-                ></bit-select>
-              </bit-form-field>
-
-              <bit-form-control>
-                <input type="checkbox" bitCheckbox formControlName="autotypeTcatoEnabled" />
-                <bit-label>Защита от кейлоггеров (Two-Channel Auto-Type Obfuscation)</bit-label>
-                <bit-hint>
-                  Разделяет ввод учетных данных между имитацией нажатий клавиш и буфером обмена
-                  (TCATO) с автоматической очисткой памяти.
-                </bit-hint>
-              </bit-form-control>
+              <div class="tw-flex tw-items-center">
+                <input
+                  type="checkbox"
+                  bitCheckbox
+                  formControlName="enableAutotype"
+                  (change)="saveEnableAutotype()"
+                />
+              </div>
             </div>
-          }
+
+            @if (form.value.enableAutotype) {
+              <div class="tw-mt-4 tw-flex tw-flex-col tw-gap-3">
+                <!-- Direct autotype shortcut row -->
+                <div
+                  class="tw-flex tw-items-center tw-justify-between tw-p-2.5 tw-rounded-xl tw-bg-slate-50 dark:tw-bg-slate-900/50 tw-border tw-border-slate-200/60 dark:tw-border-slate-700/50"
+                >
+                  <div class="tw-flex tw-flex-col">
+                    <span
+                      class="tw-text-xs tw-font-semibold tw-text-slate-800 dark:tw-text-slate-200"
+                      >{{ "enableAutotypeShortcutPreview" | i18n }}</span
+                    >
+                    <span class="tw-text-[11px] tw-text-slate-500 dark:tw-text-slate-400">{{
+                      "enableAutotypeShortcutDescription" | i18n
+                    }}</span>
+                  </div>
+                  <div class="tw-flex tw-items-center tw-gap-2.5">
+                    <kbd class="fluent-kbd">{{ form.value.autotypeShortcut }}</kbd>
+                    <a
+                      class="tw-cursor-pointer tw-text-xs tw-font-medium tw-text-blue-600 hover:tw-text-blue-700 dark:tw-text-blue-400"
+                      bitLink
+                      tabindex="0"
+                      (click)="saveAutotypeShortcut(); $event.preventDefault()"
+                      (keydown.enter)="saveAutotypeShortcut(); $event.preventDefault()"
+                    >
+                      {{ "editShortcut" | i18n }}
+                    </a>
+                  </div>
+                </div>
+
+                <!-- Spotlight shortcut row -->
+                <div
+                  class="tw-flex tw-items-center tw-justify-between tw-p-2.5 tw-rounded-xl tw-bg-slate-50 dark:tw-bg-slate-900/50 tw-border tw-border-slate-200/60 dark:tw-border-slate-700/50"
+                >
+                  <div class="tw-flex tw-flex-col">
+                    <span
+                      class="tw-text-xs tw-font-semibold tw-text-slate-800 dark:tw-text-slate-200"
+                      >Глобальный поиск AutoType (Spotlight):</span
+                    >
+                    <span class="tw-text-[11px] tw-text-slate-500 dark:tw-text-slate-400"
+                      >Открывает спотлайт-поиск AutoType в любое активное окно</span
+                    >
+                  </div>
+                  <div class="tw-flex tw-items-center tw-gap-2.5">
+                    <kbd class="fluent-kbd">{{ form.value.autotypeGlobalShortcut }}</kbd>
+                    <a
+                      class="tw-cursor-pointer tw-text-xs tw-font-medium tw-text-blue-600 hover:tw-text-blue-700 dark:tw-text-blue-400"
+                      bitLink
+                      tabindex="0"
+                      (click)="saveAutotypeGlobalShortcut(); $event.preventDefault()"
+                      (keydown.enter)="saveAutotypeGlobalShortcut(); $event.preventDefault()"
+                    >
+                      {{ "editShortcut" | i18n }}
+                    </a>
+                  </div>
+                </div>
+
+                <!-- Picker position row -->
+                <div
+                  class="tw-p-2.5 tw-rounded-xl tw-bg-slate-50 dark:tw-bg-slate-900/50 tw-border tw-border-slate-200/60 dark:tw-border-slate-700/50"
+                >
+                  <bit-form-field disableMargin>
+                    <bit-label class="!tw-text-xs !tw-font-semibold"
+                      >Позиция всплывающего селектора</bit-label
+                    >
+                    <bit-select
+                      formControlName="autotypePickerPosition"
+                      [items]="autotypePickerPositionOptions"
+                    ></bit-select>
+                  </bit-form-field>
+                </div>
+
+                <!-- TCATO Row -->
+                <div
+                  class="tw-p-3 tw-rounded-xl tw-bg-slate-50 dark:tw-bg-slate-900/50 tw-border tw-border-slate-200/60 dark:tw-border-slate-700/50"
+                >
+                  <bit-form-control>
+                    <input type="checkbox" bitCheckbox formControlName="autotypeTcatoEnabled" />
+                    <bit-label class="!tw-font-semibold">
+                      <span class="tw-flex tw-items-center tw-gap-1.5">
+                        <i
+                          class="bwi bwi-shield tw-text-emerald-600 dark:tw-text-emerald-400"
+                          aria-hidden="true"
+                        ></i>
+                        Защита от кейлоггеров (Two-Channel Auto-Type Obfuscation)
+                      </span>
+                    </bit-label>
+                    <bit-hint>
+                      Разделяет ввод учетных данных между имитацией аппаратных скан-кодов и буфером
+                      обмена (TCATO) с мгновенной автоматической очисткой памяти.
+                    </bit-hint>
+                  </bit-form-control>
+                </div>
+              </div>
+            }
+          </div>
         }
 
         @if (showEnableAutotypeGa()) {

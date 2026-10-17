@@ -198,14 +198,95 @@ html.theme_dark tr[appVaultCollectionRow][data-active="true"] input[bitCheckbox]
   }
 }
 
-/* 4. Sidebar Navigation Items Clean Card Styling */
-bit-nav-item [data-spotlight-target],
-app-folder-filter [data-spotlight-target],
-app-type-filter [data-spotlight-target] {
-  border-radius: 12px !important;
-  margin-top: 2px !important;
-  margin-bottom: 2px !important;
-  transition: all 0.15s ease !important;
+/* 4. Sidebar Navigation Items Clean Card & Fluent Styling */
+nav#bit-side-nav,
+[data-nav-version="default"],
+app-side-nav {
+  bit-nav-item [data-testid="nav-item-container"],
+  bit-nav-item [data-spotlight-target],
+  app-folder-filter [data-testid="nav-item-container"],
+  app-folder-filter [data-spotlight-target],
+  app-type-filter [data-testid="nav-item-container"],
+  app-type-filter [data-spotlight-target],
+  app-organization-filter [data-testid="nav-item-container"],
+  app-status-filter [data-testid="nav-item-container"] {
+    border-radius: 12px !important;
+    margin-top: 2px !important;
+    margin-bottom: 2px !important;
+    transition: all 0.16s ease !important;
+  }
+
+  bit-nav-item [data-testid="nav-item-container"]:hover,
+  app-folder-filter [data-testid="nav-item-container"]:hover,
+  app-type-filter [data-testid="nav-item-container"]:hover,
+  app-organization-filter [data-testid="nav-item-container"]:hover,
+  app-status-filter [data-testid="nav-item-container"]:hover {
+    background-color: rgba(255, 255, 255, 0.15) !important;
+    border-color: rgba(255, 255, 255, 0.3) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+    transform: translateX(2px) !important;
+  }
+
+  [data-testid="nav-item-container"][style*="--color-nav-bg-brand"],
+  [data-testid="nav-item-container"]:has([aria-current="page"]),
+  [data-testid="nav-item-container"]:has([aria-pressed="true"]),
+  [data-testid="nav-item-container"].tw-bg-bg-nav-active {
+    background-color: rgba(0, 0, 0, 0.3) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25) !important;
+    font-weight: 600 !important;
+
+    * {
+      color: #ffffff !important;
+    }
+  }
+
+  button[slot="end"],
+  .bwi-pencil {
+    opacity: 0.75;
+    transition: all 0.15s ease;
+    border-radius: 6px;
+    padding: 3px;
+
+    &:hover {
+      opacity: 1;
+      background-color: rgba(255, 255, 255, 0.25);
+      transform: scale(1.1);
+    }
+  }
+}
+
+/* Fluent Settings Card & Keyboard Shortcut Badges */
+.fluent-autotype-card {
+  transition: all 0.15s ease;
+
+  &:hover {
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+  }
+}
+
+.fluent-kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 11px;
+  font-weight: 600;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.15);
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  color: #1e293b;
+  min-width: 65px;
+  text-align: center;
+}
+
+html.theme_dark .fluent-kbd {
+  background: #0f172a;
+  border-color: #475569;
+  color: #f8fafc;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.4);
 }
 
 /* 5. "+ New / Добавить" Button & Dropdown Menu Offset */

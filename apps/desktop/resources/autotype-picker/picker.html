@@ -482,8 +482,34 @@
         color: #ffffff !important;
       }
 
-      .cipher-item.is-selected * {
+      /* Specific selection colors instead of blanket * override */
+      .cipher-item.is-selected .item-name {
         color: #ffffff !important;
+      }
+
+      .cipher-item.is-selected .item-username {
+        color: rgba(255, 255, 255, 0.92) !important;
+      }
+
+      .cipher-item.is-selected .item-icon-box {
+        background: rgba(255, 255, 255, 0.25) !important;
+        color: #ffffff !important;
+      }
+
+      .cipher-item.is-selected .match-badge {
+        background: rgba(255, 255, 255, 0.25) !important;
+        border-color: rgba(255, 255, 255, 0.5) !important;
+        color: #ffffff !important;
+        font-weight: 600 !important;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+      }
+
+      .cipher-item.is-selected .item-sequence {
+        background: rgba(0, 0, 0, 0.32) !important;
+        border-color: rgba(255, 255, 255, 0.4) !important;
+        color: #ffffff !important;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        font-weight: 600 !important;
       }
 
       body.theme-light .cipher-item:hover .item-name {
@@ -499,6 +525,7 @@
         border-radius: 8px;
         background: var(--icon-box-bg);
         font-size: 15px;
+        color: var(--text-accent);
         flex-shrink: 0;
         transition: background 0.12s ease;
       }
@@ -509,6 +536,7 @@
 
       .cipher-item.is-selected .item-icon-box {
         background: rgba(255, 255, 255, 0.25);
+        color: #ffffff !important;
       }
 
       .item-details {
@@ -542,10 +570,10 @@
         font-weight: 600;
       }
 
-      .match-badge.badge-proc {
+      body.theme-light .match-badge.badge-proc {
         background: #dcfce7;
         border-color: #86efac;
-        color: #166534;
+        color: #14532d !important;
       }
 
       body.theme-dark .match-badge.badge-proc {
@@ -554,10 +582,10 @@
         color: #34d399;
       }
 
-      .match-badge.badge-title {
+      body.theme-light .match-badge.badge-title {
         background: #f3e8ff;
         border-color: #d8b4fe;
-        color: #6b21a8;
+        color: #581c87 !important;
       }
 
       body.theme-dark .match-badge.badge-title {
@@ -584,6 +612,10 @@
         font-weight: 500;
       }
 
+      body.theme-light .item-username {
+        color: #2563eb !important;
+      }
+
       .item-sequence {
         font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
         background: var(--seq-bg);
@@ -598,14 +630,21 @@
         max-width: 160px;
       }
 
-      /* Quick Action Buttons on row (Styled like fork's [bit-chip-action]) */
+      body.theme-light .item-sequence {
+        background: #f8fafc;
+        border-color: #cbd5e1;
+        color: #1e293b !important;
+        font-weight: 500;
+      }
+
+      /* Structured Action Buttons on row */
       .item-actions {
         display: flex;
         align-items: center;
-        gap: 4px;
+        gap: 6px;
         flex-shrink: 0;
-        opacity: 0.6;
-        transition: opacity 0.12s ease;
+        opacity: 0.85;
+        transition: opacity 0.15s ease;
       }
 
       .cipher-item:hover .item-actions,
@@ -613,43 +652,137 @@
         opacity: 1;
       }
 
+      .action-svg {
+        display: block;
+        flex-shrink: 0;
+        pointer-events: none;
+      }
+
       .action-btn {
         background: var(--action-btn-bg);
         border: 1px solid var(--action-btn-border);
         color: var(--action-btn-text);
-        font-size: 12px;
-        width: 28px;
         height: 28px;
-        border-radius: 8px;
         display: flex;
         align-items: center;
         justify-content: center;
         cursor: pointer;
         transition: all 0.12s ease;
         position: relative;
+        padding: 0 7px;
+        user-select: none;
+        outline: none;
       }
 
-      .cipher-item.is-selected .action-btn {
-        background: rgba(255, 255, 255, 0.22);
-        border-color: rgba(255, 255, 255, 0.4);
+      .btn-primary-autotype {
+        border-radius: 8px;
+        gap: 5px;
+        font-size: 11px;
+        font-weight: 600;
+        background: #eff6ff;
+        border-color: #bfdbfe;
+        color: #1d4ed8;
+        padding: 0 9px;
+      }
+
+      body.theme-dark .btn-primary-autotype {
+        background: #1e3a8a;
+        border-color: #3b82f6;
+        color: #93c5fd;
+      }
+
+      .btn-primary-autotype:hover {
+        background: #2563eb !important;
+        border-color: #3b82f6 !important;
+        color: #ffffff !important;
+        box-shadow: 0 2px 8px rgba(37, 99, 235, 0.4);
+      }
+
+      .action-segmented-group {
+        display: flex;
+        align-items: center;
+        background: var(--action-btn-bg);
+        border: 1px solid var(--action-btn-border);
+        border-radius: 8px;
+        overflow: hidden;
+      }
+
+      .action-segmented-group .action-btn {
+        border: none;
+        border-right: 1px solid var(--action-btn-border);
+        border-radius: 0;
+        width: 28px;
+        padding: 0;
+      }
+
+      .action-segmented-group .action-btn:last-child {
+        border-right: none;
+      }
+
+      .action-segmented-group .action-btn:hover {
+        background: #2563eb;
         color: #ffffff;
       }
 
-      .action-btn:hover {
-        background: #1d4ed8 !important;
-        border-color: #93c5fd !important;
+      body.theme-light .action-segmented-group .action-btn:hover {
+        background: #eff6ff;
+        color: #1d4ed8;
+      }
+
+      .btn-edit {
+        border-radius: 8px;
+        width: 28px;
+        padding: 0;
+      }
+
+      .btn-edit:hover {
+        background: #2563eb;
+        color: #ffffff;
+      }
+
+      body.theme-light .btn-edit:hover {
+        background: #eff6ff;
+        color: #1d4ed8;
+      }
+
+      /* When row is selected (.is-selected) */
+      .cipher-item.is-selected .btn-primary-autotype {
+        background: rgba(255, 255, 255, 0.28) !important;
+        border-color: rgba(255, 255, 255, 0.5) !important;
         color: #ffffff !important;
-        transform: scale(1.08);
       }
 
-      .action-btn.btn-autotype:hover {
-        background: #059669 !important;
-        border-color: #34d399 !important;
+      .cipher-item.is-selected .btn-primary-autotype:hover {
+        background: #ffffff !important;
+        border-color: #ffffff !important;
+        color: #2563eb !important;
       }
 
-      .action-btn.btn-edit:hover {
-        background: #7c3aed !important;
-        border-color: #c084fc !important;
+      .cipher-item.is-selected .action-segmented-group {
+        background: rgba(255, 255, 255, 0.16) !important;
+        border-color: rgba(255, 255, 255, 0.35) !important;
+      }
+
+      .cipher-item.is-selected .action-segmented-group .action-btn {
+        background: transparent !important;
+        border-right-color: rgba(255, 255, 255, 0.25) !important;
+        color: #ffffff !important;
+      }
+
+      .cipher-item.is-selected .action-segmented-group .action-btn:hover {
+        background: rgba(255, 255, 255, 0.32) !important;
+        color: #ffffff !important;
+      }
+
+      .cipher-item.is-selected .btn-edit {
+        background: rgba(255, 255, 255, 0.16) !important;
+        border-color: rgba(255, 255, 255, 0.35) !important;
+        color: #ffffff !important;
+      }
+
+      .cipher-item.is-selected .btn-edit:hover {
+        background: rgba(255, 255, 255, 0.32) !important;
+        color: #ffffff !important;
       }
 
       /* Empty state */
@@ -911,7 +1044,28 @@
       <div id="contextMenu" class="context-menu">
         <div class="context-item" data-action="autotype">
           <div class="context-left">
-            <span class="context-icon">⌨️</span>
+            <span class="context-icon"
+              ><svg
+                viewBox="0 0 24 24"
+                width="14"
+                height="14"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <rect x="2" y="4" width="20" height="16" rx="2" ry="2"></rect>
+                <line x1="6" y1="8" x2="6.01" y2="8"></line>
+                <line x1="10" y1="8" x2="10.01" y2="8"></line>
+                <line x1="14" y1="8" x2="14.01" y2="8"></line>
+                <line x1="18" y1="8" x2="18.01" y2="8"></line>
+                <line x1="6" y1="12" x2="6.01" y2="12"></line>
+                <line x1="10" y1="12" x2="10.01" y2="12"></line>
+                <line x1="14" y1="12" x2="14.01" y2="12"></line>
+                <line x1="18" y1="12" x2="18.01" y2="12"></line>
+                <line x1="7" y1="16" x2="17" y2="16"></line></svg
+            ></span>
             <span>Автонабор</span>
           </div>
           <kbd class="context-kbd">Enter</kbd>
@@ -919,28 +1073,83 @@
         <div class="context-divider"></div>
         <div class="context-item" data-action="copy-username">
           <div class="context-left">
-            <span class="context-icon">👤</span>
+            <span class="context-icon"
+              ><svg
+                viewBox="0 0 24 24"
+                width="14"
+                height="14"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle></svg
+            ></span>
             <span>Скопировать логин</span>
           </div>
           <kbd class="context-kbd">Ctrl+B</kbd>
         </div>
         <div class="context-item" data-action="copy-password">
           <div class="context-left">
-            <span class="context-icon">🔑</span>
+            <span class="context-icon"
+              ><svg
+                viewBox="0 0 24 24"
+                width="14"
+                height="14"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path
+                  d="M21 2l-2 2m-1.5 1.5L14 9l-1.5-1.5L11 9l-1.5-1.5L8 9c-3.3 0-6 2.7-6 6s2.7 6 6 6 6-2.7 6-6l-1.5-1.5L14 12l1.5-1.5L17 12l4.5-4.5"
+                ></path>
+                <circle cx="8" cy="15" r="2"></circle></svg
+            ></span>
             <span>Скопировать пароль</span>
           </div>
           <kbd class="context-kbd">Ctrl+C</kbd>
         </div>
         <div class="context-item" id="ctxTotp" data-action="copy-totp">
           <div class="context-left">
-            <span class="context-icon">⏳</span>
+            <span class="context-icon"
+              ><svg
+                viewBox="0 0 24 24"
+                width="14"
+                height="14"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline></svg
+            ></span>
             <span>Скопировать код TOTP</span>
           </div>
           <kbd class="context-kbd">Ctrl+T</kbd>
         </div>
         <div class="context-item" id="ctxUrl" data-action="copy-url">
           <div class="context-left">
-            <span class="context-icon">🔗</span>
+            <span class="context-icon"
+              ><svg
+                viewBox="0 0 24 24"
+                width="14"
+                height="14"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                <polyline points="15 3 21 3 21 9"></polyline>
+                <line x1="10" y1="14" x2="21" y2="3"></line></svg
+            ></span>
             <span>Скопировать URL</span>
           </div>
           <kbd class="context-kbd">Ctrl+U</kbd>
@@ -948,7 +1157,20 @@
         <div class="context-divider"></div>
         <div class="context-item" data-action="edit">
           <div class="context-left">
-            <span class="context-icon">✏️</span>
+            <span class="context-icon"
+              ><svg
+                viewBox="0 0 24 24"
+                width="14"
+                height="14"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg
+            ></span>
             <span>Редактировать запись</span>
           </div>
           <kbd class="context-kbd">Ctrl+E</kbd>
@@ -1161,6 +1383,18 @@
             .replace(/\{ENTER\}/gi, " ↵ ");
         }
 
+        const SVG_KEYBOARD = `<svg class="action-svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2" ry="2"></rect><line x1="6" y1="8" x2="6.01" y2="8"></line><line x1="10" y1="8" x2="10.01" y2="8"></line><line x1="14" y1="8" x2="14.01" y2="8"></line><line x1="18" y1="8" x2="18.01" y2="8"></line><line x1="6" y1="12" x2="6.01" y2="12"></line><line x1="10" y1="12" x2="10.01" y2="12"></line><line x1="14" y1="12" x2="14.01" y2="12"></line><line x1="18" y1="12" x2="18.01" y2="12"></line><line x1="7" y1="16" x2="17" y2="16"></line></svg>`;
+
+        const SVG_USER = `<svg class="action-svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>`;
+
+        const SVG_KEY = `<svg class="action-svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-1.5 1.5L14 9l-1.5-1.5L11 9l-1.5-1.5L8 9c-3.3 0-6 2.7-6 6s2.7 6 6 6 6-2.7 6-6l-1.5-1.5L14 12l1.5-1.5L17 12l4.5-4.5"></path><circle cx="8" cy="15" r="2"></circle></svg>`;
+
+        const SVG_TOTP = `<svg class="action-svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>`;
+
+        const SVG_URL = `<svg class="action-svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>`;
+
+        const SVG_EDIT = `<svg class="action-svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>`;
+
         function renderItems() {
           resultsList.innerHTML = "";
           hideContextMenu();
@@ -1196,17 +1430,17 @@
             }
 
             const totpBtnHtml = item.hasTotp
-              ? `<button class="action-btn btn-copy-totp" title="Скопировать код TOTP (Ctrl+T)" data-action="copy-totp">⏳</button>`
+              ? `<button class="action-btn" title="Скопировать код TOTP (Ctrl+T)" data-action="copy-totp">${SVG_TOTP}</button>`
               : "";
 
             const urlBtnHtml = item.hasUrl
-              ? `<button class="action-btn btn-copy-url" title="Скопировать URL (Ctrl+U)" data-action="copy-url">🔗</button>`
+              ? `<button class="action-btn" title="Скопировать URL (Ctrl+U)" data-action="copy-url">${SVG_URL}</button>`
               : "";
 
             const formattedSeq = formatSequencePreview(item.sequencePreview);
 
             row.innerHTML = `
-            <div class="item-icon-box">🔑</div>
+            <div class="item-icon-box">${SVG_KEY}</div>
             <div class="item-details">
               <div class="title-row">
                 <span class="item-name">${escapeHtml(item.name || "Без названия")}</span>
@@ -1218,12 +1452,19 @@
               </div>
             </div>
             <div class="item-actions">
-              <button class="action-btn btn-autotype" title="Автонабор (Enter)" data-action="autotype">⌨️</button>
-              <button class="action-btn btn-copy-username" title="Скопировать логин (Ctrl+B)" data-action="copy-username">👤</button>
-              <button class="action-btn btn-copy-password" title="Скопировать пароль (Ctrl+C)" data-action="copy-password">🔑</button>
-              ${totpBtnHtml}
-              ${urlBtnHtml}
-              <button class="action-btn btn-edit" title="Редактировать запись (Ctrl+E)" data-action="edit">✏️</button>
+              <button class="action-btn btn-primary-autotype" title="Автонабор в целевое окно (Enter)" data-action="autotype">
+                ${SVG_KEYBOARD}
+                <span class="btn-caption">Ввод</span>
+              </button>
+              <div class="action-segmented-group">
+                <button class="action-btn" title="Скопировать логин (Ctrl+B)" data-action="copy-username">${SVG_USER}</button>
+                <button class="action-btn" title="Скопировать пароль (Ctrl+C)" data-action="copy-password">${SVG_KEY}</button>
+                ${totpBtnHtml}
+                ${urlBtnHtml}
+              </div>
+              <button class="action-btn btn-edit" title="Редактировать запись (Ctrl+E)" data-action="edit">
+                ${SVG_EDIT}
+              </button>
             </div>
           `;
 
