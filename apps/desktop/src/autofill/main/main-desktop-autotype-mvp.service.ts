@@ -122,6 +122,49 @@ export class MainDesktopAutotypeMvpService {
       },
     );
 
+    ipcMain.handle(
+      AUTOTYPE_MVP_IPC_CHANNELS.PICKER_COPY_FIELD,
+      async (
+        _event,
+        data: { cipherId: string; field: "username" | "password" | "totp" | "url" },
+      ) => {
+        if (!this.windowMain.win || this.windowMain.win.isDestroyed()) {
+          return { success: false, message: "Окно Bitwarden недоступно" };
+        }
+        return await new Promise((resolve) => {
+          const replyChannel = `${AUTOTYPE_MVP_IPC_CHANNELS.PICKER_COPY_FIELD}_reply_${Date.now()}_${Math.random()}`;
+          ipcMain.once(replyChannel, (_e, result) => {
+            resolve(result);
+          });
+          this.windowMain.win.webContents.send(AUTOTYPE_MVP_IPC_CHANNELS.PICKER_COPY_FIELD, {
+            ...data,
+            replyChannel,
+          });
+          setTimeout(() => {
+            ipcMain.removeAllListeners(replyChannel);
+            resolve({ success: false, message: "Таймаут копирования" });
+          }, 4000);
+        });
+      },
+    );
+
+    ipcMain.on(
+      AUTOTYPE_MVP_IPC_CHANNELS.PICKER_EDIT_CIPHER,
+      async (_event, data: { cipherId: string }) => {
+        this.pickerWindow.close();
+        if (this.windowMain.win && !this.windowMain.win.isDestroyed()) {
+          if (this.windowMain.win.isMinimized()) {
+            this.windowMain.win.restore();
+          }
+          this.windowMain.win.show();
+          this.windowMain.win.focus();
+          this.windowMain.win.webContents.send(AUTOTYPE_MVP_IPC_CHANNELS.PICKER_EDIT_CIPHER, {
+            cipherId: data.cipherId,
+          });
+        }
+      },
+    );
+
     ipcMain.on(
       AUTOTYPE_MVP_IPC_CHANNELS.EXECUTE_SEQUENCE,
       async (
@@ -188,6 +231,8 @@ export class MainDesktopAutotypeMvpService {
     ipcMain.removeAllListeners(AUTOTYPE_MVP_IPC_CHANNELS.OPEN_PICKER);
     ipcMain.removeAllListeners(AUTOTYPE_MVP_IPC_CHANNELS.CLOSE_PICKER);
     ipcMain.removeAllListeners(AUTOTYPE_MVP_IPC_CHANNELS.PICKER_SELECT);
+    ipcMain.removeHandler(AUTOTYPE_MVP_IPC_CHANNELS.PICKER_COPY_FIELD);
+    ipcMain.removeAllListeners(AUTOTYPE_MVP_IPC_CHANNELS.PICKER_EDIT_CIPHER);
     ipcMain.removeAllListeners(AUTOTYPE_MVP_IPC_CHANNELS.EXECUTE_SEQUENCE);
     ipcMain.removeAllListeners(AUTOTYPE_MVP_IPC_CHANNELS.EXECUTE);
     ipcMain.removeAllListeners(AUTOTYPE_MVP_IPC_CHANNELS.EXECUTION_ERROR);

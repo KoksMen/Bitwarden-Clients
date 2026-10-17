@@ -523,6 +523,11 @@ export class AppComponent implements OnInit, OnDestroy {
           case "launchUri":
             this.platformUtilsService.launchUri(message.url);
             break;
+          case "editCipherById":
+            if (!this.router.url.includes("vault")) {
+              await this.router.navigate(["/vault"]);
+            }
+            break;
         }
       });
     });

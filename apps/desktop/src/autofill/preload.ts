@@ -105,6 +105,26 @@ const autotypeMvp = {
   ) => {
     ipcRenderer.on(AUTOTYPE_MVP_IPC_CHANNELS.PICKER_ITEM_CHOSEN, (_event, data) => fn(data));
   },
+  copyPickerField: (data: {
+    cipherId: string;
+    field: "username" | "password" | "totp" | "url";
+  }): Promise<{ success: boolean; message: string }> => {
+    return ipcRenderer.invoke(AUTOTYPE_MVP_IPC_CHANNELS.PICKER_COPY_FIELD, data);
+  },
+  editPickerCipher: (data: { cipherId: string }) => {
+    ipcRenderer.send(AUTOTYPE_MVP_IPC_CHANNELS.PICKER_EDIT_CIPHER, data);
+  },
+  onPickerCopyField: (
+    fn: (data: { cipherId: string; field: string; replyChannel: string }) => void,
+  ) => {
+    ipcRenderer.on(AUTOTYPE_MVP_IPC_CHANNELS.PICKER_COPY_FIELD, (_event, data) => fn(data));
+  },
+  onPickerEditCipher: (fn: (data: { cipherId: string }) => void) => {
+    ipcRenderer.on(AUTOTYPE_MVP_IPC_CHANNELS.PICKER_EDIT_CIPHER, (_event, data) => fn(data));
+  },
+  sendReply: (channel: string, data: any) => {
+    ipcRenderer.send(channel, data);
+  },
 };
 
 export default {

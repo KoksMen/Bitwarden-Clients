@@ -657,6 +657,27 @@ export class VaultComponent<C extends CipherViewLike> implements OnInit, OnDestr
               }
               break;
             }
+            case "editCipherById": {
+              if (message.cipherId) {
+                const userId =
+                  this.activeUserId ??
+                  (await firstValueFrom(
+                    this.accountService.activeAccount$.pipe(
+                      map((a) => a?.id),
+                      filter((id): id is UserId => id != null),
+                    ),
+                  ));
+                if (userId) {
+                  const cipher = await firstValueFrom(
+                    this.cipherService.cipherView$(userId, message.cipherId as CipherId),
+                  );
+                  if (cipher) {
+                    await this.editCipher(cipher);
+                  }
+                }
+              }
+              break;
+            }
             default:
               detectChanges = false;
               break;

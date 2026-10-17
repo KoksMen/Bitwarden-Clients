@@ -92,7 +92,8 @@ const DEFAULT_SEQUENCE = "{USERNAME}{TAB}{PASSWORD}{ENTER}";
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AutotypeSequenceSectionComponent implements OnInit {
-  readonly sequence: string = DEFAULT_SEQUENCE;
+  // eslint-disable-next-line @bitwarden/components/enforce-readonly-angular-properties
+  sequence: string = DEFAULT_SEQUENCE;
 
   readonly presets = [
     { label: "Логин + Пароль + Enter", seq: "{USERNAME}{TAB}{PASSWORD}{ENTER}" },

@@ -24,6 +24,7 @@ import { AutotypeFeatureFlagState } from "@bitwarden/common/desktop-native/enums
 import { autotypeFeatureFlagState$ } from "@bitwarden/common/desktop-native/services/autotype-feature-flags";
 import { DeviceType } from "@bitwarden/common/enums";
 import { ConfigService } from "@bitwarden/common/platform/abstractions/config/config.service";
+import { MessagingService } from "@bitwarden/common/platform/abstractions/messaging.service";
 import { PlatformUtilsService } from "@bitwarden/common/platform/abstractions/platform-utils.service";
 import {
   GlobalStateProvider,
@@ -120,6 +121,7 @@ export class DesktopAutotypeMvpService implements OnDestroy {
     private billingAccountProfileStateService: BillingAccountProfileStateService,
     private desktopAutotypePolicy: DesktopAutotypeDefaultSettingPolicy,
     private logService: LogService,
+    private messagingService: MessagingService,
   ) {
     this.autotypeEnabledUserSetting$ = this.autotypeEnabledState.state$.pipe(
       map((enabled) => enabled ?? true),
@@ -220,6 +222,91 @@ export class DesktopAutotypeMvpService implements OnDestroy {
           });
         },
       );
+    }
+
+    if (ipc.autofill.autotypeMvp.onPickerCopyField) {
+      ipc.autofill.autotypeMvp.onPickerCopyField(
+        async (data: { cipherId: string; field: string; replyChannel: string }) => {
+          const cipher = await this.getCipherById(data.cipherId);
+          if (!cipher) {
+            ipc.autofill.autotypeMvp.sendReply(data.replyChannel, {
+              success: false,
+              message: "Запись не найдена",
+            });
+            return;
+          }
+
+          let message = "";
+          let copied = false;
+
+          switch (data.field) {
+            case "username":
+              if (cipher.login?.username) {
+                this.platformUtilsService.copyToClipboard(cipher.login.username);
+                message = "Логин скопирован";
+                copied = true;
+              } else {
+                message = "Логин отсутствует";
+              }
+              break;
+
+            case "password":
+              if (cipher.login?.password && cipher.viewPassword) {
+                this.platformUtilsService.copyToClipboard(cipher.login.password);
+                message = "Пароль скопирован";
+                copied = true;
+              } else {
+                message = "Пароль недоступен";
+              }
+              break;
+
+            case "totp":
+              if (cipher.login?.hasTotp && cipher.login?.totp) {
+                try {
+                  const codeObj = await firstValueFrom(
+                    this.totpService.getCode$(cipher.login.totp),
+                  );
+                  if (codeObj && codeObj.code) {
+                    this.platformUtilsService.copyToClipboard(codeObj.code);
+                    message = `Код TOTP (${codeObj.code}) скопирован`;
+                    copied = true;
+                  } else {
+                    message = "Не удалось сгенерировать код TOTP";
+                  }
+                } catch {
+                  message = "Ошибка при вычислении TOTP";
+                }
+              } else {
+                message = "TOTP не настроен";
+              }
+              break;
+
+            case "url": {
+              const uris = cipher.login?.uris || [];
+              const primaryUri =
+                uris.find(
+                  (u) => u.uri && !u.uri.startsWith("app://") && !u.uri.startsWith("apptitle://"),
+                )?.uri || uris[0]?.uri;
+              if (primaryUri) {
+                this.platformUtilsService.copyToClipboard(primaryUri);
+                message = "URL скопирован";
+                copied = true;
+              } else {
+                message = "URL отсутствует";
+              }
+              break;
+            }
+          }
+
+          ipc.autofill.autotypeMvp.sendReply(data.replyChannel, { success: copied, message });
+        },
+      );
+    }
+
+    if (ipc.autofill.autotypeMvp.onPickerEditCipher) {
+      ipc.autofill.autotypeMvp.onPickerEditCipher((data: { cipherId: string }) => {
+        this.messagingService.send("editCipherById", { cipherId: data.cipherId });
+      });
     }
 
     // In this fork, ensure Autotype is default-enabled locally if never configured
@@ -356,7 +443,9 @@ export class DesktopAutotypeMvpService implements OnDestroy {
             raw === cleanExe
           );
         });
-        if (procMatch) {return true;}
+        if (procMatch) {
+          return true;
+        }
       }
 
       // 2. Window title matching
@@ -369,7 +458,9 @@ export class DesktopAutotypeMvpService implements OnDestroy {
           }
           return false;
         });
-        if (titleMatch) {return true;}
+        if (titleMatch) {
+          return true;
+        }
       }
 
       // 3. Name-based match
@@ -473,10 +564,20 @@ export class DesktopAutotypeMvpService implements OnDestroy {
         const customSeq = this.getCustomSequence(c);
         const sequencePreview = customSeq || "{USERNAME} ⇥ {PASSWORD} ↵";
 
+        const primaryUri =
+          uris.find((u) => u.uri && !u.uri.startsWith("app://") && !u.uri.startsWith("apptitle://"))
+            ?.uri ||
+          uris[0]?.uri ||
+          "";
+
         const item = {
           id: c.id,
           name: c.name || "Без названия",
           username: c.login?.username || "",
+          hasPassword: !!(c.login?.password && c.viewPassword),
+          hasTotp: !!c.login?.hasTotp,
+          hasUrl: !!primaryUri,
+          url: primaryUri,
           matchType: matchType || "search",
           matchBadge: badge || undefined,
           sequencePreview,

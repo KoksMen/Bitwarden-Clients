@@ -221,10 +221,14 @@ export class RunningAppsDialogComponent implements OnInit {
   protected readonly dialogRef = inject<DialogRef<RunningAppItem | null>>(DialogRef);
   private readonly cdr = inject(ChangeDetectorRef);
 
-  readonly searchQuery = "";
-  readonly isLoading = true;
-  readonly allApps: RunningAppItem[] = [];
-  readonly filteredApps: RunningAppItem[] = [];
+  // eslint-disable-next-line @bitwarden/components/enforce-readonly-angular-properties
+  searchQuery = "";
+  // eslint-disable-next-line @bitwarden/components/enforce-readonly-angular-properties
+  isLoading = true;
+  // eslint-disable-next-line @bitwarden/components/enforce-readonly-angular-properties
+  allApps: RunningAppItem[] = [];
+  // eslint-disable-next-line @bitwarden/components/enforce-readonly-angular-properties
+  filteredApps: RunningAppItem[] = [];
 
   static open(dialogService: DialogService): DialogRef<RunningAppItem | null> {
     return dialogService.open<RunningAppItem | null>(RunningAppsDialogComponent, {

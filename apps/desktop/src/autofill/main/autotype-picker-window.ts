@@ -21,6 +21,10 @@ export interface AutotypePickerItem {
   matchType: "process" | "title" | "search";
   matchBadge?: string;
   sequencePreview: string;
+  hasPassword?: boolean;
+  hasTotp?: boolean;
+  hasUrl?: boolean;
+  url?: string;
 }
 
 export interface AutotypePickerOpenOptions {
@@ -81,8 +85,8 @@ export class AutotypePickerWindow {
 
     if (this.win == null || this.win.isDestroyed()) {
       this.win = new BrowserWindow({
-        width: 540,
-        height: 400,
+        width: 580,
+        height: 420,
         frame: false,
         alwaysOnTop: true,
         skipTaskbar: true,
@@ -131,8 +135,8 @@ export class AutotypePickerWindow {
       return;
     }
 
-    const width = 540;
-    const height = 400;
+    const width = 580;
+    const height = 420;
     const cursorPoint = screen.getCursorScreenPoint();
     const currentDisplay = screen.getDisplayNearestPoint(cursorPoint);
     const workArea = currentDisplay.workArea;
