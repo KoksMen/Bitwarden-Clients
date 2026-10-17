@@ -172,6 +172,13 @@ export class MainDesktopAutotypeMvpService {
     });
 
     ipcMain.on(
+      AUTOTYPE_MVP_IPC_CHANNELS.PICKER_THEME_CHANGED,
+      (_event, data: { theme: string }) => {
+        this.pickerWindow.setTheme(data.theme);
+      },
+    );
+
+    ipcMain.on(
       AUTOTYPE_MVP_IPC_CHANNELS.EXECUTE_SEQUENCE,
       async (
         _event,

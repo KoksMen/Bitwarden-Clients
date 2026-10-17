@@ -16,6 +16,7 @@ import {
   takeUntil,
 } from "rxjs";
 
+import { AbstractThemingService } from "@bitwarden/angular/platform/services/theming/theming.service.abstraction";
 import { Account, AccountService } from "@bitwarden/common/auth/abstractions/account.service";
 import { AuthService } from "@bitwarden/common/auth/abstractions/auth.service";
 import { AuthenticationStatus } from "@bitwarden/common/auth/enums/authentication-status";
@@ -29,6 +30,7 @@ import { DeviceType } from "@bitwarden/common/enums";
 import { ConfigService } from "@bitwarden/common/platform/abstractions/config/config.service";
 import { MessagingService } from "@bitwarden/common/platform/abstractions/messaging.service";
 import { PlatformUtilsService } from "@bitwarden/common/platform/abstractions/platform-utils.service";
+import { ThemeTypes } from "@bitwarden/common/platform/enums";
 import {
   GlobalStateProvider,
   AUTOTYPE_SETTINGS_DISK,
@@ -137,6 +139,7 @@ export class DesktopAutotypeMvpService implements OnDestroy {
     private logService: LogService,
     private messagingService: MessagingService,
     @Optional() private autofillSettingsService?: AutofillSettingsServiceAbstraction,
+    @Optional() private themingService?: AbstractThemingService,
   ) {
     this.autotypeEnabledUserSetting$ = this.autotypeEnabledState.state$.pipe(
       map((enabled) => enabled ?? true),
@@ -187,6 +190,7 @@ export class DesktopAutotypeMvpService implements OnDestroy {
       // 1. If triggered by global spotlight shortcut, open search immediately
       if (data.isGlobalSearch) {
         const items = await this.preparePickerItems(data.windowTitle, data.processName);
+        const theme = await this.getCurrentTheme();
         ipc.autofill.autotypeMvp.openPicker({
           targetWindow: data,
           mode: "search",
@@ -194,6 +198,7 @@ export class DesktopAutotypeMvpService implements OnDestroy {
           useTcato: tcatoEnabled,
           initialQuery: "",
           items,
+          theme,
         });
         return;
       }
@@ -211,6 +216,7 @@ export class DesktopAutotypeMvpService implements OnDestroy {
         });
       } else {
         const items = await this.preparePickerItems(data.windowTitle, data.processName);
+        const theme = await this.getCurrentTheme();
         ipc.autofill.autotypeMvp.openPicker({
           targetWindow: data,
           mode: possibleCiphers.length >= 2 ? "picker" : "search",
@@ -218,6 +224,7 @@ export class DesktopAutotypeMvpService implements OnDestroy {
           useTcato: tcatoEnabled,
           initialQuery: "",
           items,
+          theme,
         });
       }
     });
@@ -397,6 +404,15 @@ export class DesktopAutotypeMvpService implements OnDestroy {
         takeUntil(this.destroy$),
       )
       .subscribe();
+
+    if (this.themingService) {
+      this.themingService.theme$
+        .pipe(distinctUntilChanged(), takeUntil(this.destroy$))
+        .subscribe((theme) => {
+          const t = theme === ThemeTypes.Light ? "light" : "dark";
+          ipc.autofill.autotypeMvp.sendThemeChanged(t);
+        });
+    }
   }
 
   private get autotypeFeatureEnabled$(): Observable<boolean> {
@@ -746,6 +762,26 @@ export class DesktopAutotypeMvpService implements OnDestroy {
       this.logService.error("Failed to get clear clipboard delay setting", e);
     }
     return 300;
+  }
+
+  private async getCurrentTheme(): Promise<"light" | "dark"> {
+    try {
+      if (typeof document !== "undefined" && document.documentElement) {
+        if (document.documentElement.classList.contains("theme_light")) {
+          return "light";
+        }
+        if (document.documentElement.classList.contains("theme_dark")) {
+          return "dark";
+        }
+      }
+      if (this.themingService) {
+        const theme = await firstValueFrom(this.themingService.theme$.pipe(take(1)));
+        return theme === ThemeTypes.Light ? "light" : "dark";
+      }
+    } catch {
+      // fallback
+    }
+    return "dark";
   }
 
   ngOnDestroy() {

@@ -128,6 +128,12 @@ const autotypeMvp = {
   onPickerEditCipher: (fn: (data: { cipherId: string }) => void) => {
     ipcRenderer.on(AUTOTYPE_MVP_IPC_CHANNELS.PICKER_EDIT_CIPHER, (_event, data) => fn(data));
   },
+  sendThemeChanged: (theme: string) => {
+    ipcRenderer.send(AUTOTYPE_MVP_IPC_CHANNELS.PICKER_THEME_CHANGED, { theme });
+  },
+  onPickerThemeChanged: (fn: (data: { theme: string }) => void) => {
+    ipcRenderer.on(AUTOTYPE_MVP_IPC_CHANNELS.PICKER_THEME_CHANGED, (_event, data) => fn(data));
+  },
   sendReply: (channel: string, data: any) => {
     ipcRenderer.send(channel, data);
   },

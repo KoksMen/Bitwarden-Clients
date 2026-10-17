@@ -36,13 +36,17 @@ const DEFAULT_SEQUENCE = "{USERNAME}{TAB}{PASSWORD}{ENTER}";
         display: flex;
         flex-direction: column;
         gap: 6px;
-        margin-top: 10px;
+        margin-top: 12px;
       }
       .presets-row .label-hint,
       .chips-row .label-hint {
-        font-size: 11.5px;
-        color: #71717a;
-        font-weight: 500;
+        font-size: 12px;
+        font-weight: 600;
+        color: #64748b;
+      }
+      :host-context(html.theme_dark) .presets-row .label-hint,
+      :host-context(html.theme_dark) .chips-row .label-hint {
+        color: #94a3b8;
       }
       .preset-buttons,
       .chip-buttons {
@@ -51,41 +55,71 @@ const DEFAULT_SEQUENCE = "{USERNAME}{TAB}{PASSWORD}{ENTER}";
         gap: 6px;
       }
       .preset-btn {
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        border-radius: 4px;
-        padding: 3px 8px;
-        font-size: 11.5px;
-        color: #d4d4d8;
+        background: #f1f5f9;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        padding: 4px 10px;
+        font-size: 12px;
+        font-weight: 500;
+        color: #1e293b;
         cursor: pointer;
         transition: all 0.15s ease;
       }
       .preset-btn:hover {
-        background: rgba(59, 130, 246, 0.15);
-        border-color: rgba(59, 130, 246, 0.35);
-        color: #93c5fd;
+        background: #eff6ff;
+        border-color: #3b82f6;
+        color: #1d4ed8;
       }
       .preset-btn.active {
-        background: rgba(59, 130, 246, 0.25);
-        border-color: #3b82f6;
-        color: #60a5fa;
+        background: #2563eb !important;
+        border-color: #1d4ed8 !important;
+        color: #ffffff !important;
         font-weight: 600;
+        box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35);
+      }
+      :host-context(html.theme_dark) .preset-btn {
+        background: #1e293b;
+        border-color: #334155;
+        color: #f8fafc;
+      }
+      :host-context(html.theme_dark) .preset-btn:hover {
+        background: #1e3a8a;
+        border-color: #60a5fa;
+        color: #ffffff;
+      }
+      :host-context(html.theme_dark) .preset-btn.active {
+        background: #2563eb !important;
+        border-color: #93c5fd !important;
+        color: #ffffff !important;
+        box-shadow: 0 2px 10px rgba(37, 99, 235, 0.45);
       }
       .chip-btn {
-        background: rgba(255, 255, 255, 0.03);
-        border: 1px dashed rgba(255, 255, 255, 0.15);
-        border-radius: 4px;
-        padding: 2px 7px;
-        font-size: 11px;
-        font-family: monospace;
-        color: #a1a1aa;
+        background: #f8fafc;
+        border: 1px dashed #94a3b8;
+        border-radius: 6px;
+        padding: 3px 8px;
+        font-size: 11.5px;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        color: #334155;
         cursor: pointer;
         transition: all 0.15s ease;
       }
       .chip-btn:hover {
-        background: rgba(255, 255, 255, 0.08);
-        border-color: rgba(255, 255, 255, 0.3);
-        color: #f4f4f5;
+        background: #eff6ff;
+        border-color: #2563eb;
+        color: #1d4ed8;
+        transform: translateY(-1px);
+      }
+      :host-context(html.theme_dark) .chip-btn {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: #475569;
+        color: #cbd5e1;
+      }
+      :host-context(html.theme_dark) .chip-btn:hover {
+        background: #1e3a8a;
+        border-color: #60a5fa;
+        color: #ffffff;
+        transform: translateY(-1px);
       }
     `,
   ],

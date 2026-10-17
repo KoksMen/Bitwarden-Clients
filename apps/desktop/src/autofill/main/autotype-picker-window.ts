@@ -34,6 +34,7 @@ export interface AutotypePickerOpenOptions {
   positionMode?: "center" | "cursor";
   useTcato?: boolean;
   items?: AutotypePickerItem[];
+  theme?: string;
 }
 
 export class AutotypePickerWindow {
@@ -83,6 +84,9 @@ export class AutotypePickerWindow {
     this.currentTargetWindow = options.targetWindow;
     this.currentUseTcato = options.useTcato ?? false;
 
+    const isLight = options.theme === "light";
+    const bgColor = isLight ? "#ffffff" : "#0f172a";
+
     if (this.win == null || this.win.isDestroyed()) {
       this.win = new BrowserWindow({
         width: 580,
@@ -92,7 +96,7 @@ export class AutotypePickerWindow {
         skipTaskbar: true,
         resizable: false,
         show: false,
-        backgroundColor: "#18181b",
+        backgroundColor: bgColor,
         webPreferences: {
           preload: path.join(__dirname, "preload.js"),
           contextIsolation: true,
@@ -107,6 +111,8 @@ export class AutotypePickerWindow {
       });
 
       await this.win.loadURL(this.getPickerUrl());
+    } else {
+      this.win.setBackgroundColor(bgColor);
     }
 
     this.positionWindow(options.positionMode ?? "center");
@@ -121,7 +127,16 @@ export class AutotypePickerWindow {
       initialQuery: options.initialQuery || "",
       items: options.items || [],
       useTcato: options.useTcato || false,
+      theme: options.theme || "dark",
     });
+  }
+
+  setTheme(theme: string) {
+    if (this.win && !this.win.isDestroyed()) {
+      const isLight = theme === "light";
+      this.win.setBackgroundColor(isLight ? "#ffffff" : "#0f172a");
+      this.win.webContents.send(AUTOTYPE_MVP_IPC_CHANNELS.PICKER_THEME_CHANGED, { theme });
+    }
   }
 
   close() {
