@@ -198,10 +198,14 @@ html.theme_dark tr[appVaultCollectionRow][data-active="true"] input[bitCheckbox]
   }
 }
 
-/* 4. Sidebar Navigation Items Clean Card & Fluent Styling */
+/* 4. Complete Sidebar Navigation Overhaul (1Password / Fluent Style) */
 nav#bit-side-nav,
 [data-nav-version="default"],
 app-side-nav {
+  background: linear-gradient(180deg, #1752c4 0%, #0d388f 100%) !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.12) !important;
+
+  /* Nav Item Containers (Modern Pills) */
   bit-nav-item [data-testid="nav-item-container"],
   bit-nav-item [data-spotlight-target],
   app-folder-filter [data-testid="nav-item-container"],
@@ -210,30 +214,33 @@ app-side-nav {
   app-type-filter [data-spotlight-target],
   app-organization-filter [data-testid="nav-item-container"],
   app-status-filter [data-testid="nav-item-container"] {
-    border-radius: 12px !important;
-    margin-top: 2px !important;
-    margin-bottom: 2px !important;
+    border-radius: 10px !important;
+    margin: 2px 6px !important;
+    padding-right: 6px !important;
     transition: all 0.16s ease !important;
   }
 
+  /* Nav Item Hover State */
   bit-nav-item [data-testid="nav-item-container"]:hover,
   app-folder-filter [data-testid="nav-item-container"]:hover,
   app-type-filter [data-testid="nav-item-container"]:hover,
   app-organization-filter [data-testid="nav-item-container"]:hover,
   app-status-filter [data-testid="nav-item-container"]:hover {
-    background-color: rgba(255, 255, 255, 0.15) !important;
-    border-color: rgba(255, 255, 255, 0.3) !important;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+    background-color: rgba(255, 255, 255, 0.14) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.16) !important;
     transform: translateX(2px) !important;
   }
 
+  /* Nav Item Active State */
   [data-testid="nav-item-container"][style*="--color-nav-bg-brand"],
   [data-testid="nav-item-container"]:has([aria-current="page"]),
   [data-testid="nav-item-container"]:has([aria-pressed="true"]),
   [data-testid="nav-item-container"].tw-bg-bg-nav-active {
-    background-color: rgba(0, 0, 0, 0.3) !important;
-    border: 1px solid rgba(255, 255, 255, 0.3) !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25) !important;
+    background-color: rgba(255, 255, 255, 0.22) !important;
+    border: 1px solid rgba(255, 255, 255, 0.28) !important;
+    box-shadow:
+      0 3px 12px rgba(0, 0, 0, 0.22),
+      inset 3px 0 0 #ffffff !important;
     font-weight: 600 !important;
 
     * {
@@ -241,6 +248,120 @@ app-side-nav {
     }
   }
 
+  /* Category Squircle Badge Tiles */
+  bit-nav-item bit-icon,
+  app-type-filter bit-icon,
+  app-folder-filter bit-icon,
+  app-status-filter bit-icon,
+  app-organization-filter bit-icon,
+  bit-nav-group > div bit-icon {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 26px !important;
+    height: 26px !important;
+    min-width: 26px !important;
+    border-radius: 7px !important;
+    margin-right: 10px !important;
+    background: rgba(255, 255, 255, 0.16);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.18) !important;
+    transition:
+      transform 0.15s ease,
+      box-shadow 0.15s ease !important;
+
+    i,
+    .bwi,
+    svg {
+      color: #ffffff !important;
+      font-size: 13px !important;
+      line-height: 1 !important;
+    }
+  }
+
+  /* Hover micro-zoom on icon tile */
+  [data-testid="nav-item-container"]:hover bit-icon {
+    transform: scale(1.08) !important;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.26) !important;
+  }
+
+  /* Specific Category Color Gradient Tiles (1Password / Apple Passwords aesthetic) */
+  bit-icon:has([class*="star"]),
+  bit-icon:has(.bwi-star) {
+    background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+  }
+
+  bit-icon:has([class*="globe"]),
+  bit-icon:has(.bwi-globe),
+  bit-icon:has(.bwi-login) {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8) !important;
+  }
+
+  bit-icon:has([class*="credit-card"]),
+  bit-icon:has(.bwi-credit-card) {
+    background: linear-gradient(135deg, #10b981, #059669) !important;
+  }
+
+  bit-icon:has([class*="id-card"]),
+  bit-icon:has(.bwi-id-card) {
+    background: linear-gradient(135deg, #6366f1, #4f46e5) !important;
+  }
+
+  bit-icon:has([class*="sticky-note"]),
+  bit-icon:has(.bwi-sticky-note) {
+    background: linear-gradient(135deg, #a855f7, #7c3aed) !important;
+  }
+
+  bit-icon:has([class*="key"]),
+  bit-icon:has(.bwi-key),
+  bit-icon:has(.bwi-key-round) {
+    background: linear-gradient(135deg, #f43f5e, #e11d48) !important;
+  }
+
+  bit-icon:has([class*="archive"]),
+  bit-icon:has(.bwi-archive) {
+    background: linear-gradient(135deg, #64748b, #475569) !important;
+  }
+
+  bit-icon:has([class*="trash"]),
+  bit-icon:has(.bwi-trash) {
+    background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+  }
+
+  bit-icon:has([class*="folder"]),
+  bit-icon:has(.bwi-folder) {
+    background: linear-gradient(135deg, #0284c7, #0369a1) !important;
+  }
+
+  bit-icon:has([class*="grid"]),
+  bit-icon:has(.bwi-grid) {
+    background: linear-gradient(135deg, #475569, #334155) !important;
+  }
+
+  bit-icon:has([class*="vault"]),
+  bit-icon:has(.bwi-vault) {
+    background: linear-gradient(135deg, #2563eb, #1e40af) !important;
+  }
+
+  bit-icon:has([class*="send"]),
+  bit-icon:has([class*="paper-plane"]),
+  bit-icon:has(.bwi-send) {
+    background: linear-gradient(135deg, #8b5cf6, #6d28d9) !important;
+  }
+
+  bit-icon:has([class*="generate"]),
+  bit-icon:has([class*="refresh"]),
+  bit-icon:has(.bwi-generate) {
+    background: linear-gradient(135deg, #f97316, #ea580c) !important;
+  }
+
+  bit-icon:has([class*="download"]),
+  bit-icon:has([class*="import"]),
+  bit-icon:has(.bwi-import),
+  bit-icon:has(.bwi-download) {
+    background: linear-gradient(135deg, #0ea5e9, #0284c7) !important;
+  }
+
+  /* Folder Edit Pencil */
   button[slot="end"],
   .bwi-pencil {
     opacity: 0.75;
@@ -254,14 +375,31 @@ app-side-nav {
       transform: scale(1.1);
     }
   }
+
+  /* Group & Section Headers */
+  bit-nav-group > button,
+  bit-nav-section > h2,
+  .bit-nav-group-header {
+    letter-spacing: 0.05em !important;
+    font-size: 11.5px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    color: rgba(255, 255, 255, 0.7) !important;
+  }
 }
 
-/* Fluent Settings Card & Keyboard Shortcut Badges */
-.fluent-autotype-card {
-  transition: all 0.15s ease;
+/* Fluent Settings Cards & Keyboard Shortcut Badges */
+.fluent-settings-container {
+  .fluent-card {
+    transition: all 0.15s ease;
 
-  &:hover {
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+    &:hover {
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+    }
+  }
+
+  .fluent-setting-row {
+    transition: background-color 0.12s ease;
   }
 }
 

@@ -84,9 +84,9 @@
         --card-hover-bg: #eff6ff;
         --card-hover-border: #3b82f6;
         --card-hover-shadow: 0 4px 14px rgba(37, 99, 235, 0.12);
-        --card-selected-bg: #2563eb;
-        --card-selected-border: #1d4ed8;
-        --card-selected-shadow: 0 6px 18px rgba(37, 99, 235, 0.35);
+        --card-selected-bg: #eff6ff;
+        --card-selected-border: #2563eb;
+        --card-selected-shadow: 0 4px 14px rgba(37, 99, 235, 0.16);
         --icon-box-bg: #f1f5f9;
         --icon-box-hover: rgba(255, 255, 255, 0.3);
         --action-btn-bg: #f1f5f9;
@@ -478,37 +478,90 @@
         box-shadow: var(--card-selected-shadow);
       }
 
-      body.theme-dark .cipher-item:hover * {
-        color: #ffffff !important;
+      /* Selected Card Theme-Specific Styling (Flawless WCAG Contrast) */
+      body.theme-light .cipher-item.is-selected {
+        background-color: #eff6ff !important;
+        border-color: #2563eb !important;
+        box-shadow:
+          inset 3.5px 0 0 #2563eb,
+          0 4px 14px rgba(37, 99, 235, 0.16) !important;
       }
 
-      /* Specific selection colors instead of blanket * override */
-      .cipher-item.is-selected .item-name {
-        color: #ffffff !important;
+      body.theme-light .cipher-item.is-selected .item-name {
+        color: #0f172a !important;
+        font-weight: 700 !important;
       }
 
-      .cipher-item.is-selected .item-username {
-        color: rgba(255, 255, 255, 0.92) !important;
-      }
-
-      .cipher-item.is-selected .item-icon-box {
-        background: rgba(255, 255, 255, 0.25) !important;
-        color: #ffffff !important;
-      }
-
-      .cipher-item.is-selected .match-badge {
-        background: rgba(255, 255, 255, 0.25) !important;
-        border-color: rgba(255, 255, 255, 0.5) !important;
-        color: #ffffff !important;
+      body.theme-light .cipher-item.is-selected .item-username {
+        color: #1d4ed8 !important;
         font-weight: 600 !important;
-        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
       }
 
-      .cipher-item.is-selected .item-sequence {
-        background: rgba(0, 0, 0, 0.32) !important;
-        border-color: rgba(255, 255, 255, 0.4) !important;
+      body.theme-light .cipher-item.is-selected .item-icon-box {
+        background: #dbeafe !important;
+        color: #1d4ed8 !important;
+      }
+
+      body.theme-light .cipher-item.is-selected .match-badge.badge-proc {
+        background: #dcfce7 !important;
+        border-color: #86efac !important;
+        color: #14532d !important;
+        text-shadow: none !important;
+      }
+
+      body.theme-light .cipher-item.is-selected .match-badge.badge-title {
+        background: #f3e8ff !important;
+        border-color: #d8b4fe !important;
+        color: #581c87 !important;
+        text-shadow: none !important;
+      }
+
+      body.theme-light .cipher-item.is-selected .item-sequence {
+        background: #e2e8f0 !important;
+        border-color: #cbd5e1 !important;
+        color: #0f172a !important;
+        text-shadow: none !important;
+        font-weight: 600 !important;
+      }
+
+      body.theme-dark .cipher-item.is-selected {
+        background-color: rgba(37, 99, 235, 0.28) !important;
+        border-color: #3b82f6 !important;
+        box-shadow:
+          inset 3.5px 0 0 #60a5fa,
+          0 6px 18px rgba(0, 0, 0, 0.4) !important;
+      }
+
+      body.theme-dark .cipher-item.is-selected .item-name {
         color: #ffffff !important;
-        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        font-weight: 700 !important;
+      }
+
+      body.theme-dark .cipher-item.is-selected .item-username {
+        color: #93c5fd !important;
+      }
+
+      body.theme-dark .cipher-item.is-selected .item-icon-box {
+        background: rgba(59, 130, 246, 0.35) !important;
+        color: #60a5fa !important;
+      }
+
+      body.theme-dark .cipher-item.is-selected .match-badge.badge-proc {
+        background: rgba(16, 185, 129, 0.25) !important;
+        border-color: rgba(16, 185, 129, 0.5) !important;
+        color: #34d399 !important;
+      }
+
+      body.theme-dark .cipher-item.is-selected .match-badge.badge-title {
+        background: rgba(168, 85, 247, 0.25) !important;
+        border-color: rgba(168, 85, 247, 0.5) !important;
+        color: #c084fc !important;
+      }
+
+      body.theme-dark .cipher-item.is-selected .item-sequence {
+        background: rgba(15, 23, 42, 0.75) !important;
+        border-color: rgba(148, 163, 184, 0.3) !important;
+        color: #e2e8f0 !important;
         font-weight: 600 !important;
       }
 
@@ -745,43 +798,85 @@
         color: #1d4ed8;
       }
 
-      /* When row is selected (.is-selected) */
-      .cipher-item.is-selected .btn-primary-autotype {
-        background: rgba(255, 255, 255, 0.28) !important;
-        border-color: rgba(255, 255, 255, 0.5) !important;
+      /* When row is selected (.is-selected) - Light Theme */
+      body.theme-light .cipher-item.is-selected .btn-primary-autotype {
+        background: #2563eb !important;
+        border-color: #1d4ed8 !important;
+        color: #ffffff !important;
+        box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3) !important;
+      }
+
+      body.theme-light .cipher-item.is-selected .btn-primary-autotype:hover {
+        background: #1d4ed8 !important;
+        border-color: #1e40af !important;
         color: #ffffff !important;
       }
 
-      .cipher-item.is-selected .btn-primary-autotype:hover {
+      body.theme-light .cipher-item.is-selected .action-segmented-group {
         background: #ffffff !important;
-        border-color: #ffffff !important;
+        border-color: #cbd5e1 !important;
+      }
+
+      body.theme-light .cipher-item.is-selected .action-segmented-group .action-btn {
+        background: transparent !important;
+        border-right-color: #e2e8f0 !important;
+        color: #334155 !important;
+      }
+
+      body.theme-light .cipher-item.is-selected .action-segmented-group .action-btn:hover {
+        background: #eff6ff !important;
         color: #2563eb !important;
       }
 
-      .cipher-item.is-selected .action-segmented-group {
-        background: rgba(255, 255, 255, 0.16) !important;
-        border-color: rgba(255, 255, 255, 0.35) !important;
+      body.theme-light .cipher-item.is-selected .btn-edit {
+        background: #ffffff !important;
+        border-color: #cbd5e1 !important;
+        color: #334155 !important;
       }
 
-      .cipher-item.is-selected .action-segmented-group .action-btn {
+      body.theme-light .cipher-item.is-selected .btn-edit:hover {
+        background: #eff6ff !important;
+        color: #2563eb !important;
+      }
+
+      /* When row is selected (.is-selected) - Dark Theme */
+      body.theme-dark .cipher-item.is-selected .btn-primary-autotype {
+        background: #2563eb !important;
+        border-color: #3b82f6 !important;
+        color: #ffffff !important;
+        box-shadow: 0 2px 8px rgba(37, 99, 235, 0.45) !important;
+      }
+
+      body.theme-dark .cipher-item.is-selected .btn-primary-autotype:hover {
+        background: #3b82f6 !important;
+        border-color: #60a5fa !important;
+        color: #ffffff !important;
+      }
+
+      body.theme-dark .cipher-item.is-selected .action-segmented-group {
+        background: rgba(15, 23, 42, 0.6) !important;
+        border-color: rgba(255, 255, 255, 0.2) !important;
+      }
+
+      body.theme-dark .cipher-item.is-selected .action-segmented-group .action-btn {
         background: transparent !important;
-        border-right-color: rgba(255, 255, 255, 0.25) !important;
+        border-right-color: rgba(255, 255, 255, 0.12) !important;
+        color: #cbd5e1 !important;
+      }
+
+      body.theme-dark .cipher-item.is-selected .action-segmented-group .action-btn:hover {
+        background: rgba(255, 255, 255, 0.15) !important;
         color: #ffffff !important;
       }
 
-      .cipher-item.is-selected .action-segmented-group .action-btn:hover {
-        background: rgba(255, 255, 255, 0.32) !important;
-        color: #ffffff !important;
+      body.theme-dark .cipher-item.is-selected .btn-edit {
+        background: rgba(15, 23, 42, 0.6) !important;
+        border-color: rgba(255, 255, 255, 0.2) !important;
+        color: #cbd5e1 !important;
       }
 
-      .cipher-item.is-selected .btn-edit {
-        background: rgba(255, 255, 255, 0.16) !important;
-        border-color: rgba(255, 255, 255, 0.35) !important;
-        color: #ffffff !important;
-      }
-
-      .cipher-item.is-selected .btn-edit:hover {
-        background: rgba(255, 255, 255, 0.32) !important;
+      body.theme-dark .cipher-item.is-selected .btn-edit:hover {
+        background: rgba(255, 255, 255, 0.15) !important;
         color: #ffffff !important;
       }
 

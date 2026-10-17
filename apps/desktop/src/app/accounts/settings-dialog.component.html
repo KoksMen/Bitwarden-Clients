@@ -107,303 +107,492 @@
       </bit-tab>
 
       <bit-tab [label]="'appPreferences' | i18n">
-        <bit-form-control>
-          <input
-            type="checkbox"
-            bitCheckbox
-            formControlName="runInBackground"
-            (change)="saveRunInBackground()"
-          />
-          <bit-label>{{ runInBackgroundText }}</bit-label>
-          <bit-hint>{{ runInBackgroundDescText }}</bit-hint>
-        </bit-form-control>
-
-        @if (showOpenAtLoginOption) {
-          <bit-form-control>
-            <input
-              type="checkbox"
-              bitCheckbox
-              formControlName="openAtLogin"
-              (change)="saveOpenAtLogin()"
-            />
-            <bit-label>{{ "openAtLogin" | i18n }}</bit-label>
-            <bit-hint>{{ "openAtLoginDesc" | i18n }}</bit-hint>
-          </bit-form-control>
-        }
-
-        @if (showEnableAutotype()) {
+        <div class="fluent-settings-container tw-flex tw-flex-col tw-gap-4 tw-py-2">
+          <!-- 1. SYSTEM & STARTUP CARD -->
           <div
-            class="fluent-autotype-card tw-mb-4 tw-rounded-2xl tw-border tw-border-solid tw-border-slate-200 dark:tw-border-slate-700 tw-p-4 tw-bg-white dark:tw-bg-slate-800/80 tw-shadow-sm"
+            class="fluent-card tw-rounded-2xl tw-border tw-border-solid tw-border-slate-200 dark:tw-border-slate-700 tw-p-4 tw-bg-white dark:tw-bg-slate-800/80 tw-shadow-sm"
           >
             <div
-              class="tw-flex tw-items-center tw-justify-between tw-pb-3 tw-border-b tw-border-slate-100 dark:tw-border-slate-700/60"
+              class="tw-flex tw-items-center tw-gap-3 tw-pb-3 tw-border-b tw-border-slate-100 dark:tw-border-slate-700/60"
             >
-              <div class="tw-flex tw-items-center tw-gap-3">
-                <div
-                  class="tw-w-9 tw-h-9 tw-rounded-xl tw-bg-blue-50 dark:tw-bg-blue-900/40 tw-flex tw-items-center tw-justify-center tw-text-blue-600 dark:tw-text-blue-400 tw-text-lg"
-                >
-                  <i class="bwi bwi-desktop" aria-hidden="true"></i>
-                </div>
-                <div>
-                  <div class="tw-flex tw-items-center tw-gap-2">
-                    <span class="tw-text-sm tw-font-bold tw-text-slate-900 dark:tw-text-slate-100"
-                      >Автонабор и быстрый ввод (AutoType)</span
-                    >
-                    <span
-                      class="tw-text-[10px] tw-font-semibold tw-px-2 tw-py-0.5 tw-rounded-full tw-bg-emerald-50 dark:tw-bg-emerald-900/40 tw-text-emerald-700 dark:tw-text-emerald-400 tw-border tw-border-emerald-200 dark:tw-border-emerald-800"
-                      >KeePassXC Engine</span
-                    >
-                  </div>
-                  <div class="tw-text-xs tw-text-slate-500 dark:tw-text-slate-400">
-                    Автоматический ввод учетных данных в сторонние приложения Windows
-                  </div>
-                </div>
+              <div
+                class="tw-w-9 tw-h-9 tw-rounded-xl tw-bg-blue-50 dark:tw-bg-blue-900/40 tw-flex tw-items-center tw-justify-center tw-text-blue-600 dark:tw-text-blue-400 tw-text-lg"
+              >
+                <i class="bwi bwi-desktop" aria-hidden="true"></i>
               </div>
-
-              <div class="tw-flex tw-items-center">
-                <input
-                  type="checkbox"
-                  bitCheckbox
-                  formControlName="enableAutotype"
-                  (change)="saveEnableAutotype()"
-                />
+              <div>
+                <div class="tw-text-sm tw-font-bold tw-text-slate-900 dark:tw-text-slate-100">
+                  Система и фоновый режим
+                </div>
+                <div class="tw-text-xs tw-text-slate-500 dark:tw-text-slate-400">
+                  Управление поведением Bitwarden при старте и сворачивании
+                </div>
               </div>
             </div>
 
-            @if (form.value.enableAutotype) {
-              <div class="tw-mt-4 tw-flex tw-flex-col tw-gap-3">
-                <!-- Direct autotype shortcut row -->
+            <div class="tw-divide-y tw-divide-slate-100 dark:tw-divide-slate-700/50">
+              @if (showOpenAtLoginOption) {
                 <div
-                  class="tw-flex tw-items-center tw-justify-between tw-p-2.5 tw-rounded-xl tw-bg-slate-50 dark:tw-bg-slate-900/50 tw-border tw-border-slate-200/60 dark:tw-border-slate-700/50"
+                  class="fluent-setting-row tw-py-3 tw-flex tw-items-center tw-justify-between tw-gap-4"
                 >
-                  <div class="tw-flex tw-flex-col">
+                  <div class="fluent-setting-info tw-flex tw-flex-col">
                     <span
                       class="tw-text-xs tw-font-semibold tw-text-slate-800 dark:tw-text-slate-200"
-                      >{{ "enableAutotypeShortcutPreview" | i18n }}</span
                     >
-                    <span class="tw-text-[11px] tw-text-slate-500 dark:tw-text-slate-400">{{
-                      "enableAutotypeShortcutDescription" | i18n
-                    }}</span>
+                      {{ "openAtLogin" | i18n }}
+                    </span>
+                    <span class="tw-text-[11px] tw-text-slate-500 dark:tw-text-slate-400">
+                      {{ "openAtLoginDesc" | i18n }}
+                    </span>
                   </div>
-                  <div class="tw-flex tw-items-center tw-gap-2.5">
-                    <kbd class="fluent-kbd">{{ form.value.autotypeShortcut }}</kbd>
-                    <a
-                      class="tw-cursor-pointer tw-text-xs tw-font-medium tw-text-blue-600 hover:tw-text-blue-700 dark:tw-text-blue-400"
-                      bitLink
-                      tabindex="0"
-                      (click)="saveAutotypeShortcut(); $event.preventDefault()"
-                      (keydown.enter)="saveAutotypeShortcut(); $event.preventDefault()"
-                    >
-                      {{ "editShortcut" | i18n }}
-                    </a>
+                  <div class="fluent-setting-control">
+                    <input
+                      type="checkbox"
+                      bitCheckbox
+                      formControlName="openAtLogin"
+                      (change)="saveOpenAtLogin()"
+                    />
                   </div>
                 </div>
+              }
 
-                <!-- Spotlight shortcut row -->
-                <div
-                  class="tw-flex tw-items-center tw-justify-between tw-p-2.5 tw-rounded-xl tw-bg-slate-50 dark:tw-bg-slate-900/50 tw-border tw-border-slate-200/60 dark:tw-border-slate-700/50"
-                >
-                  <div class="tw-flex tw-flex-col">
-                    <span
-                      class="tw-text-xs tw-font-semibold tw-text-slate-800 dark:tw-text-slate-200"
-                      >Глобальный поиск AutoType (Spotlight):</span
-                    >
-                    <span class="tw-text-[11px] tw-text-slate-500 dark:tw-text-slate-400"
-                      >Открывает спотлайт-поиск AutoType в любое активное окно</span
-                    >
-                  </div>
-                  <div class="tw-flex tw-items-center tw-gap-2.5">
-                    <kbd class="fluent-kbd">{{ form.value.autotypeGlobalShortcut }}</kbd>
-                    <a
-                      class="tw-cursor-pointer tw-text-xs tw-font-medium tw-text-blue-600 hover:tw-text-blue-700 dark:tw-text-blue-400"
-                      bitLink
-                      tabindex="0"
-                      (click)="saveAutotypeGlobalShortcut(); $event.preventDefault()"
-                      (keydown.enter)="saveAutotypeGlobalShortcut(); $event.preventDefault()"
-                    >
-                      {{ "editShortcut" | i18n }}
-                    </a>
-                  </div>
+              <div
+                class="fluent-setting-row tw-py-3 tw-flex tw-items-center tw-justify-between tw-gap-4"
+              >
+                <div class="fluent-setting-info tw-flex tw-flex-col">
+                  <span
+                    class="tw-text-xs tw-font-semibold tw-text-slate-800 dark:tw-text-slate-200"
+                  >
+                    {{ runInBackgroundText }}
+                  </span>
+                  <span class="tw-text-[11px] tw-text-slate-500 dark:tw-text-slate-400">
+                    {{ runInBackgroundDescText }}
+                  </span>
                 </div>
-
-                <!-- Picker position row -->
-                <div
-                  class="tw-p-2.5 tw-rounded-xl tw-bg-slate-50 dark:tw-bg-slate-900/50 tw-border tw-border-slate-200/60 dark:tw-border-slate-700/50"
-                >
-                  <bit-form-field disableMargin>
-                    <bit-label class="!tw-text-xs !tw-font-semibold"
-                      >Позиция всплывающего селектора</bit-label
-                    >
-                    <bit-select
-                      formControlName="autotypePickerPosition"
-                      [items]="autotypePickerPositionOptions"
-                    ></bit-select>
-                  </bit-form-field>
-                </div>
-
-                <!-- TCATO Row -->
-                <div
-                  class="tw-p-3 tw-rounded-xl tw-bg-slate-50 dark:tw-bg-slate-900/50 tw-border tw-border-slate-200/60 dark:tw-border-slate-700/50"
-                >
-                  <bit-form-control>
-                    <input type="checkbox" bitCheckbox formControlName="autotypeTcatoEnabled" />
-                    <bit-label class="!tw-font-semibold">
-                      <span class="tw-flex tw-items-center tw-gap-1.5">
-                        <i
-                          class="bwi bwi-shield tw-text-emerald-600 dark:tw-text-emerald-400"
-                          aria-hidden="true"
-                        ></i>
-                        Защита от кейлоггеров (Two-Channel Auto-Type Obfuscation)
-                      </span>
-                    </bit-label>
-                    <bit-hint>
-                      Разделяет ввод учетных данных между имитацией аппаратных скан-кодов и буфером
-                      обмена (TCATO) с мгновенной автоматической очисткой памяти.
-                    </bit-hint>
-                  </bit-form-control>
+                <div class="fluent-setting-control">
+                  <input
+                    type="checkbox"
+                    bitCheckbox
+                    formControlName="runInBackground"
+                    (change)="saveRunInBackground()"
+                  />
                 </div>
               </div>
-            }
+
+              <div
+                class="fluent-setting-row tw-py-3 tw-flex tw-items-center tw-justify-between tw-gap-4"
+              >
+                <div class="fluent-setting-info tw-flex tw-flex-col">
+                  <span
+                    class="tw-text-xs tw-font-semibold tw-text-slate-800 dark:tw-text-slate-200"
+                  >
+                    {{ "enableHardwareAcceleration" | i18n }}
+                  </span>
+                  <span class="tw-text-[11px] tw-text-slate-500 dark:tw-text-slate-400">
+                    {{ "enableHardwareAccelerationDesc" | i18n }}
+                  </span>
+                </div>
+                <div class="fluent-setting-control">
+                  <input
+                    type="checkbox"
+                    bitCheckbox
+                    formControlName="enableHardwareAcceleration"
+                    (change)="saveHardwareAcceleration()"
+                  />
+                </div>
+              </div>
+            </div>
           </div>
-        }
 
-        @if (showEnableAutotypeGa()) {
-          <bit-form-control>
-            <input
-              type="checkbox"
-              bitCheckbox
-              formControlName="enableAutotypeGa"
-              (change)="saveEnableAutotypeGa()"
-            />
-            <bit-label>
-              <span class="tw-flex tw-items-center tw-gap-2">
-                {{ "enableAutotypeGaShortcut" | i18n }}
-                <code>{{ form.value.autotypeGaShortcut }}</code>
-              </span>
-            </bit-label>
-            @if (form.value.enableAutotypeGa) {
-              <bit-hint>
-                <b>{{ "important" | i18n }}</b>
-                {{ "enableAutotypeShortcutDescription" | i18n }}
-                <a
-                  class="tw-cursor-pointer"
-                  bitLink
-                  tabindex="0"
-                  (click)="saveAutotypeGaShortcut(); $event.preventDefault()"
-                  (keydown.enter)="saveAutotypeGaShortcut(); $event.preventDefault()"
-                >
-                  {{ "editShortcut" | i18n }}
-                </a>
-              </bit-hint>
-            }
-          </bit-form-control>
-        }
-
-        <bit-form-control>
-          <input
-            type="checkbox"
-            bitCheckbox
-            formControlName="enableHardwareAcceleration"
-            (change)="saveHardwareAcceleration()"
-          />
-          <bit-label>{{ "enableHardwareAcceleration" | i18n }}</bit-label>
-          <bit-hint>{{ "enableHardwareAccelerationDesc" | i18n }}</bit-hint>
-        </bit-form-control>
-
-        <bit-form-control>
-          <input
-            type="checkbox"
-            bitCheckbox
-            formControlName="enableSshAgent"
-            (change)="saveSshAgent()"
-          />
-          <bit-label>{{ "enableSshAgent" | i18n }}</bit-label>
-          <bit-hint>{{ "enableSshAgentDesc" | i18n }}</bit-hint>
-        </bit-form-control>
-
-        @if (form.value.enableSshAgent) {
-          <bit-form-field>
-            <bit-label>{{ "sshAgentPromptBehavior" | i18n }}</bit-label>
-            <bit-select
-              formControlName="sshAgentPromptBehavior"
-              [items]="sshAgentPromptBehaviorOptions"
-            />
-            <bit-hint>{{ "sshAgentPromptBehaviorDesc" | i18n }}</bit-hint>
-          </bit-form-field>
-        }
-
-        @if (!isLinux) {
-          <bit-form-control>
-            <input
-              type="checkbox"
-              bitCheckbox
-              formControlName="allowScreenshots"
-              (change)="savePreventScreenshots()"
-            />
-            <bit-label>{{ "allowScreenshots" | i18n }}</bit-label>
-            <bit-hint>{{ "allowScreenshotsDesc" | i18n }}</bit-hint>
-          </bit-form-control>
-        }
-
-        @if (showDuckDuckGoIntegrationOption) {
-          <bit-form-control>
-            <input
-              type="checkbox"
-              bitCheckbox
-              formControlName="enableDuckDuckGoBrowserIntegration"
-              (change)="saveDdgBrowserIntegration()"
-            />
-            <bit-label>{{ "enableDuckDuckGoBrowserIntegration" | i18n }}</bit-label>
-            <bit-hint>{{ "enableDuckDuckGoBrowserIntegrationDesc" | i18n }}</bit-hint>
-          </bit-form-control>
-        }
-
-        <bit-form-control>
-          <input
-            type="checkbox"
-            bitCheckbox
-            formControlName="showQuickCopyActions"
-            (change)="saveQuickCopyActions()"
-          />
-          <bit-label>
-            {{ "showQuickCopyActionsInVault" | i18n }}
-            <show-quick-copy-actions-details-popover slot="end" />
-          </bit-label>
-        </bit-form-control>
-
-        <bit-form-field>
-          <bit-label>{{ "theme" | i18n }}</bit-label>
-          <bit-select formControlName="theme" [items]="themeOptions" />
-          <bit-hint>{{ "themeDesc" | i18n }}</bit-hint>
-        </bit-form-field>
-
-        <bit-form-field>
-          <bit-label>{{ "language" | i18n }}</bit-label>
-          <bit-select formControlName="locale" [items]="localeOptions" />
-          <bit-hint>{{ "languageDesc" | i18n }}</bit-hint>
-        </bit-form-field>
-
-        @if (showPasskeyProviderSetting()) {
-          <bit-item>
-            <button
-              type="button"
-              bit-item-content
-              [truncate]="false"
-              (click)="managePasskeyProvider()"
+          <!-- 2. AUTOTYPE MASTER SUITE CARD -->
+          @if (showEnableAutotype()) {
+            <div
+              class="fluent-card fluent-autotype-card tw-rounded-2xl tw-border tw-border-solid tw-border-slate-200 dark:tw-border-slate-700 tw-p-4 tw-bg-white dark:tw-bg-slate-800/80 tw-shadow-sm"
             >
-              {{ "passkeyProvider" | i18n }}
-              <span slot="secondary">{{ "passkeyProviderDesc" | i18n }}</span>
-              <span slot="end" class="tw-flex tw-items-center tw-gap-2">
-                @if (passkeyProviderState()?.enabled) {
-                  <span bitBadge variant="success">{{ "turnedOn" | i18n }}</span>
-                } @else {
-                  <span bitBadge variant="subtle">{{ "turnedOff" | i18n }}</span>
+              <div
+                class="tw-flex tw-items-center tw-justify-between tw-pb-3 tw-border-b tw-border-slate-100 dark:tw-border-slate-700/60"
+              >
+                <div class="tw-flex tw-items-center tw-gap-3">
+                  <div
+                    class="tw-w-9 tw-h-9 tw-rounded-xl tw-bg-indigo-50 dark:tw-bg-indigo-900/40 tw-flex tw-items-center tw-justify-center tw-text-indigo-600 dark:tw-text-indigo-400 tw-text-lg"
+                  >
+                    <i class="bwi bwi-terminal" aria-hidden="true"></i>
+                  </div>
+                  <div>
+                    <div class="tw-flex tw-items-center tw-gap-2">
+                      <span
+                        class="tw-text-sm tw-font-bold tw-text-slate-900 dark:tw-text-slate-100"
+                      >
+                        Автонабор и быстрый ввод (AutoType)
+                      </span>
+                      <span
+                        class="tw-text-[10px] tw-font-semibold tw-px-2 tw-py-0.5 tw-rounded-full tw-bg-emerald-50 dark:tw-bg-emerald-900/40 tw-text-emerald-700 dark:tw-text-emerald-400 tw-border tw-border-emerald-200 dark:tw-border-emerald-800"
+                      >
+                        KeePassXC Engine
+                      </span>
+                    </div>
+                    <div class="tw-text-xs tw-text-slate-500 dark:tw-text-slate-400">
+                      Автоматический ввод учетных данных в сторонние приложения Windows
+                    </div>
+                  </div>
+                </div>
+
+                <div class="tw-flex tw-items-center">
+                  <input
+                    type="checkbox"
+                    bitCheckbox
+                    formControlName="enableAutotype"
+                    (change)="saveEnableAutotype()"
+                  />
+                </div>
+              </div>
+
+              @if (form.value.enableAutotype) {
+                <div class="tw-mt-4 tw-flex tw-flex-col tw-gap-3">
+                  <!-- Direct autotype shortcut row -->
+                  <div
+                    class="tw-flex tw-items-center tw-justify-between tw-p-2.5 tw-rounded-xl tw-bg-slate-50 dark:tw-bg-slate-900/50 tw-border tw-border-slate-200/60 dark:tw-border-slate-700/50"
+                  >
+                    <div class="tw-flex tw-flex-col">
+                      <span
+                        class="tw-text-xs tw-font-semibold tw-text-slate-800 dark:tw-text-slate-200"
+                      >
+                        {{ "enableAutotypeShortcutPreview" | i18n }}
+                      </span>
+                      <span class="tw-text-[11px] tw-text-slate-500 dark:tw-text-slate-400">
+                        {{ "enableAutotypeShortcutDescription" | i18n }}
+                      </span>
+                    </div>
+                    <div class="tw-flex tw-items-center tw-gap-2.5">
+                      <kbd class="fluent-kbd">{{ form.value.autotypeShortcut }}</kbd>
+                      <a
+                        class="tw-cursor-pointer tw-text-xs tw-font-medium tw-text-blue-600 hover:tw-text-blue-700 dark:tw-text-blue-400"
+                        bitLink
+                        tabindex="0"
+                        (click)="saveAutotypeShortcut(); $event.preventDefault()"
+                        (keydown.enter)="saveAutotypeShortcut(); $event.preventDefault()"
+                      >
+                        {{ "editShortcut" | i18n }}
+                      </a>
+                    </div>
+                  </div>
+
+                  <!-- Spotlight shortcut row -->
+                  <div
+                    class="tw-flex tw-items-center tw-justify-between tw-p-2.5 tw-rounded-xl tw-bg-slate-50 dark:tw-bg-slate-900/50 tw-border tw-border-slate-200/60 dark:tw-border-slate-700/50"
+                  >
+                    <div class="tw-flex tw-flex-col">
+                      <span
+                        class="tw-text-xs tw-font-semibold tw-text-slate-800 dark:tw-text-slate-200"
+                      >
+                        Глобальный поиск AutoType (Spotlight):
+                      </span>
+                      <span class="tw-text-[11px] tw-text-slate-500 dark:tw-text-slate-400">
+                        Открывает спотлайт-поиск AutoType в любое активное окно
+                      </span>
+                    </div>
+                    <div class="tw-flex tw-items-center tw-gap-2.5">
+                      <kbd class="fluent-kbd">{{ form.value.autotypeGlobalShortcut }}</kbd>
+                      <a
+                        class="tw-cursor-pointer tw-text-xs tw-font-medium tw-text-blue-600 hover:tw-text-blue-700 dark:tw-text-blue-400"
+                        bitLink
+                        tabindex="0"
+                        (click)="saveAutotypeGlobalShortcut(); $event.preventDefault()"
+                        (keydown.enter)="saveAutotypeGlobalShortcut(); $event.preventDefault()"
+                      >
+                        {{ "editShortcut" | i18n }}
+                      </a>
+                    </div>
+                  </div>
+
+                  <!-- Picker position row -->
+                  <div
+                    class="tw-p-2.5 tw-rounded-xl tw-bg-slate-50 dark:tw-bg-slate-900/50 tw-border tw-border-slate-200/60 dark:tw-border-slate-700/50"
+                  >
+                    <bit-form-field disableMargin>
+                      <bit-label class="!tw-text-xs !tw-font-semibold"
+                        >Позиция всплывающего селектора</bit-label
+                      >
+                      <bit-select
+                        formControlName="autotypePickerPosition"
+                        [items]="autotypePickerPositionOptions"
+                      ></bit-select>
+                    </bit-form-field>
+                  </div>
+
+                  <!-- TCATO Row -->
+                  <div
+                    class="tw-p-3 tw-rounded-xl tw-bg-slate-50 dark:tw-bg-slate-900/50 tw-border tw-border-slate-200/60 dark:tw-border-slate-700/50"
+                  >
+                    <bit-form-control>
+                      <input type="checkbox" bitCheckbox formControlName="autotypeTcatoEnabled" />
+                      <bit-label class="!tw-font-semibold">
+                        <span class="tw-flex tw-items-center tw-gap-1.5">
+                          <i
+                            class="bwi bwi-shield tw-text-emerald-600 dark:tw-text-emerald-400"
+                            aria-hidden="true"
+                          ></i>
+                          Защита от кейлоггеров (Two-Channel Auto-Type Obfuscation)
+                        </span>
+                      </bit-label>
+                      <bit-hint>
+                        Разделяет ввод учетных данных между имитацией аппаратных скан-кодов и
+                        буфером обмена (TCATO) с мгновенной автоматической очисткой памяти.
+                      </bit-hint>
+                    </bit-form-control>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+
+          @if (showEnableAutotypeGa()) {
+            <div
+              class="fluent-card tw-rounded-2xl tw-border tw-border-solid tw-border-slate-200 dark:tw-border-slate-700 tw-p-4 tw-bg-white dark:tw-bg-slate-800/80 tw-shadow-sm"
+            >
+              <bit-form-control>
+                <input
+                  type="checkbox"
+                  bitCheckbox
+                  formControlName="enableAutotypeGa"
+                  (change)="saveEnableAutotypeGa()"
+                />
+                <bit-label>
+                  <span class="tw-flex tw-items-center tw-gap-2">
+                    {{ "enableAutotypeGaShortcut" | i18n }}
+                    <code>{{ form.value.autotypeGaShortcut }}</code>
+                  </span>
+                </bit-label>
+                @if (form.value.enableAutotypeGa) {
+                  <bit-hint>
+                    <b>{{ "important" | i18n }}</b>
+                    {{ "enableAutotypeShortcutDescription" | i18n }}
+                    <a
+                      class="tw-cursor-pointer"
+                      bitLink
+                      tabindex="0"
+                      (click)="saveAutotypeGaShortcut(); $event.preventDefault()"
+                      (keydown.enter)="saveAutotypeGaShortcut(); $event.preventDefault()"
+                    >
+                      {{ "editShortcut" | i18n }}
+                    </a>
+                  </bit-hint>
                 }
-                <bit-icon name="bwi-external-link" />
-              </span>
-            </button>
-          </bit-item>
-        }
+              </bit-form-control>
+            </div>
+          }
+
+          <!-- 3. SECURITY & INTEGRATIONS CARD -->
+          <div
+            class="fluent-card tw-rounded-2xl tw-border tw-border-solid tw-border-slate-200 dark:tw-border-slate-700 tw-p-4 tw-bg-white dark:tw-bg-slate-800/80 tw-shadow-sm"
+          >
+            <div
+              class="tw-flex tw-items-center tw-gap-3 tw-pb-3 tw-border-b tw-border-slate-100 dark:tw-border-slate-700/60"
+            >
+              <div
+                class="tw-w-9 tw-h-9 tw-rounded-xl tw-bg-emerald-50 dark:tw-bg-emerald-900/40 tw-flex tw-items-center tw-justify-center tw-text-emerald-600 dark:tw-text-emerald-400 tw-text-lg"
+              >
+                <i class="bwi bwi-shield" aria-hidden="true"></i>
+              </div>
+              <div>
+                <div class="tw-text-sm tw-font-bold tw-text-slate-900 dark:tw-text-slate-100">
+                  Безопасность и интеграции
+                </div>
+                <div class="tw-text-xs tw-text-slate-500 dark:tw-text-slate-400">
+                  Защита рабочего пространства, интеграция со службами и буфером обмена
+                </div>
+              </div>
+            </div>
+
+            <div class="tw-divide-y tw-divide-slate-100 dark:tw-divide-slate-700/50">
+              <!-- SSH Agent -->
+              <div class="fluent-setting-row tw-py-3 tw-flex tw-flex-col tw-gap-2">
+                <div class="tw-flex tw-items-center tw-justify-between tw-gap-4">
+                  <div class="fluent-setting-info tw-flex tw-flex-col">
+                    <span
+                      class="tw-text-xs tw-font-semibold tw-text-slate-800 dark:tw-text-slate-200"
+                    >
+                      {{ "enableSshAgent" | i18n }}
+                    </span>
+                    <span class="tw-text-[11px] tw-text-slate-500 dark:tw-text-slate-400">
+                      {{ "enableSshAgentDesc" | i18n }}
+                    </span>
+                  </div>
+                  <div class="fluent-setting-control">
+                    <input
+                      type="checkbox"
+                      bitCheckbox
+                      formControlName="enableSshAgent"
+                      (change)="saveSshAgent()"
+                    />
+                  </div>
+                </div>
+
+                @if (form.value.enableSshAgent) {
+                  <div
+                    class="tw-mt-2 tw-pt-2 tw-border-t tw-border-dashed tw-border-slate-200 dark:tw-border-slate-700"
+                  >
+                    <bit-form-field disableMargin>
+                      <bit-label class="!tw-text-xs">{{
+                        "sshAgentPromptBehavior" | i18n
+                      }}</bit-label>
+                      <bit-select
+                        formControlName="sshAgentPromptBehavior"
+                        [items]="sshAgentPromptBehaviorOptions"
+                      />
+                      <bit-hint>{{ "sshAgentPromptBehaviorDesc" | i18n }}</bit-hint>
+                    </bit-form-field>
+                  </div>
+                }
+              </div>
+
+              <!-- Allow Screenshots -->
+              @if (!isLinux) {
+                <div
+                  class="fluent-setting-row tw-py-3 tw-flex tw-items-center tw-justify-between tw-gap-4"
+                >
+                  <div class="fluent-setting-info tw-flex tw-flex-col">
+                    <span
+                      class="tw-text-xs tw-font-semibold tw-text-slate-800 dark:tw-text-slate-200"
+                    >
+                      {{ "allowScreenshots" | i18n }}
+                    </span>
+                    <span class="tw-text-[11px] tw-text-slate-500 dark:tw-text-slate-400">
+                      {{ "allowScreenshotsDesc" | i18n }}
+                    </span>
+                  </div>
+                  <div class="fluent-setting-control">
+                    <input
+                      type="checkbox"
+                      bitCheckbox
+                      formControlName="allowScreenshots"
+                      (change)="savePreventScreenshots()"
+                    />
+                  </div>
+                </div>
+              }
+
+              <!-- DuckDuckGo Integration -->
+              @if (showDuckDuckGoIntegrationOption) {
+                <div
+                  class="fluent-setting-row tw-py-3 tw-flex tw-items-center tw-justify-between tw-gap-4"
+                >
+                  <div class="fluent-setting-info tw-flex tw-flex-col">
+                    <span
+                      class="tw-text-xs tw-font-semibold tw-text-slate-800 dark:tw-text-slate-200"
+                    >
+                      {{ "enableDuckDuckGoBrowserIntegration" | i18n }}
+                    </span>
+                    <span class="tw-text-[11px] tw-text-slate-500 dark:tw-text-slate-400">
+                      {{ "enableDuckDuckGoBrowserIntegrationDesc" | i18n }}
+                    </span>
+                  </div>
+                  <div class="fluent-setting-control">
+                    <input
+                      type="checkbox"
+                      bitCheckbox
+                      formControlName="enableDuckDuckGoBrowserIntegration"
+                      (change)="saveDdgBrowserIntegration()"
+                    />
+                  </div>
+                </div>
+              }
+
+              <!-- Quick copy actions in vault -->
+              <div
+                class="fluent-setting-row tw-py-3 tw-flex tw-items-center tw-justify-between tw-gap-4"
+              >
+                <div class="fluent-setting-info tw-flex tw-flex-col">
+                  <span
+                    class="tw-text-xs tw-font-semibold tw-text-slate-800 dark:tw-text-slate-200 tw-flex tw-items-center tw-gap-1.5"
+                  >
+                    {{ "showQuickCopyActionsInVault" | i18n }}
+                    <show-quick-copy-actions-details-popover slot="end" />
+                  </span>
+                  <span class="tw-text-[11px] tw-text-slate-500 dark:tw-text-slate-400">
+                    Отображать быстрые кнопки копирования логина и пароля в списке записей
+                  </span>
+                </div>
+                <div class="fluent-setting-control">
+                  <input
+                    type="checkbox"
+                    bitCheckbox
+                    formControlName="showQuickCopyActions"
+                    (change)="saveQuickCopyActions()"
+                  />
+                </div>
+              </div>
+
+              <!-- Passkey Provider -->
+              @if (showPasskeyProviderSetting()) {
+                <div class="fluent-setting-row tw-py-3">
+                  <bit-item>
+                    <button
+                      type="button"
+                      bit-item-content
+                      [truncate]="false"
+                      (click)="managePasskeyProvider()"
+                    >
+                      {{ "passkeyProvider" | i18n }}
+                      <span slot="secondary">{{ "passkeyProviderDesc" | i18n }}</span>
+                      <span slot="end" class="tw-flex tw-items-center tw-gap-2">
+                        @if (passkeyProviderState()?.enabled) {
+                          <span bitBadge variant="success">{{ "turnedOn" | i18n }}</span>
+                        } @else {
+                          <span bitBadge variant="subtle">{{ "turnedOff" | i18n }}</span>
+                        }
+                        <bit-icon name="bwi-external-link" />
+                      </span>
+                    </button>
+                  </bit-item>
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- 4. APPEARANCE & LOCALIZATION CARD -->
+          <div
+            class="fluent-card tw-rounded-2xl tw-border tw-border-solid tw-border-slate-200 dark:tw-border-slate-700 tw-p-4 tw-bg-white dark:tw-bg-slate-800/80 tw-shadow-sm"
+          >
+            <div
+              class="tw-flex tw-items-center tw-gap-3 tw-pb-3 tw-border-b tw-border-slate-100 dark:tw-border-slate-700/60"
+            >
+              <div
+                class="tw-w-9 tw-h-9 tw-rounded-xl tw-bg-purple-50 dark:tw-bg-purple-900/40 tw-flex tw-items-center tw-justify-center tw-text-purple-600 dark:tw-text-purple-400 tw-text-lg"
+              >
+                <i class="bwi bwi-sun" aria-hidden="true"></i>
+              </div>
+              <div>
+                <div class="tw-text-sm tw-font-bold tw-text-slate-900 dark:tw-text-slate-100">
+                  Внешний вид и язык
+                </div>
+                <div class="tw-text-xs tw-text-slate-500 dark:tw-text-slate-400">
+                  Персонализация цветовой схемы и региональных параметров
+                </div>
+              </div>
+            </div>
+
+            <div class="tw-divide-y tw-divide-slate-100 dark:tw-divide-slate-700/50">
+              <div class="fluent-setting-row tw-py-3">
+                <bit-form-field disableMargin>
+                  <bit-label class="!tw-text-xs !tw-font-semibold">{{ "theme" | i18n }}</bit-label>
+                  <bit-select formControlName="theme" [items]="themeOptions" />
+                  <bit-hint>{{ "themeDesc" | i18n }}</bit-hint>
+                </bit-form-field>
+              </div>
+
+              <div class="fluent-setting-row tw-py-3">
+                <bit-form-field disableMargin>
+                  <bit-label class="!tw-text-xs !tw-font-semibold">{{
+                    "language" | i18n
+                  }}</bit-label>
+                  <bit-select formControlName="locale" [items]="localeOptions" />
+                  <bit-hint>{{ "languageDesc" | i18n }}</bit-hint>
+                </bit-form-field>
+              </div>
+            </div>
+          </div>
+        </div>
       </bit-tab>
     </bit-tab-group>
   </ng-container>
