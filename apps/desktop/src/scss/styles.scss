@@ -401,6 +401,20 @@ app-side-nav {
   .fluent-setting-row {
     transition: background-color 0.12s ease;
   }
+
+  .fluent-setting-control {
+    bit-form-field {
+      margin-bottom: 0 !important;
+    }
+
+    bit-select {
+      button {
+        border-radius: 8px !important;
+        font-size: 12px !important;
+        min-height: 32px !important;
+      }
+    }
+  }
 }
 
 .fluent-kbd {

@@ -307,17 +307,26 @@
 
                   <!-- Picker position row -->
                   <div
-                    class="tw-p-2.5 tw-rounded-xl tw-bg-slate-50 dark:tw-bg-slate-900/50 tw-border tw-border-slate-200/60 dark:tw-border-slate-700/50"
+                    class="tw-flex tw-items-center tw-justify-between tw-gap-4 tw-p-2.5 tw-rounded-xl tw-bg-slate-50 dark:tw-bg-slate-900/50 tw-border tw-border-slate-200/60 dark:tw-border-slate-700/50"
                   >
-                    <bit-form-field disableMargin>
-                      <bit-label class="!tw-text-xs !tw-font-semibold"
-                        >Позиция всплывающего селектора</bit-label
+                    <div class="fluent-setting-info tw-flex tw-flex-col">
+                      <span
+                        class="tw-text-xs tw-font-semibold tw-text-slate-800 dark:tw-text-slate-200"
                       >
-                      <bit-select
-                        formControlName="autotypePickerPosition"
-                        [items]="autotypePickerPositionOptions"
-                      ></bit-select>
-                    </bit-form-field>
+                        Позиция всплывающего селектора
+                      </span>
+                      <span class="tw-text-[11px] tw-text-slate-500 dark:tw-text-slate-400">
+                        Где отображать окно выбора при вызове автонабора
+                      </span>
+                    </div>
+                    <div class="fluent-setting-control tw-w-52 tw-shrink-0">
+                      <bit-form-field disableMargin>
+                        <bit-select
+                          formControlName="autotypePickerPosition"
+                          [items]="autotypePickerPositionOptions"
+                        ></bit-select>
+                      </bit-form-field>
+                    </div>
                   </div>
 
                   <!-- TCATO Row -->
@@ -430,18 +439,26 @@
 
                 @if (form.value.enableSshAgent) {
                   <div
-                    class="tw-mt-2 tw-pt-2 tw-border-t tw-border-dashed tw-border-slate-200 dark:tw-border-slate-700"
+                    class="tw-mt-2 tw-flex tw-items-center tw-justify-between tw-gap-4 tw-p-2.5 tw-rounded-xl tw-bg-slate-50 dark:tw-bg-slate-900/50 tw-border tw-border-slate-200/60 dark:tw-border-slate-700/50"
                   >
-                    <bit-form-field disableMargin>
-                      <bit-label class="!tw-text-xs">{{
-                        "sshAgentPromptBehavior" | i18n
-                      }}</bit-label>
-                      <bit-select
-                        formControlName="sshAgentPromptBehavior"
-                        [items]="sshAgentPromptBehaviorOptions"
-                      />
-                      <bit-hint>{{ "sshAgentPromptBehaviorDesc" | i18n }}</bit-hint>
-                    </bit-form-field>
+                    <div class="fluent-setting-info tw-flex tw-flex-col">
+                      <span
+                        class="tw-text-xs tw-font-semibold tw-text-slate-800 dark:tw-text-slate-200"
+                      >
+                        {{ "sshAgentPromptBehavior" | i18n }}
+                      </span>
+                      <span class="tw-text-[11px] tw-text-slate-500 dark:tw-text-slate-400">
+                        {{ "sshAgentPromptBehaviorDesc" | i18n }}
+                      </span>
+                    </div>
+                    <div class="fluent-setting-control tw-w-52 tw-shrink-0">
+                      <bit-form-field disableMargin>
+                        <bit-select
+                          formControlName="sshAgentPromptBehavior"
+                          [items]="sshAgentPromptBehaviorOptions"
+                        />
+                      </bit-form-field>
+                    </div>
                   </div>
                 }
               </div>
@@ -573,22 +590,44 @@
             </div>
 
             <div class="tw-divide-y tw-divide-slate-100 dark:tw-divide-slate-700/50">
-              <div class="fluent-setting-row tw-py-3">
-                <bit-form-field disableMargin>
-                  <bit-label class="!tw-text-xs !tw-font-semibold">{{ "theme" | i18n }}</bit-label>
-                  <bit-select formControlName="theme" [items]="themeOptions" />
-                  <bit-hint>{{ "themeDesc" | i18n }}</bit-hint>
-                </bit-form-field>
+              <div
+                class="fluent-setting-row tw-py-3 tw-flex tw-items-center tw-justify-between tw-gap-4"
+              >
+                <div class="fluent-setting-info tw-flex tw-flex-col">
+                  <span
+                    class="tw-text-xs tw-font-semibold tw-text-slate-800 dark:tw-text-slate-200"
+                  >
+                    {{ "theme" | i18n }}
+                  </span>
+                  <span class="tw-text-[11px] tw-text-slate-500 dark:tw-text-slate-400">
+                    {{ "themeDesc" | i18n }}
+                  </span>
+                </div>
+                <div class="fluent-setting-control tw-w-52 tw-shrink-0">
+                  <bit-form-field disableMargin>
+                    <bit-select formControlName="theme" [items]="themeOptions" />
+                  </bit-form-field>
+                </div>
               </div>
 
-              <div class="fluent-setting-row tw-py-3">
-                <bit-form-field disableMargin>
-                  <bit-label class="!tw-text-xs !tw-font-semibold">{{
-                    "language" | i18n
-                  }}</bit-label>
-                  <bit-select formControlName="locale" [items]="localeOptions" />
-                  <bit-hint>{{ "languageDesc" | i18n }}</bit-hint>
-                </bit-form-field>
+              <div
+                class="fluent-setting-row tw-py-3 tw-flex tw-items-center tw-justify-between tw-gap-4"
+              >
+                <div class="fluent-setting-info tw-flex tw-flex-col">
+                  <span
+                    class="tw-text-xs tw-font-semibold tw-text-slate-800 dark:tw-text-slate-200"
+                  >
+                    {{ "language" | i18n }}
+                  </span>
+                  <span class="tw-text-[11px] tw-text-slate-500 dark:tw-text-slate-400">
+                    {{ "languageDesc" | i18n }}
+                  </span>
+                </div>
+                <div class="fluent-setting-control tw-w-52 tw-shrink-0">
+                  <bit-form-field disableMargin>
+                    <bit-select formControlName="locale" [items]="localeOptions" />
+                  </bit-form-field>
+                </div>
               </div>
             </div>
           </div>
