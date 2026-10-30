@@ -54,13 +54,13 @@ export class NavItemComponent extends NavBaseComponent {
    * Base padding for nav items (in rem)
    * This provides the initial indentation for nav items before depth-based padding
    */
-  private readonly TREE_BASE_PADDING = 2.25;
+  private readonly TREE_BASE_PADDING = 1.0;
 
   /**
    * Padding increment per tree depth level (in rem)
    * Each nested level adds this amount of padding to visually indicate hierarchy
    */
-  private readonly TREE_DEPTH_PADDING = 1.5;
+  private readonly TREE_DEPTH_PADDING = 0.75;
 
   /**
    * Forces active styles to be shown, regardless of the `routerLinkActiveOptions`

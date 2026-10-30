@@ -9,11 +9,11 @@
 <ng-template #endSlot><ng-content select="[slot=end]"></ng-content></ng-template>
 
 @if (version === "default") {
-  <div class="tw-cursor-pointer tw-px-2 tw-my-1">
+  <div class="tw-cursor-pointer" [class.tw-px-3]="open" [class.tw-px-2]="!open">
     @if (open || icon()) {
       <div
         [style.padding-inline-start]="navItemIndentationPadding()"
-        class="tw-relative tw-rounded-xl tw-h-11 tw-border tw-border-transparent hover:tw-border-blue-400/50 tw-bg-bg-nav hover:tw-bg-blue-100/60 dark:hover:tw-bg-blue-900/40 tw-transition-all"
+        class="tw-relative tw-rounded-xl tw-h-9 tw-bg-bg-nav hover:tw-bg-bg-nav-hover"
         [class]="fvwStyles()"
         [style]="
           showActiveStyles()

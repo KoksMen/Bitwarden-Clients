@@ -37,6 +37,13 @@ public sealed class TcatoService
 
         foreach (var token in request.Tokens)
         {
+            // Security: Abort sequence if target window lost foreground focus
+            if (request.Hwnd != 0 && Win32.GetForegroundWindow() != (nint)request.Hwnd)
+            {
+                ReleaseModifiers(hkl, force: true);
+                return false;
+            }
+
             switch (token.Type.ToLowerInvariant())
             {
                 case "text":
@@ -74,12 +81,12 @@ public sealed class TcatoService
         return true;
     }
 
-    private static void ReleaseModifiers(nint hkl)
+    private static void ReleaseModifiers(nint hkl, bool force = false)
     {
         var modifiers = new[] { Win32.VK_CONTROL, Win32.VK_MENU, Win32.VK_SHIFT, Win32.VK_LWIN, Win32.VK_RWIN };
         foreach (var vk in modifiers)
         {
-            if ((Win32.GetAsyncKeyState(vk) & 0x8000) != 0)
+            if (force || (Win32.GetAsyncKeyState(vk) & 0x8000) != 0)
             {
                 SendKeyUpScanCode(vk, hkl);
             }
@@ -380,16 +387,23 @@ public sealed class TcatoService
                 {
                     Win32.EmptyClipboard();
                     byte[] bytes = System.Text.Encoding.Unicode.GetBytes(text + "\0");
-                    nint hMem = Win32.GlobalAlloc(Win32.GMEM_MOVEABLE, (nuint)bytes.Length);
-                    if (hMem != 0)
+                    try
                     {
-                        nint pMem = Win32.GlobalLock(hMem);
-                        if (pMem != 0)
+                        nint hMem = Win32.GlobalAlloc(Win32.GMEM_MOVEABLE, (nuint)bytes.Length);
+                        if (hMem != 0)
                         {
-                            Marshal.Copy(bytes, 0, pMem, bytes.Length);
-                            Win32.GlobalUnlock(hMem);
-                            Win32.SetClipboardData(Win32.CF_UNICODETEXT, hMem);
+                            nint pMem = Win32.GlobalLock(hMem);
+                            if (pMem != 0)
+                            {
+                                Marshal.Copy(bytes, 0, pMem, bytes.Length);
+                                Win32.GlobalUnlock(hMem);
+                                Win32.SetClipboardData(Win32.CF_UNICODETEXT, hMem);
+                            }
                         }
+                    }
+                    finally
+                    {
+                        Array.Clear(bytes, 0, bytes.Length);
                     }
                     return;
                 }

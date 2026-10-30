@@ -5,7 +5,8 @@
   },
   "productName": "Bitwarden",
   "appId": "com.bitwarden.desktop",
-  "buildDependenciesFromSource": true,
+  "buildDependenciesFromSource": false,
+  "npmRebuild": false,
   "copyright": "Copyright © 2015-2026 Bitwarden Inc.",
   "directories": {
     "buildResources": "resources",

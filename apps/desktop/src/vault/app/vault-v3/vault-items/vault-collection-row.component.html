@@ -42,8 +42,13 @@
   </div>
 </td>
 @if (showOwner()) {
-  <td bitCell [ngClass]="RowHeightClass" class="tw-hidden @md:tw-table-cell">
+  <td
+    bitCell
+    [ngClass]="RowHeightClass"
+    class="tw-hidden tw-shrink-0 tw-items-center tw-justify-center tw-px-3 @md:tw-flex"
+  >
     <app-org-badge
+      class="tw-flex tw-items-center"
       [disabled]="disabled()"
       [organizationId]="collection().organizationId"
       [organizationName]="collection().organizationId | orgNameFromId: organizations()"
@@ -51,4 +56,4 @@
     </app-org-badge>
   </td>
 }
-<td bitCell [ngClass]="RowHeightClass" class="tw-w-40 tw-shrink-0"></td>
+<td bitCell [ngClass]="RowHeightClass" class="tw-shrink-0 tw-ps-2"></td>

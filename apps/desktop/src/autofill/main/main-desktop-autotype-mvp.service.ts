@@ -188,6 +188,20 @@ export class MainDesktopAutotypeMvpService {
           useTcato: boolean;
         },
       ) => {
+        if (
+          !data ||
+          typeof data !== "object" ||
+          typeof data.hwnd !== "number" ||
+          !Number.isInteger(data.hwnd) ||
+          !Array.isArray(data.tokens) ||
+          data.tokens.length === 0
+        ) {
+          this.logService.error(
+            "EXECUTE_SEQUENCE rejected: invalid payload structure or empty tokens.",
+          );
+          return;
+        }
+
         if (data.hwnd) {
           await this.helperService.focusWindow(data.hwnd);
           await new Promise((r) => setTimeout(r, 100));
