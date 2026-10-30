@@ -126,6 +126,10 @@
       },
       {
         "from": "resources/windows_plugin_authenticator_logo_light.stable.svg",
+        "to": "plugin_authenticator_logo.svg"
+      },
+      {
+        "from": "resources/windows_plugin_authenticator_logo_light.stable.svg",
         "to": "plugin_authenticator_logo_light.svg"
       },
       {

@@ -106,7 +106,19 @@ export class DesktopAutofillMain {
 
     ipcMain.handle(
       AutofillIpcChannelControl.GetPasskeyProviderState,
-      (): Promise<passkey_authenticator.PasskeyProviderState> => passkey_authenticator.getState(),
+      async (): Promise<passkey_authenticator.PasskeyProviderState> => {
+        if (typeof (passkey_authenticator as any)?.getState === "function") {
+          try {
+            return await (passkey_authenticator as any).getState();
+          } catch (e) {
+            this.logService.error("Failed to getState from passkey_authenticator", e);
+          }
+        }
+        return {
+          registered: this.enabled,
+          enabled: false,
+        };
+      },
     );
   }
 
