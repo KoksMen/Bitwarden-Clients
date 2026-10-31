@@ -16,7 +16,7 @@ namespace BitwardenPasskeyState
             {
                 try
                 {
-                    Process.Start(new ProcessStartInfo("ms-settings:passkeys") { UseShellExecute = true });
+                    Process.Start(new ProcessStartInfo("ms-settings:savedpasskeys") { UseShellExecute = true });
                     return 0;
                 }
                 catch (Exception ex)

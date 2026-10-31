@@ -140,7 +140,7 @@ export class DesktopAutofillMain {
         if (params.command === "openSettings") {
           try {
             // eslint-disable-next-line no-restricted-syntax
-            await shell.openExternal("ms-settings:passkeys");
+            await shell.openExternal("ms-settings:savedpasskeys");
           } catch (e) {
             this.logService.error("Failed to open passkey settings via shell:", e);
           }
