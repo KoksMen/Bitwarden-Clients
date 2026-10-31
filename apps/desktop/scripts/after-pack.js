@@ -70,6 +70,15 @@ async function doBuild(context) {
     console.log("Copied memory-protection wrapper script");
   }
 
+  if (context.electronPlatformName === "win32") {
+    const appxAssetsSource = path.join(__dirname, "../resources/appx");
+    if (fse.existsSync(appxAssetsSource)) {
+      const appxAssetsDest = path.join(context.appOutDir, "assets");
+      fse.copySync(appxAssetsSource, appxAssetsDest);
+      console.log(`Copied AppX assets from ${appxAssetsSource} to ${appxAssetsDest}`);
+    }
+  }
+
   if (isMacOsBuild) {
     if (isTargetArch) {
       console.log("[macOS] Copying extensions...");
