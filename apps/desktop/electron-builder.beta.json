@@ -146,6 +146,10 @@
         "to": "plugin_authenticator_config.json"
       },
       {
+        "from": "resources/bitwarden_passkey_state.exe",
+        "to": "bitwarden_passkey_state.exe"
+      },
+      {
         "from": "resources/windows_plugin_authenticator_logo_light.beta.svg",
         "to": "plugin_authenticator_logo.svg"
       },

@@ -1,7 +1,6 @@
 // FIXME: Update this file to be type safe and remove this and next line
 // @ts-strict-ignore
 import { spawn } from "child_process";
-import * as fs from "fs";
 import * as path from "path";
 
 import { app } from "electron";
@@ -10,27 +9,6 @@ import { DEV_ICON_FILE, isDev } from "./utils";
 
 app.setName("Bitwarden");
 if (process.platform === "win32") {
-  // If running as a packaged app or sparse package without package identity,
-  // relaunch via shell:AppsFolder so Windows grants full AppModel identity (required for Windows Hello passkeys).
-  if (app.isPackaged && !process.windowsStore && !process.argv.includes("--no-package-relaunch")) {
-    const manifestPath = path.join(path.dirname(process.execPath), "AppxManifest.xml");
-    if (fs.existsSync(manifestPath)) {
-      try {
-        const aumid = "8bitSolutionsLLC.bitwardendesktop_h4e712dmw3xyy!bitwardendesktop";
-        const args = [
-          `shell:AppsFolder\\${aumid}`,
-          "--no-package-relaunch",
-          ...process.argv.slice(1),
-        ];
-        const child = spawn("explorer.exe", args, { detached: true, stdio: "ignore" });
-        child.unref();
-        process.exit(0);
-      } catch {
-        // Fallback: proceed un-packaged if relaunch failed
-      }
-    }
-  }
-
   // Set this before the first BrowserWindow is created so Windows uses the
   // Bitwarden identity in the taskbar, jump list, notifications, and pinned shortcuts.
   if (!process.windowsStore) {

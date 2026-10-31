@@ -190,14 +190,6 @@ export class DesktopAutofillService implements OnDestroy {
 
   /** Opens the OS settings for credential providers. */
   async openCredentialProviderSettings(): Promise<void> {
-    if (process.platform === "win32") {
-      try {
-        window.open("ms-settings:passkeys");
-        return;
-      } catch {
-        // Fallback to command
-      }
-    }
     const result = await ipc.autofill.desktopAutofill.runCommand<AutofillOpenSettingsCommand>({
       namespace: "autofill",
       command: "openSettings",

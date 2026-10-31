@@ -1,4 +1,8 @@
-import { ipcMain } from "electron";
+import { execFile } from "child_process";
+import * as fs from "fs";
+import * as path from "path";
+
+import { app, ipcMain, shell } from "electron";
 
 import { LogService } from "@bitwarden/common/platform/abstractions/log.service";
 import { autofill, passkey_authenticator } from "@bitwarden/desktop-napi";
@@ -114,10 +118,41 @@ export class DesktopAutofillMain {
             this.logService.error("Failed to getState from passkey_authenticator", e);
           }
         }
+        if (process.platform === "win32") {
+          const windowsState = await this.getWindowsPasskeyState();
+          if (windowsState) {
+            return windowsState;
+          }
+        }
         return {
           registered: this.enabled,
           enabled: false,
         };
+      },
+    );
+
+    ipcMain.handle(
+      AutofillIpcChannelControl.RunCommand,
+      async <C extends AutofillCommandDefinition>(
+        _event: any,
+        params: RunCommandParams<C>,
+      ): Promise<RunCommandResult<C>> => {
+        if (params.command === "openSettings") {
+          try {
+            // eslint-disable-next-line no-restricted-syntax
+            await shell.openExternal("ms-settings:passkeys");
+          } catch (e) {
+            this.logService.error("Failed to open passkey settings via shell:", e);
+          }
+          return { type: "success", value: {} } as RunCommandResult<C>;
+        }
+        if (params.command === "requestEnable") {
+          return {
+            type: "success",
+            value: { supported: false, enabled: false },
+          } as RunCommandResult<C>;
+        }
+        return this.runCommand(params);
       },
     );
   }
@@ -142,16 +177,6 @@ export class DesktopAutofillMain {
     if (this.enabled) {
       return true;
     }
-
-    ipcMain.handle(
-      AutofillIpcChannelControl.RunCommand,
-      <C extends AutofillCommandDefinition>(
-        _event: any,
-        params: RunCommandParams<C>,
-      ): Promise<RunCommandResult<C>> => {
-        return this.runCommand(params);
-      },
-    );
 
     // Register IPC listeners and response callbacks
     const registrationCallback = this.makeListener(
@@ -349,5 +374,40 @@ export class DesktopAutofillMain {
 
       return { type: "error", error: String(e) } as RunCommandResult<C>;
     }
+  }
+
+  private async getWindowsPasskeyState(): Promise<passkey_authenticator.PasskeyProviderState | null> {
+    try {
+      const helperName = "bitwarden_passkey_state.exe";
+      const possiblePaths = [
+        path.join(process.resourcesPath ?? "", helperName),
+        path.join(process.resourcesPath ?? "", "resources", helperName),
+        path.join(app.getAppPath(), "resources", helperName),
+        path.join(app.getAppPath(), "..", "resources", helperName),
+        path.join(__dirname, "..", "..", "..", "resources", helperName),
+      ];
+      const helperPath = possiblePaths.find((p) => fs.existsSync(p));
+      if (helperPath) {
+        return await new Promise((resolve) => {
+          execFile(helperPath, ["get-state"], { timeout: 3000 }, (error, stdout) => {
+            if (error) {
+              this.logService.error("Error executing passkey state helper:", error);
+              resolve(null);
+              return;
+            }
+            try {
+              const res = JSON.parse(stdout.trim()) as passkey_authenticator.PasskeyProviderState;
+              resolve(res);
+            } catch (err) {
+              this.logService.error("Failed to parse passkey state helper output:", err);
+              resolve(null);
+            }
+          });
+        });
+      }
+    } catch (e) {
+      this.logService.error("Error in getWindowsPasskeyState:", e);
+    }
+    return null;
   }
 }
