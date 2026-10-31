@@ -173,19 +173,31 @@ export class DesktopAutofillService implements OnDestroy {
    * @returns whether the app is enabled, or `undefined` if the OS cannot prompt.
    */
   async requestEnableCredentialProvider(): Promise<boolean | undefined> {
-    const result = await ipc.autofill.desktopAutofill.runCommand<AutofillRequestEnableCommand>({
-      namespace: "autofill",
-      command: "requestEnable",
-      params: {},
-    });
-    if (result.type === "error") {
-      throw new Error(result.error);
+    try {
+      const result = await ipc.autofill.desktopAutofill.runCommand<AutofillRequestEnableCommand>({
+        namespace: "autofill",
+        command: "requestEnable",
+        params: {},
+      });
+      if (result.type === "error") {
+        return undefined;
+      }
+      return result.value.supported ? result.value.enabled : undefined;
+    } catch {
+      return undefined;
     }
-    return result.value.supported ? result.value.enabled : undefined;
   }
 
   /** Opens the OS settings for credential providers. */
   async openCredentialProviderSettings(): Promise<void> {
+    if (process.platform === "win32") {
+      try {
+        window.open("ms-settings:passkeys");
+        return;
+      } catch {
+        // Fallback to command
+      }
+    }
     const result = await ipc.autofill.desktopAutofill.runCommand<AutofillOpenSettingsCommand>({
       namespace: "autofill",
       command: "openSettings",

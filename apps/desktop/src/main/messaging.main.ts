@@ -1,5 +1,9 @@
 // FIXME: Update this file to be type safe and remove this and next line
 // @ts-strict-ignore
+import { execSync } from "child_process";
+import * as fs from "fs";
+import * as path from "path";
+
 import { app, ipcMain } from "electron";
 import { firstValueFrom } from "rxjs";
 
@@ -125,6 +129,33 @@ export class MessagingMain {
         .catch((e) => {
           this.main.logService.error("Error setting autostart", e);
         });
+    } else if (process.platform === "win32") {
+      const manifestPath = path.join(path.dirname(app.getPath("exe")), "AppxManifest.xml");
+      if (app.isPackaged && fs.existsSync(manifestPath)) {
+        try {
+          const aumid = "8bitSolutionsLLC.bitwardendesktop_h4e712dmw3xyy!bitwardendesktop";
+          if (enabled) {
+            execSync(
+              `reg add "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run" /v "com.bitwarden.desktop" /t REG_SZ /d "explorer.exe shell:AppsFolder\\${aumid} --autostart" /f`,
+              { stdio: "ignore" },
+            );
+          } else {
+            execSync(
+              `reg delete "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run" /v "com.bitwarden.desktop" /f`,
+              { stdio: "ignore" },
+            );
+          }
+          return;
+        } catch (e) {
+          this.main.logService.error("Error setting autostart in Windows registry", e);
+        }
+      }
+      const args = enabled
+        ? app.isPackaged
+          ? [AUTOSTART_FLAG]
+          : [app.getAppPath(), AUTOSTART_FLAG]
+        : [];
+      app.setLoginItemSettings({ openAtLogin: enabled, args });
     } else {
       // A packaged build can be started with the flag alone. During local development,
       // however, the registered executable is electron.exe, so Electron also needs the
