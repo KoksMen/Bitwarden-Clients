@@ -2097,6 +2097,30 @@
   "openAtLoginDesc": {
     "message": "Start the Bitwarden desktop application automatically on login."
   },
+  "startup": {
+    "message": "Startup"
+  },
+  "startMinimized": {
+    "message": "Minimize window at application startup"
+  },
+  "startMinimizedDesc": {
+    "message": "Start Bitwarden minimized to the system tray on startup."
+  },
+  "systemTray": {
+    "message": "System tray"
+  },
+  "minimizeToTray": {
+    "message": "Minimize window to system tray"
+  },
+  "minimizeToTrayDesc": {
+    "message": "When minimizing the window, hide it to the system tray instead of the taskbar."
+  },
+  "closeToTray": {
+    "message": "Close window to system tray"
+  },
+  "closeToTrayDesc": {
+    "message": "When closing the window, keep Bitwarden running in the background and hide it to the system tray."
+  },
   "language": {
     "message": "Language"
   },

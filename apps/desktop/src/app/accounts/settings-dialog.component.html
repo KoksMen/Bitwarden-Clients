@@ -107,16 +107,7 @@
       </bit-tab>
 
       <bit-tab [label]="'appPreferences' | i18n">
-        <bit-form-control>
-          <input
-            type="checkbox"
-            bitCheckbox
-            formControlName="runInBackground"
-            (change)="saveRunInBackground()"
-          />
-          <bit-label>{{ runInBackgroundText }}</bit-label>
-          <bit-hint>{{ runInBackgroundDescText }}</bit-hint>
-        </bit-form-control>
+        <h3 class="tw-text-base tw-font-semibold tw-mb-2">{{ "startup" | i18n }}</h3>
 
         @if (showOpenAtLoginOption) {
           <bit-form-control>
@@ -128,6 +119,56 @@
             />
             <bit-label>{{ "openAtLogin" | i18n }}</bit-label>
             <bit-hint>{{ "openAtLoginDesc" | i18n }}</bit-hint>
+          </bit-form-control>
+
+          @if (form.value.openAtLogin) {
+            <bit-form-control class="tw-ms-5">
+              <input
+                type="checkbox"
+                bitCheckbox
+                formControlName="startMinimized"
+                (change)="saveStartMinimized()"
+              />
+              <bit-label>{{ "startMinimized" | i18n }}</bit-label>
+              <bit-hint>{{ "startMinimizedDesc" | i18n }}</bit-hint>
+            </bit-form-control>
+          }
+        }
+
+        <h3 class="tw-text-base tw-font-semibold tw-mt-4 tw-mb-2">{{ "systemTray" | i18n }}</h3>
+
+        <bit-form-control>
+          <input
+            type="checkbox"
+            bitCheckbox
+            formControlName="runInBackground"
+            (change)="saveRunInBackground()"
+          />
+          <bit-label>{{ runInBackgroundText }}</bit-label>
+          <bit-hint>{{ runInBackgroundDescText }}</bit-hint>
+        </bit-form-control>
+
+        @if (form.value.runInBackground) {
+          <bit-form-control class="tw-ms-5">
+            <input
+              type="checkbox"
+              bitCheckbox
+              formControlName="minimizeToTray"
+              (change)="saveMinimizeToTray()"
+            />
+            <bit-label>{{ "minimizeToTray" | i18n }}</bit-label>
+            <bit-hint>{{ "minimizeToTrayDesc" | i18n }}</bit-hint>
+          </bit-form-control>
+
+          <bit-form-control class="tw-ms-5">
+            <input
+              type="checkbox"
+              bitCheckbox
+              formControlName="closeToTray"
+              (change)="saveCloseToTray()"
+            />
+            <bit-label>{{ "closeToTray" | i18n }}</bit-label>
+            <bit-hint>{{ "closeToTrayDesc" | i18n }}</bit-hint>
           </bit-form-control>
         }
 

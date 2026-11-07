@@ -42,6 +42,18 @@ const OPEN_AT_LOGIN_KEY = new KeyDefinition<boolean>(DESKTOP_SETTINGS_DISK, "ope
   deserializer: (b) => b,
 });
 
+const START_MINIMIZED_KEY = new KeyDefinition<boolean>(DESKTOP_SETTINGS_DISK, "startMinimized", {
+  deserializer: (b) => b,
+});
+
+const MINIMIZE_TO_TRAY_KEY = new KeyDefinition<boolean>(DESKTOP_SETTINGS_DISK, "minimizeToTray", {
+  deserializer: (b) => b,
+});
+
+const CLOSE_TO_TRAY_KEY = new KeyDefinition<boolean>(DESKTOP_SETTINGS_DISK, "closeToTray", {
+  deserializer: (b) => b,
+});
+
 const ALWAYS_ON_TOP_KEY = new KeyDefinition<boolean>(DESKTOP_SETTINGS_DISK, "alwaysOnTop", {
   deserializer: (b) => b,
 });
@@ -101,6 +113,24 @@ export class DesktopSettingsService {
    * The application setting for whether or not the application should open at system login.
    */
   openAtLogin$ = this.openAtLoginState.state$.pipe(map((v) => v ?? !isDev()));
+
+  private readonly startMinimizedState = this.stateProvider.getGlobal(START_MINIMIZED_KEY);
+  /**
+   * The application setting for whether or not Bitwarden should start minimized upon autostart.
+   */
+  startMinimized$ = this.startMinimizedState.state$.pipe(map((v) => v ?? true));
+
+  private readonly minimizeToTrayState = this.stateProvider.getGlobal(MINIMIZE_TO_TRAY_KEY);
+  /**
+   * The application setting for whether minimizing the window hides it to the system tray.
+   */
+  minimizeToTray$ = this.minimizeToTrayState.state$.pipe(map((v) => v ?? true));
+
+  private readonly closeToTrayState = this.stateProvider.getGlobal(CLOSE_TO_TRAY_KEY);
+  /**
+   * The application setting for whether closing the window hides it to the system tray.
+   */
+  closeToTray$ = this.closeToTrayState.state$.pipe(map((v) => v ?? true));
 
   private readonly alwaysOnTopState = this.stateProvider.getGlobal(ALWAYS_ON_TOP_KEY);
 
@@ -182,6 +212,27 @@ export class DesktopSettingsService {
    */
   async setOpenAtLogin(value: boolean) {
     await this.openAtLoginState.update(() => value);
+  }
+
+  /**
+   * Sets the setting for whether or not the application should start minimized upon autostart.
+   */
+  async setStartMinimized(value: boolean) {
+    await this.startMinimizedState.update(() => value);
+  }
+
+  /**
+   * Sets the setting for whether minimizing the window hides it to the system tray.
+   */
+  async setMinimizeToTray(value: boolean) {
+    await this.minimizeToTrayState.update(() => value);
+  }
+
+  /**
+   * Sets the setting for whether closing the window hides it to the system tray.
+   */
+  async setCloseToTray(value: boolean) {
+    await this.closeToTrayState.update(() => value);
   }
 
   /**

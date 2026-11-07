@@ -76,6 +76,13 @@ async function doBuild(context) {
       const appxAssetsDest = path.join(context.appOutDir, "assets");
       fse.copySync(appxAssetsSource, appxAssetsDest);
       console.log(`Copied AppX assets from ${appxAssetsSource} to ${appxAssetsDest}`);
+
+      const manifestSource = path.join(appxAssetsSource, "AppxManifest.xml");
+      if (fse.existsSync(manifestSource)) {
+        const manifestDest = path.join(context.appOutDir, "AppxManifest.xml");
+        fse.copyFileSync(manifestSource, manifestDest);
+        console.log(`Copied AppxManifest.xml to ${manifestDest}`);
+      }
     }
   }
 

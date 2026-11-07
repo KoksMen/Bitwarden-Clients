@@ -382,10 +382,12 @@ export class Main {
         // Reset modal mode to make sure main window is displayed correctly
         await this.desktopSettingsService.resetModalMode();
 
-        // Autostart should start to tray. However showing it then hiding it quickly triggers a bug in Kwin
-        // https://bugs.kde.org/show_bug.cgi?id=520724. Until it is fixed we must never call show when
-        // autostart is enabled.
-        const showWindow = !isAutostart;
+        const startMinimized = await firstValueFrom(this.desktopSettingsService.startMinimized$);
+        const runInBackground = await firstValueFrom(this.desktopSettingsService.runInBackground$);
+        const shouldStartHiddenToTray = isAutostart && startMinimized && runInBackground;
+        const shouldStartMinimizedToTaskbar = isAutostart && startMinimized && !runInBackground;
+
+        const showWindow = !shouldStartHiddenToTray && !shouldStartMinimizedToTaskbar;
 
         // Main-process bitwarden-ipc handlers should be registered after `ipcService.init()` and
         // before `windowMain.init()`, so the renderer always finds main's IPC client and handlers ready.
@@ -411,11 +413,13 @@ export class Main {
           },
         ]);
 
-        // Autostart starts to tray. Any auto-start mechanism must provide this flag.
-        // Only hide to tray when running in the background is enabled; otherwise there
-        // would be a hidden window with no tray icon to bring it back.
-        if (isAutostart && (await firstValueFrom(this.desktopSettingsService.runInBackground$))) {
+        if (shouldStartHiddenToTray) {
           this.trayMain.hideToTray();
+        } else if (shouldStartMinimizedToTaskbar) {
+          this.windowMain.win?.minimize();
+        } else {
+          this.windowMain.win?.show();
+          this.windowMain.win?.focus();
         }
 
         this.powerMonitorMain.init();

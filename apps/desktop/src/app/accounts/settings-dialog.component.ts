@@ -200,7 +200,10 @@ export class SettingsDialogComponent implements OnInit {
     showQuickCopyActions: false,
     // App Settings
     runInBackground: false,
+    minimizeToTray: true,
+    closeToTray: true,
     openAtLogin: false,
+    startMinimized: true,
     enableHardwareAcceleration: true,
     enableSshAgent: false,
     sshAgentPromptBehavior: SshAgentPromptType.Always,
@@ -316,7 +319,10 @@ export class SettingsDialogComponent implements OnInit {
         this.vaultCopyButtonsService.showQuickCopyActions$,
       ),
       runInBackground: await firstValueFrom(this.desktopSettingsService.runInBackground$),
+      minimizeToTray: await firstValueFrom(this.desktopSettingsService.minimizeToTray$),
+      closeToTray: await firstValueFrom(this.desktopSettingsService.closeToTray$),
       openAtLogin: await firstValueFrom(this.desktopSettingsService.openAtLogin$),
+      startMinimized: await firstValueFrom(this.desktopSettingsService.startMinimized$),
       enableDuckDuckGoBrowserIntegration: await firstValueFrom(
         this.desktopAutofillSettingsService.enableDuckDuckGoBrowserIntegration$,
       ),
@@ -678,6 +684,21 @@ export class SettingsDialogComponent implements OnInit {
 
   protected async saveRunInBackground() {
     await this.desktopSettingsService.setRunInBackground(this.form.value.runInBackground);
+  }
+
+  protected async saveMinimizeToTray() {
+    await this.desktopSettingsService.setMinimizeToTray(this.form.value.minimizeToTray);
+  }
+
+  protected async saveCloseToTray() {
+    await this.desktopSettingsService.setCloseToTray(this.form.value.closeToTray);
+  }
+
+  protected async saveStartMinimized() {
+    await this.desktopSettingsService.setStartMinimized(this.form.value.startMinimized);
+    if (this.form.value.openAtLogin) {
+      this.messagingService.send("updateOpenAtLogin");
+    }
   }
 
   private async saveLocale(newValue: string) {

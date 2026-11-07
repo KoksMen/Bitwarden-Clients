@@ -30,7 +30,9 @@ export class TrayMain {
     private biometricService: BiometricsService,
   ) {
     if (process.platform === "win32") {
-      this.icon = path.join(__dirname, "/images/icon.ico");
+      const icoPath = path.join(__dirname, "images", "icon.ico");
+      const nImage = nativeImage.createFromPath(icoPath);
+      this.icon = !nImage.isEmpty() ? nImage : icoPath;
     } else if (process.platform === "darwin") {
       const nImage = nativeImage.createFromPath(path.join(__dirname, "/images/icon-template.png"));
       nImage.setTemplateImage(true);
@@ -90,17 +92,27 @@ export class TrayMain {
       await this.biometricService.setShouldAutopromptNow(true);
     });
 
+    win.on("minimize", async () => {
+      const runInBackground = await firstValueFrom(this.desktopSettingsService.runInBackground$);
+      const minimizeToTray = await firstValueFrom(this.desktopSettingsService.minimizeToTray$);
+      if (runInBackground && minimizeToTray) {
+        this.hideToTray();
+      }
+    });
+
     win.on("close", async (e: Event) => {
       if (this.windowMain.isQuitting) {
         return;
       }
 
-      if (await firstValueFrom(this.desktopSettingsService.runInBackground$)) {
+      const runInBackground = await firstValueFrom(this.desktopSettingsService.runInBackground$);
+      const closeToTray = await firstValueFrom(this.desktopSettingsService.closeToTray$);
+      if (runInBackground && closeToTray) {
         // Keep running in the background: closing the window hides it to the tray.
         e.preventDefault();
         this.hideToTray();
       } else {
-        // Not running in the background: closing the window quits the application.
+        // Not running in the background or closeToTray is disabled: closing the window quits the application.
         // Setting isQuitting ensures macOS also quits via the window-all-closed handler.
         this.windowMain.isQuitting = true;
       }
@@ -145,7 +157,10 @@ export class TrayMain {
         this.windowMain.win.restore();
       }
       this.windowMain.show();
+      const wasAlwaysOnTop = this.windowMain.win.isAlwaysOnTop();
+      this.windowMain.win.setAlwaysOnTop(true);
       this.windowMain.win.focus();
+      this.windowMain.win.setAlwaysOnTop(wasAlwaysOnTop);
     }
 
     if (this.isDarwin()) {

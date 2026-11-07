@@ -206,7 +206,10 @@ describe("SettingsDialogComponent", () => {
     autofillSettingsServiceAbstraction.clearClipboardDelay$ = of(null);
     desktopSettingsService.minimizeOnCopy$ = of(false);
     desktopSettingsService.runInBackground$ = of(false);
+    desktopSettingsService.minimizeToTray$ = of(true);
+    desktopSettingsService.closeToTray$ = of(true);
     desktopSettingsService.openAtLogin$ = of(false);
+    desktopSettingsService.startMinimized$ = of(true);
     desktopSettingsService.hardwareAcceleration$ = of(false);
     desktopSettingsService.sshAgentEnabled$ = of(false);
     desktopSettingsService.sshAgentPromptBehavior$ = of(SshAgentPromptType.Always);
@@ -219,6 +222,10 @@ describe("SettingsDialogComponent", () => {
     policyService.policiesByType$.mockReturnValue(of([null]));
     desktopAutotypeMvpService.autotypeEnabledUserSetting$ = of(false);
     desktopAutotypeMvpService.autotypeKeyboardShortcut$ = of(["Control", "Alt", "B"]);
+    desktopAutotypeMvpService.autotypeGlobalShortcut$ = of(["Control", "Alt", "A"]);
+    desktopAutotypeMvpService.autotypePickerPosition$ = of("center");
+    desktopAutotypeMvpService.autotypeTcatoEnabled$ = of(false);
+    desktopAutotypeService.enableAutotypeGa$ = of(false);
     desktopAutotypeService.autotypeEnabledUserSetting$ = of(false);
     desktopAutotypeService.autotypeKeyboardShortcut$ = of(["Control", "Alt", "G"]);
     billingAccountProfileStateService.hasPremiumFromAnySource$.mockReturnValue(of(false));

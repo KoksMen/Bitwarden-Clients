@@ -6,7 +6,18 @@ import { pathToFileURL } from "node:url";
 import * as path from "path";
 import * as url from "url";
 
-import { app, BrowserWindow, ipcMain, nativeTheme, screen, session, protocol, net } from "electron";
+import {
+  app,
+  BrowserWindow,
+  ipcMain,
+  nativeImage,
+  NativeImage,
+  nativeTheme,
+  screen,
+  session,
+  protocol,
+  net,
+} from "electron";
 import { concatMap, firstValueFrom, pairwise } from "rxjs";
 
 import { LogService } from "@bitwarden/common/platform/abstractions/log.service";
@@ -229,10 +240,14 @@ export class WindowMain {
               if (this.focusWindowCallback != null) {
                 void this.focusWindowCallback();
               } else if (this.win != null) {
-                if (this.win.isMinimized() || !this.win.isVisible()) {
-                  this.win.show();
+                if (this.win.isMinimized()) {
+                  this.win.restore();
                 }
+                this.win.show();
+                const wasAlwaysOnTop = this.win.isAlwaysOnTop();
+                this.win.setAlwaysOnTop(true);
                 this.win.focus();
+                this.win.setAlwaysOnTop(wasAlwaysOnTop);
               }
               if (isWindows() || isLinux()) {
                 if (this.argvCallback != null) {
@@ -433,16 +448,18 @@ export class WindowMain {
    * Window icon. Only Linux and Windows draw one; macOS uses the bundle/dock icon, which
    * entry.ts badges separately for dev runs.
    */
-  private windowIcon(): string | undefined {
+  private windowIcon(): string | NativeImage | undefined {
     if (isDev()) {
       return path.join(__dirname, "images", DEV_ICON_FILE);
     }
 
     if (isWindows()) {
-      return path.join(__dirname, "/images/icon.ico");
+      const icoPath = path.join(__dirname, "images", "icon.ico");
+      const nImage = nativeImage.createFromPath(icoPath);
+      return !nImage.isEmpty() ? nImage : icoPath;
     }
 
-    return isLinux() ? path.join(__dirname, "/images/icon.png") : undefined;
+    return isLinux() ? path.join(__dirname, "images", "icon.png") : undefined;
   }
 
   /**
@@ -512,6 +529,7 @@ export class WindowMain {
 
     if (show) {
       this.win.show();
+      this.win.focus();
     }
 
     if (template === "full-app") {

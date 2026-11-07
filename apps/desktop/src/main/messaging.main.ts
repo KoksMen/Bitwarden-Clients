@@ -1,8 +1,6 @@
 // FIXME: Update this file to be type safe and remove this and next line
 // @ts-strict-ignore
 import { execSync } from "child_process";
-import * as fs from "fs";
-import * as path from "path";
 
 import { app, ipcMain } from "electron";
 import { firstValueFrom } from "rxjs";
@@ -31,7 +29,7 @@ export class MessagingMain {
     // On app start, regenerate the configurations needed to autostart or not auto-start
     // depending on the setting provided in the settings file.
     const openAtLogin = await firstValueFrom(this.desktopSettingsService.openAtLogin$);
-    this.setOpenAtLogin(openAtLogin);
+    await this.setOpenAtLogin(openAtLogin);
 
     ipcMain.on(
       "messagingService",
@@ -68,10 +66,16 @@ export class MessagingMain {
         this.main.trayMain.hideToTray();
         break;
       case "addOpenAtLogin":
-        this.setOpenAtLogin(true);
+        await this.setOpenAtLogin(true);
         break;
       case "removeOpenAtLogin":
-        this.setOpenAtLogin(false);
+        await this.setOpenAtLogin(false);
+        break;
+      case "updateOpenAtLogin":
+        {
+          const currentOpenAtLogin = await firstValueFrom(this.desktopSettingsService.openAtLogin$);
+          await this.setOpenAtLogin(currentOpenAtLogin);
+        }
         break;
       case "setFocus":
         await this.setFocus();
@@ -118,52 +122,52 @@ export class MessagingMain {
 
   // On Linux all the autostart setup (Flatpak portal, Snap, and plain-Linux .desktop file
   // management) is handled by the Rust native module; here we only gather the values Electron
-  // knows and delegate. macOS/Windows use Electron's login-item API, which has no Rust equivalent.
-  private setOpenAtLogin(enabled: boolean) {
+  // knows and delegate. macOS/Windows use Electron's login-item API or direct registry entries.
+  private async setOpenAtLogin(enabled: boolean) {
+    const startMinimized = await firstValueFrom(this.desktopSettingsService.startMinimized$);
     if (process.platform === "linux") {
       autostart
         .setAutostart(enabled, {
           execPath: app.getPath("exe"),
-          autostartFlag: AUTOSTART_FLAG,
+          autostartFlag: startMinimized ? AUTOSTART_FLAG : "",
         })
         .catch((e) => {
           this.main.logService.error("Error setting autostart", e);
         });
     } else if (process.platform === "win32") {
-      const manifestPath = path.join(path.dirname(app.getPath("exe")), "AppxManifest.xml");
-      if (app.isPackaged && fs.existsSync(manifestPath)) {
-        try {
-          const aumid = "8bitSolutionsLLC.bitwardendesktop_h4e712dmw3xyy!bitwardendesktop";
-          if (enabled) {
-            execSync(
-              `reg add "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run" /v "com.bitwarden.desktop" /t REG_SZ /d "explorer.exe shell:AppsFolder\\${aumid} --autostart" /f`,
-              { stdio: "ignore" },
-            );
-          } else {
-            execSync(
-              `reg delete "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run" /v "com.bitwarden.desktop" /f`,
-              { stdio: "ignore" },
-            );
-          }
-          return;
-        } catch (e) {
-          this.main.logService.error("Error setting autostart in Windows registry", e);
+      try {
+        if (enabled) {
+          const exePath = app.getPath("exe");
+          const argStr = startMinimized ? ` ${AUTOSTART_FLAG}` : "";
+          // Write directly to HKCU Run key just like KeePassXC
+          execSync(
+            `reg add "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run" /v "Bitwarden" /t REG_SZ /d "\\"${exePath}\\"${argStr}" /f`,
+            { stdio: "ignore" },
+          );
+        } else {
+          execSync(
+            `reg delete "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run" /v "Bitwarden" /f`,
+            { stdio: "ignore" },
+          );
         }
+        try {
+          execSync(
+            `reg delete "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run" /v "com.bitwarden.desktop" /f`,
+            { stdio: "ignore" },
+          );
+        } catch {
+          // ignore if old key does not exist
+        }
+      } catch (e) {
+        this.main.logService.error("Error setting autostart in Windows registry", e);
       }
-      const args = enabled
-        ? app.isPackaged
-          ? [AUTOSTART_FLAG]
-          : [app.getAppPath(), AUTOSTART_FLAG]
-        : [];
-      app.setLoginItemSettings({ openAtLogin: enabled, args });
     } else {
-      // A packaged build can be started with the flag alone. During local development,
-      // however, the registered executable is electron.exe, so Electron also needs the
-      // application path; otherwise Windows opens Electron's default "path-to-app" page.
       const args = enabled
-        ? app.isPackaged
-          ? [AUTOSTART_FLAG]
-          : [app.getAppPath(), AUTOSTART_FLAG]
+        ? startMinimized
+          ? app.isPackaged
+            ? [AUTOSTART_FLAG]
+            : [app.getAppPath(), AUTOSTART_FLAG]
+          : []
         : [];
       app.setLoginItemSettings({ openAtLogin: enabled, args });
     }
