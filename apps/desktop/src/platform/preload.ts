@@ -161,6 +161,8 @@ export default {
   },
 
   isWindowVisible: (): Promise<boolean> => ipcRenderer.invoke("windowVisible"),
+  getKeyboardState: (): Promise<{ layout: string; capsLock: boolean; langId?: number } | null> =>
+    ipcRenderer.invoke("get-keyboard-state"),
 
   getLanguageFile: (formattedLocale: string): Promise<object> =>
     ipcRenderer.invoke("getLanguageFile", formattedLocale),

@@ -325,4 +325,60 @@ public sealed class WindowService
             }
         }
     }
+
+    public KeyboardStateInfo GetKeyboardState()
+    {
+        EnsureInputDesktop();
+        nint hwnd = Win32.GetForegroundWindow();
+        uint tid = Win32.GetWindowThreadProcessId(hwnd, out _);
+        nint hkl = Win32.GetKeyboardLayout(tid);
+        int langId = (int)((long)hkl & 0xFFFF);
+        int primaryLang = langId & 0x3FF;
+
+        string layout = primaryLang switch
+        {
+            0x19 => "RU",
+            0x22 => "UA",
+            0x23 => "BY",
+            0x3F => "KZ",
+            0x09 => "EN",
+            0x07 => "DE",
+            0x0C => "FR",
+            0x10 => "IT",
+            0x0A => "ES",
+            0x16 => "PT",
+            0x15 => "PL",
+            0x1F => "TR",
+            0x05 => "CS",
+            0x1B => "SK",
+            0x0E => "HU",
+            0x13 => "NL",
+            0x1D => "SV",
+            0x14 => "NO",
+            0x06 => "DA",
+            0x0B => "FI",
+            0x11 => "JA",
+            0x12 => "KO",
+            0x04 => "ZH",
+            0x08 => "EL",
+            0x0D => "HE",
+            0x01 => "AR",
+            _ => "EN"
+        };
+
+        try
+        {
+            var culture = System.Globalization.CultureInfo.GetCultureInfo(langId);
+            if (!string.IsNullOrWhiteSpace(culture.TwoLetterISOLanguageName))
+            {
+                layout = culture.TwoLetterISOLanguageName.ToUpperInvariant();
+            }
+        }
+        catch
+        {
+        }
+
+        bool capsLock = (Win32.GetKeyState(Win32.VK_CAPITAL) & 1) != 0;
+        return new KeyboardStateInfo(layout, capsLock, langId);
+    }
 }

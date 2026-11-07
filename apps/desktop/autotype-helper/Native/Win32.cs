@@ -56,6 +56,7 @@ internal static partial class Win32
     public const ushort VK_RCONTROL = 0xA3;
     public const ushort VK_LMENU = 0xA4;
     public const ushort VK_RMENU = 0xA5;
+    public const int VK_CAPITAL = 0x14;
 
     public const uint CF_UNICODETEXT = 13;
     public const uint GMEM_MOVEABLE = 0x0002;
@@ -129,6 +130,9 @@ internal static partial class Win32
 
     [DllImport("user32.dll", SetLastError = true)]
     public static extern uint GetWindowThreadProcessId(nint hWnd, out uint lpdwProcessId);
+
+    [DllImport("user32.dll")]
+    public static extern short GetKeyState(int nVirtKey);
 
     [DllImport("kernel32.dll", SetLastError = true)]
     public static extern SafeProcessHandle OpenProcess(uint dwDesiredAccess, bool bInheritHandle, uint dwProcessId);

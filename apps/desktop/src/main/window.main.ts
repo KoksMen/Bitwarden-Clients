@@ -184,7 +184,11 @@ export class WindowMain {
 
     ipcMain.on("window-focus", () => {
       if (this.win != null) {
+        if (this.win.isMinimized()) {
+          this.win.restore();
+        }
         this.win.show();
+        this.win.moveTop();
         this.win.focus();
       }
     });
@@ -212,8 +216,14 @@ export class WindowMain {
           } else if (newValue.isModalModeActive) {
             // Apply the popup modal styles
             this.logService.info("Applying popup modal styles", newValue.modalPosition);
+            if (this.win.isMinimized()) {
+              this.win.restore();
+            }
             applyPopupModalStyles(this.win, newValue.showTrafficButtons, newValue.modalPosition);
             this.win.show();
+            this.win.setAlwaysOnTop(true, "screen-saver");
+            this.win.moveTop();
+            this.win.focus();
           }
         }),
       )
@@ -415,7 +425,15 @@ export class WindowMain {
       },
     );
     this.win.once("ready-to-show", () => {
+      if (this.win.isMinimized()) {
+        this.win.restore();
+      }
       this.win.show();
+      if (modal) {
+        this.win.setAlwaysOnTop(true, "screen-saver");
+        this.win.moveTop();
+      }
+      this.win.focus();
     });
   }
 
@@ -528,7 +546,14 @@ export class WindowMain {
     }
 
     if (show) {
+      if (this.win.isMinimized()) {
+        this.win.restore();
+      }
       this.win.show();
+      if (template === "modal-app") {
+        this.win.setAlwaysOnTop(true, "screen-saver");
+        this.win.moveTop();
+      }
       this.win.focus();
     }
 

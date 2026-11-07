@@ -37,6 +37,7 @@ interface DaemonResponse {
 }
 
 export class MainAutotypeHelperService {
+  private static instance: MainAutotypeHelperService | null = null;
   private childProcess: ChildProcess | null = null;
   private pendingRequests = new Map<
     string,
@@ -46,8 +47,32 @@ export class MainAutotypeHelperService {
   private helperPath: string | null = null;
 
   constructor(private logService: LogService) {
+    MainAutotypeHelperService.instance = this;
     this.findHelperExecutable();
     this.startDaemon();
+  }
+
+  static getInstance(logService?: LogService): MainAutotypeHelperService | null {
+    if (!MainAutotypeHelperService.instance && logService) {
+      MainAutotypeHelperService.instance = new MainAutotypeHelperService(logService);
+    }
+    return MainAutotypeHelperService.instance;
+  }
+
+  async getKeyboardState(): Promise<{ layout: string; capsLock: boolean; langId?: number } | null> {
+    if (process.platform !== "win32") {
+      return null;
+    }
+    try {
+      const res = await this.sendCommand<{ layout: string; capsLock: boolean; langId: number }>(
+        "get-keyboard-state",
+        {},
+        1500,
+      );
+      return res;
+    } catch {
+      return null;
+    }
   }
 
   private findHelperExecutable(): string | null {

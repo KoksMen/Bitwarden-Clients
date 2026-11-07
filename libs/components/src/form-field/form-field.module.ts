@@ -4,6 +4,7 @@ import { FormControlModule } from "../form-control";
 import { InputModule } from "../input/input.module";
 import { MultiSelectModule } from "../multi-select/multi-select.module";
 
+import { BitCapsLockLayoutIndicatorComponent } from "./caps-lock-layout-indicator.component";
 import { BitCustomInputDirective } from "./custom-input.directive";
 import { BitErrorSummaryComponent } from "./error-summary.component";
 import { BitErrorComponent } from "./error.component";
@@ -25,6 +26,7 @@ import { BitSuffixDirective } from "./suffix.directive";
     BitPasswordInputToggleDirective,
     BitPrefixDirective,
     BitSuffixDirective,
+    BitCapsLockLayoutIndicatorComponent,
   ],
   exports: [
     FormControlModule,
@@ -38,6 +40,7 @@ import { BitSuffixDirective } from "./suffix.directive";
     BitPasswordInputToggleDirective,
     BitPrefixDirective,
     BitSuffixDirective,
+    BitCapsLockLayoutIndicatorComponent,
   ],
 })
 export class FormFieldModule {}

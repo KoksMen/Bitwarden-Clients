@@ -1,4 +1,10 @@
 {
+  "capsLockOn": {
+    "message": "Caps Lock is on"
+  },
+  "keyboardLayout": {
+    "message": "Layout"
+  },
   "appLogoLabel": {
     "message": "Bitwarden logo"
   },

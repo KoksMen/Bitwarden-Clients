@@ -13,12 +13,16 @@ export function applyPopupModalStyles(
   showTrafficButtons: boolean = true,
   position?: Position,
 ) {
+  if (window.isMinimized()) {
+    window.restore();
+  }
   window.unmaximize();
   window.setSize(popupWidth, popupHeight);
   window.setWindowButtonVisibility?.(showTrafficButtons);
   window.setMenuBarVisibility?.(false);
   window.setResizable(false);
-  window.setAlwaysOnTop(true);
+  window.setAlwaysOnTop(true, "screen-saver");
+  window.moveTop();
 
   // Adjusting from full screen is a bit more hassle
   if (window.isFullScreen()) {

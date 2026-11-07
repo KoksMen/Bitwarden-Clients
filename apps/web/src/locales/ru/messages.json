@@ -1,4 +1,10 @@
 {
+  "capsLockOn": {
+    "message": "Caps Lock включен"
+  },
+  "keyboardLayout": {
+    "message": "Раскладка"
+  },
   "allApplications": {
     "message": "Все приложения"
   },

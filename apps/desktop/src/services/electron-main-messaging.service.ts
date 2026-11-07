@@ -8,6 +8,7 @@ import { MessageSender, CommandDefinition } from "@bitwarden/common/platform/mes
 import { getCommand } from "@bitwarden/common/platform/messaging/internal";
 import { UrlType } from "@bitwarden/common/platform/misc/safe-urls";
 
+import { MainAutotypeHelperService } from "../autofill/main/main-autotype-helper.service";
 import { WindowMain } from "../main/window.main";
 import { SafeShell } from "../platform/main/safe-shell.main";
 
@@ -30,6 +31,14 @@ export class ElectronMainMessagingService implements MessageSender {
 
     ipcMain.handle("windowVisible", () => {
       return windowMain.win?.isVisible();
+    });
+
+    ipcMain.handle("get-keyboard-state", async () => {
+      const helper = MainAutotypeHelperService.getInstance();
+      if (helper) {
+        return await helper.getKeyboardState();
+      }
+      return null;
     });
 
     ipcMain.handle("loginRequest", async (event, options) => {

@@ -75,6 +75,13 @@ internal static class Program
                 break;
             }
 
+            case "get-keyboard-state":
+            {
+                var state = windowService.GetKeyboardState();
+                Console.WriteLine(JsonSerializer.Serialize(state, JsonOptions));
+                break;
+            }
+
             case "daemon":
             default:
             {
@@ -153,6 +160,13 @@ internal static class Program
                     case "ping":
                     {
                         Console.WriteLine(JsonSerializer.Serialize(new DaemonResponse(cmd.Id, true, "pong"), JsonOptions));
+                        break;
+                    }
+
+                    case "get-keyboard-state":
+                    {
+                        var state = windowService.GetKeyboardState();
+                        Console.WriteLine(JsonSerializer.Serialize(new DaemonResponse(cmd.Id, true, state), JsonOptions));
                         break;
                     }
 

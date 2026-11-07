@@ -3,5 +3,6 @@ export * from "./form-field.component";
 export * from "./form-field-control.directive";
 export * from "./field-container.directive";
 export * from "./password-input-toggle.directive";
+export * from "./caps-lock-layout-indicator.component";
 export * from "./custom-input.directive";
 export * as BitValidators from "./bit-validators";
