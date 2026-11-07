@@ -208,15 +208,18 @@ export class WindowMain {
         pairwise(),
         concatMap(async ([lastValue, newValue]) => {
           if (lastValue.isModalModeActive && !newValue.isModalModeActive) {
-            // Reset the window state to the main window state
-            applyMainWindowStyles(this.win, this.windowStates[mainWindowSizeKey]);
-            // Because modal is used in front of another app, UX wise it makes sense to hide the main window when leaving modal mode.
+            // Hide the modal immediately so it does not visually flash/maximize to full screen
             this.win.hide();
+            // Reset the window state to the main window state while hidden
+            applyMainWindowStyles(this.win, this.windowStates[mainWindowSizeKey]);
           } else if (newValue.isModalModeActive) {
             // Apply the popup modal styles
             this.logService.info("Applying popup modal styles", newValue.modalPosition);
             if (this.win.isMinimized()) {
               this.win.restore();
+            }
+            if (this.win.isMaximized()) {
+              this.win.unmaximize();
             }
             applyPopupModalStyles(this.win, newValue.showTrafficButtons, newValue.modalPosition);
             this.win.show();

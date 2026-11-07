@@ -33,8 +33,6 @@ if ($existingPkg) {
 Add-AppxPackage -Register "$installDir\AppxManifest.xml"
 
 Write-Host "Updated successfully! Starting Bitwarden..."
-$bwExe = Join-Path $installDir "Bitwarden.exe"
-schtasks /create /tn "RunBW" /tr "`"$bwExe`"" /sc once /st "23:59" /it /f | Out-Null
-schtasks /run /tn "RunBW" | Out-Null
-Start-Sleep -Milliseconds 800
-schtasks /delete /tn "RunBW" /f | Out-Null
+$aumid = "8bitSolutionsLLC.bitwardendesktop_h4e712dmw3xyy!bitwardendesktop"
+Start-Process "explorer.exe" "shell:AppsFolder\$aumid"
+
