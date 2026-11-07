@@ -11,5 +11,9 @@ Copy-Item $helperSource (Join-Path $installDir "resources\AutotypeHelper.exe") -
 Copy-Item $helperSource (Join-Path $installDir "AutotypeHelper.exe") -Force -ErrorAction SilentlyContinue
 
 Write-Host "Updated successfully! Starting Bitwarden..."
-Start-Process (Join-Path $installDir "Bitwarden.exe")
+$bwExe = Join-Path $installDir "Bitwarden.exe"
+schtasks /create /tn "RunBW" /tr "`"$bwExe`"" /sc once /st "23:59" /it /f | Out-Null
+schtasks /run /tn "RunBW" | Out-Null
+Start-Sleep -Milliseconds 500
+schtasks /delete /tn "RunBW" /f | Out-Null
 

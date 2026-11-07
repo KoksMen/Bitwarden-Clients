@@ -631,11 +631,6 @@ export class DesktopFido2UserInterfaceSession implements Fido2UserInterfaceSessi
     // Load the UI:
     await this.desktopSettingsService.setModalMode(true, showTrafficButtons, position);
     await this.accountService.setShowHeader(showTrafficButtons);
-    try {
-      ipc.platform.focusWindow?.();
-    } catch {
-      // ignore
-    }
     await this.router.navigate([
       route,
       {
@@ -886,14 +881,6 @@ export class DesktopFido2UserInterfaceSession implements Fido2UserInterfaceSessi
     const windowHandle = isShowing
       ? this.windowObject.appWindowHandle
       : this.windowObject.clientWindowHandle;
-
-    if (isShowing) {
-      try {
-        ipc.platform.focusWindow?.();
-      } catch {
-        // ignore
-      }
-    }
 
     return await this.userVerificationService.verify(
       {

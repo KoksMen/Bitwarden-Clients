@@ -21,8 +21,7 @@ export function applyPopupModalStyles(
   window.setWindowButtonVisibility?.(showTrafficButtons);
   window.setMenuBarVisibility?.(false);
   window.setResizable(false);
-  window.setAlwaysOnTop(true, "screen-saver");
-  window.moveTop();
+  window.setAlwaysOnTop(true);
 
   // Adjusting from full screen is a bit more hassle
   if (window.isFullScreen()) {
